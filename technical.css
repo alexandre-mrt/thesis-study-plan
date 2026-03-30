@@ -1,0 +1,142 @@
+/**
+ * Technical View Styles — KaTeX + Intuitive/Technical Toggle
+ * Companion to style.css for the study guide technical view.
+ */
+
+/* === Global View Toggle (Nav) === */
+.global-view-toggle {
+  display: flex; align-items: center; gap: 6px;
+  padding: 2px; background: rgba(255,255,255,0.06);
+  border-radius: 999px; border: 1px solid var(--border-subtle);
+}
+.global-view-label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  color: var(--text-muted); padding: 0 8px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.global-view-btn {
+  padding: 4px 12px; border: none; border-radius: 999px;
+  background: transparent; color: var(--text-secondary);
+  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition-fast); white-space: nowrap;
+}
+.global-view-btn:hover { color: var(--text-primary); }
+.global-view-btn.active { background: var(--color-day1); color: white; }
+
+/* === Per-Concept View Toggle === */
+.view-toggle {
+  display: flex; gap: 2px; padding: 2px; margin-bottom: 16px;
+  background: rgba(255,255,255,0.04); border-radius: 999px;
+  border: 1px solid var(--border-subtle); width: fit-content;
+}
+.view-btn {
+  padding: 4px 14px; border: none; border-radius: 999px;
+  background: transparent; color: var(--text-muted);
+  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition-fast);
+}
+.view-btn:hover { color: var(--text-primary); }
+.view-btn.active { background: var(--day-color, var(--color-day1)); color: white; }
+
+/* === Intuitive / Technical Content Toggle === */
+.intuitive-content { display: block; }
+.intuitive-content.hidden { display: none; }
+.technical-content { display: none; }
+.technical-content.active { display: block; }
+
+/* === Technical View Components === */
+.formal-definition {
+  padding: 14px 16px; margin-bottom: 16px;
+  border-left: 3px solid var(--day-color, var(--color-day1));
+  background: rgba(255,255,255,0.02);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.math-details { margin-bottom: 16px; }
+
+.math-detail-section {
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden;
+}
+.math-detail-subtitle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; cursor: pointer; user-select: none;
+  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  background: rgba(255,255,255,0.03);
+  transition: background var(--transition-fast);
+}
+.math-detail-subtitle:hover { background: rgba(255,255,255,0.06); }
+.math-detail-subtitle .chevron {
+  font-size: 10px; color: var(--text-muted);
+  transition: transform var(--transition-fast);
+}
+.math-detail-section.open .chevron { transform: rotate(180deg); }
+.math-detail-content {
+  max-height: 0; overflow: hidden; opacity: 0;
+  padding: 0 14px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);
+  transition: max-height var(--transition-slow), opacity var(--transition-base), padding var(--transition-base);
+}
+.math-detail-section.open .math-detail-content {
+  max-height: 3000px; opacity: 1; padding: 12px 14px;
+}
+
+.security-analysis, .practical-notes {
+  padding: 14px 16px; margin-bottom: 16px;
+  border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm);
+  font-size: 13px; line-height: 1.8; color: var(--text-secondary);
+}
+.security-analysis h4, .practical-notes h4 {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--day-color, var(--color-day1));
+  margin-bottom: 8px;
+}
+.security-analysis h4::before { content: '\1F6E1\FE0F '; }
+.practical-notes h4::before { content: '\2699\FE0F '; }
+
+.key-formulas { margin-bottom: 16px; }
+.key-formulas > h4 {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--day-color, var(--color-day1));
+  margin-bottom: 10px;
+}
+.formula-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.formula-card {
+  background: #0a0a0a; border: 1px solid rgba(255,255,255,0.06);
+  border-top: 2px solid var(--day-color, var(--color-day1));
+  border-radius: var(--radius-sm); padding: 12px 14px; overflow-x: auto;
+}
+.formula-name {
+  display: block; font-family: var(--font-mono); font-size: 10px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-muted); margin-bottom: 6px;
+}
+.formula-content { font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
+
+/* === KaTeX Overrides === */
+.katex { color: var(--text-primary); }
+.katex-display { text-align: center; padding: 8px 0; overflow-x: auto; overflow-y: hidden; }
+.katex-display > .katex { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+
+/* === Responsive Overrides === */
+@media (max-width: 768px) {
+  .global-view-toggle { order: -1; }
+  .global-view-label { display: none; }
+  .formula-grid { grid-template-columns: 1fr; }
+  .katex-display { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* === Print Overrides === */
+@media print {
+  .view-toggle, .global-view-toggle { display: none !important; }
+  .technical-content { display: block !important; }
+  .intuitive-content { display: block !important; }
+  .math-detail-content { max-height: none !important; opacity: 1 !important; overflow: visible !important; padding: 12px 14px !important; }
+  .formal-definition { border-left-color: #333; background: #f9f9f9; color: #333; }
+  .security-analysis, .practical-notes { border-color: #ddd; color: #333; }
+  .security-analysis h4, .practical-notes h4, .key-formulas > h4 { color: #333; }
+  .formula-card { background: #f5f5f5; border-color: #ddd; border-top-color: #333; }
+  .formula-name { color: #555; }
+  .formula-content { color: #333; }
+  .katex { color: #111; }
+}
