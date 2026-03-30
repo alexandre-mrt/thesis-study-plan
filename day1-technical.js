@@ -1039,6 +1039,587 @@ window.DAY1_TECHNICAL = {
               "a = g^z \\cdot h^{-e} \\]"
           }
         ]
+      },
+
+      /* ───────── Oblivious Transfer (OT) ───────── */
+      {
+        name: "Oblivious Transfer (OT)",
+        formalDefinition:
+          "1-of-2 OT: Sender \\( S \\) has \\( (m_0, m_1) \\), " +
+          "Receiver \\( R \\) has \\( b \\in \\{0,1\\} \\). " +
+          "After protocol: \\( R \\) learns \\( m_b \\), " +
+          "\\( S \\) learns nothing about \\( b \\), " +
+          "\\( R \\) learns nothing about \\( m_{1-b} \\).",
+        mathDetails: [
+          {
+            subtitle: "Diffie-Hellman OT (Simplest Protocol)",
+            content:
+              "Sender picks \\( a \\), publishes " +
+              "\\( A = g^a \\). " +
+              "Receiver: if \\( b=0 \\), " +
+              "\\( B = g^r \\); if \\( b=1 \\), " +
+              "\\( B = A \\cdot g^r \\). " +
+              "Sender computes " +
+              "\\( k_0 = B^a, \\; k_1 = (B/A)^a \\). " +
+              "Encrypt: \\( e_i = \\text{Enc}(k_i, m_i) \\). " +
+              "Receiver decrypts \\( m_b \\) with " +
+              "\\( k_b = A^r \\)."
+          },
+          {
+            subtitle: "OT Extension (IKNP)",
+            content:
+              "Base OTs: \\( \\kappa \\) real OTs (128). " +
+              "Extend to \\( n \\) OTs using pseudorandom " +
+              "generator. Cost: \\( O(n) \\) symmetric " +
+              "operations + \\( \\kappa \\) base OTs. " +
+              "Core idea: transpose a random " +
+              "\\( n \\times \\kappa \\) matrix, use " +
+              "correlation to derive keys."
+          },
+          {
+            subtitle: "Security Definitions",
+            content:
+              "Sender security: " +
+              "\\( \\text{View}_S(m_0, m_1, b) \\approx " +
+              "\\text{View}_S(m_0, m_1, b') \\) for any " +
+              "\\( b, b' \\). " +
+              "Receiver security: " +
+              "\\( \\text{View}_R(m_0, m_1, b) \\approx " +
+              "\\text{Sim}(m_b) \\) — receiver only " +
+              "learns \\( m_b \\)."
+          },
+          {
+            subtitle: "Variants",
+            content:
+              "1-of-n OT (receiver picks 1 of n), " +
+              "k-of-n OT, random OT (random messages, " +
+              "used in preprocessing), string OT " +
+              "(messages are strings, not bits)."
+          }
+        ],
+        securityAnalysis:
+          "Semi-honest: CDH assumption for base OT. " +
+          "Malicious: need UC-secure OT (e.g., " +
+          "Peikert-Vaikuntanathan-Waters from LWE). " +
+          "OT is \"complete\" for MPC — any secure " +
+          "computation reduces to OT.",
+        practicalNotes:
+          "Base OT: ~1ms (2 exponentiations). " +
+          "Extended OT: ~1\\(\\mu\\)s per OT after setup. " +
+          "Libraries: libOTe (C++), emp-toolkit. " +
+          "IKNP gives ~10M OTs/second.",
+        keyFormulas: [
+          {
+            name: "DH-OT Key Derivation",
+            formula:
+              "\\[ k_0 = B^a, \\quad " +
+              "k_1 = (B / A)^a, \\quad " +
+              "k_b = A^r \\]"
+          },
+          {
+            name: "OT Extension Cost",
+            formula:
+              "\\[ \\text{Cost}(n) = O(n) " +
+              "\\text{ symmetric ops} + " +
+              "\\kappa \\text{ base OTs} \\]"
+          }
+        ]
+      },
+
+      /* ───────── Multi-Party Computation (MPC) ───────── */
+      {
+        name: "Multi-Party Computation (MPC)",
+        formalDefinition:
+          "\\( n \\) parties \\( P_1, \\ldots, P_n \\) with " +
+          "inputs \\( x_1, \\ldots, x_n \\). Compute " +
+          "\\( y = f(x_1, \\ldots, x_n) \\). Security: " +
+          "\\( \\exists \\text{Sim} : " +
+          "\\text{View}_{P_i}[\\pi] \\approx " +
+          "\\text{Sim}(x_i, y) \\) — each party's view " +
+          "is simulatable from their input and output alone.",
+        mathDetails: [
+          {
+            subtitle: "GMW Protocol (Secret Sharing based)",
+            content:
+              "Additive sharing: " +
+              "\\( x = x^{(1)} + \\cdots + x^{(n)} \\). " +
+              "Addition: local (add shares). " +
+              "Multiplication: \\( [x \\cdot y] \\) requires " +
+              "interaction — use Beaver triples " +
+              "\\( [a], [b], [c=ab] \\) preprocessed via OT."
+          },
+          {
+            subtitle: "Yao's Garbled Circuits",
+            content:
+              "For 2-party. Garbler creates garbled circuit " +
+              "\\( \\tilde{C} \\), sends to evaluator. " +
+              "Evaluator gets their input labels via OT. " +
+              "Evaluates circuit gate-by-gate. " +
+              "Constant rounds (3)."
+          },
+          {
+            subtitle: "SPDZ Protocol",
+            content:
+              "Malicious security \\( n \\)-party. " +
+              "Preprocessing: generate Beaver triples with " +
+              "MAC \\( \\alpha \\cdot x + \\beta \\). " +
+              "Online phase: \\( O(n) \\) communication per " +
+              "multiplication gate. MAC check at end " +
+              "detects cheating."
+          },
+          {
+            subtitle: "MPC-in-the-head",
+            content:
+              "Simulate \\( n \\)-party MPC locally, commit " +
+              "to each party's view, open subset for " +
+              "verification \\( \\rightarrow \\) ZK proof. " +
+              "Basis for Ligero, KKW, Banquet signature " +
+              "schemes."
+          },
+          {
+            subtitle: "Threshold Cryptography",
+            content:
+              "\\( (t, n) \\)-threshold signing: \\( t \\) " +
+              "parties jointly sign, \\( < t \\) learn nothing " +
+              "about secret key. Threshold BBS+: " +
+              "distributed credential issuance."
+          }
+        ],
+        securityAnalysis:
+          "Semi-honest: privacy against honest-but-curious. " +
+          "Malicious: privacy + correctness against active " +
+          "adversaries. UC-secure: composable with other " +
+          "protocols. Threshold \\( t < n/2 \\) (honest " +
+          "majority) or \\( t < n \\) (dishonest majority, " +
+          "with abort).",
+        practicalNotes:
+          "GMW: ~ms per AND gate (LAN), ~100ms (WAN). " +
+          "Garbled circuits: ~1\\(\\mu\\)s per AND gate. " +
+          "SPDZ online: ~10\\(\\mu\\)s per mult. " +
+          "Threshold ECDSA: ~100ms for 2-of-3. " +
+          "Libraries: MP-SPDZ, emp-toolkit, ABY framework.",
+        keyFormulas: [
+          {
+            name: "Beaver Triple Multiplication",
+            formula:
+              "\\[ [x \\cdot y] = [c] + " +
+              "\\epsilon \\cdot [b] + " +
+              "\\delta \\cdot [a] + " +
+              "\\epsilon \\cdot \\delta, \\quad " +
+              "\\epsilon = x - a, \\; " +
+              "\\delta = y - b \\]"
+          },
+          {
+            name: "Simulation Definition",
+            formula:
+              "\\[ \\text{View}_{P_i}[\\pi(x_1, \\ldots, x_n)] " +
+              "\\approx \\text{Sim}(x_i, f(x_1, \\ldots, x_n)) \\]"
+          },
+          {
+            name: "SPDZ MAC Check",
+            formula:
+              "\\[ \\text{MAC}(x) = \\alpha \\cdot x + \\beta, " +
+              "\\quad \\text{verify } \\sum_i \\text{MAC}(x_i) " +
+              "\\stackrel{?}{=} \\alpha \\cdot \\sum_i x_i " +
+              "+ \\sum_i \\beta_i \\]"
+          }
+        ]
+      },
+
+      /* ───────── Secret Sharing ───────── */
+      {
+        name: "Secret Sharing",
+        formalDefinition:
+          "\\( (t, n) \\)-secret sharing: dealer splits " +
+          "\\( s \\) into shares " +
+          "\\( (s_1, \\ldots, s_n) \\) s.t. any \\( t \\) " +
+          "shares reconstruct \\( s \\), and any " +
+          "\\( < t \\) shares reveal nothing about \\( s \\).",
+        mathDetails: [
+          {
+            subtitle: "Shamir's Secret Sharing",
+            content:
+              "Choose random polynomial " +
+              "\\( f(x) = s + a_1 x + \\cdots + " +
+              "a_{t-1} x^{t-1} \\) over " +
+              "\\( \\mathbb{F}_p \\). " +
+              "Shares: \\( s_i = f(i) \\) for " +
+              "\\( i = 1, \\ldots, n \\). " +
+              "Reconstruct via Lagrange interpolation: " +
+              "\\( s = f(0) = \\sum_{i \\in S} s_i \\cdot " +
+              "\\lambda_i \\) where " +
+              "\\( \\lambda_i = \\prod_{j \\in S, j \\neq i} " +
+              "\\frac{j}{j - i} \\)."
+          },
+          {
+            subtitle: "Additive Secret Sharing",
+            content:
+              "\\( s = s_1 + s_2 + \\cdots + s_n " +
+              "\\mod p \\). Choose " +
+              "\\( s_1, \\ldots, s_{n-1} \\) randomly, " +
+              "set \\( s_n = s - \\sum_{i=1}^{n-1} s_i \\). " +
+              "Requires ALL shares (t=n). Addition is " +
+              "free, multiplication needs interaction."
+          },
+          {
+            subtitle: "Verifiable Secret Sharing (VSS)",
+            content:
+              "Feldman VSS: dealer publishes " +
+              "\\( g^{a_0}, g^{a_1}, \\ldots, " +
+              "g^{a_{t-1}} \\). " +
+              "Each party verifies: " +
+              "\\( g^{s_i} = \\prod_{j=0}^{t-1} " +
+              "(g^{a_j})^{i^j} \\). " +
+              "Detects cheating dealer."
+          },
+          {
+            subtitle: "Proactive Secret Sharing",
+            content:
+              "Periodically refresh shares without " +
+              "changing secret. Prevents mobile adversary " +
+              "(attacker who corrupts different parties " +
+              "over time)."
+          }
+        ],
+        securityAnalysis:
+          "Shamir: information-theoretic privacy " +
+          "(unconditional). Feldman VSS: computational " +
+          "(DLP). Threshold \\( t \\leq n \\) for Shamir, " +
+          "\\( t < n/2 \\) for VSS with reconstruction " +
+          "guarantee.",
+        practicalNotes:
+          "Shamir reconstruction: \\( O(t^2) \\) field " +
+          "operations (or \\( O(t \\log^2 t) \\) with FFT). " +
+          "Used in threshold wallets (Fireblocks), HSMs, " +
+          "key recovery. Simple to implement but " +
+          "communication overhead for MPC.",
+        keyFormulas: [
+          {
+            name: "Shamir Polynomial",
+            formula:
+              "\\[ f(x) = s + a_1 x + a_2 x^2 + " +
+              "\\cdots + a_{t-1} x^{t-1} " +
+              "\\in \\mathbb{F}_p[x] \\]"
+          },
+          {
+            name: "Lagrange Basis",
+            formula:
+              "\\[ \\lambda_i = \\prod_{j \\in S, " +
+              "j \\neq i} \\frac{j}{j - i}, \\quad " +
+              "s = \\sum_{i \\in S} s_i \\cdot " +
+              "\\lambda_i \\]"
+          },
+          {
+            name: "Feldman Verification",
+            formula:
+              "\\[ g^{s_i} \\stackrel{?}{=} " +
+              "\\prod_{j=0}^{t-1} " +
+              "(g^{a_j})^{i^j} \\]"
+          }
+        ]
+      },
+
+      /* ───────── Garbled Circuits ───────── */
+      {
+        name: "Garbled Circuits",
+        formalDefinition:
+          "Garbler \\( G \\) creates \\( \\tilde{C} \\), " +
+          "a garbled version of circuit \\( C \\). " +
+          "Evaluator \\( E \\) evaluates \\( \\tilde{C} \\) " +
+          "on garbled inputs to get garbled output. " +
+          "\\( G \\) learns nothing about \\( E \\)'s input; " +
+          "\\( E \\) learns nothing beyond \\( C(x, y) \\).",
+        mathDetails: [
+          {
+            subtitle: "Wire Labels",
+            content:
+              "Each wire \\( w \\) has two labels " +
+              "\\( (W_w^0, W_w^1) \\in \\{0,1\\}^\\kappa \\). " +
+              "Label \\( W_w^b \\) represents bit \\( b \\) " +
+              "on wire \\( w \\)."
+          },
+          {
+            subtitle: "Garbled Gate",
+            content:
+              "For AND gate with input wires " +
+              "\\( a, b \\) and output wire \\( c \\):" +
+              "\\[ \\tilde{g} = \\bigl\\{ " +
+              "\\text{Enc}_{W_a^i, W_b^j}" +
+              "(W_c^{i \\wedge j}) " +
+              "\\bigr\\}_{i,j \\in \\{0,1\\}} \\]" +
+              "Four ciphertexts, randomly permuted " +
+              "(point-and-permute: add select bits " +
+              "to labels)."
+          },
+          {
+            subtitle: "Free XOR Optimization",
+            content:
+              "Choose global " +
+              "\\( \\Delta \\in \\{0,1\\}^\\kappa \\). Set " +
+              "\\( W_w^1 = W_w^0 \\oplus \\Delta \\) for " +
+              "all wires. XOR gates: " +
+              "\\( W_c^0 = W_a^0 \\oplus W_b^0 \\) — " +
+              "no encryption needed, completely free."
+          },
+          {
+            subtitle: "Half-Gates",
+            content:
+              "AND gate needs only 2 ciphertexts " +
+              "(instead of 4). Garbler half-gate + " +
+              "evaluator half-gate combined. Best known " +
+              "optimization."
+          },
+          {
+            subtitle: "Input Handling",
+            content:
+              "Garbler sends their garbled input " +
+              "directly. Evaluator gets their garbled " +
+              "input via OT: for each input bit, OT " +
+              "transfers the correct label."
+          }
+        ],
+        securityAnalysis:
+          "Simulation-based: garbled circuit + one set of " +
+          "labels \\( \\approx \\) simulator output. " +
+          "Requires OT security for evaluator's input. " +
+          "Selective vs adaptive security for garbler's " +
+          "input.",
+        practicalNotes:
+          "Half-gates: 2 AES calls per AND gate. " +
+          "~1 billion gates/second on modern CPU " +
+          "(AES-NI). Communication: 256 bits per AND " +
+          "gate. Boolean circuits only (arithmetic is " +
+          "expensive). Used for PSI (Private Set " +
+          "Intersection), private ML inference.",
+        keyFormulas: [
+          {
+            name: "Garbled Gate Encryption",
+            formula:
+              "\\[ \\tilde{g}_{i,j} = " +
+              "\\text{Enc}_{W_a^i, W_b^j}" +
+              "(W_c^{i \\wedge j}) \\]"
+          },
+          {
+            name: "Free XOR Relation",
+            formula:
+              "\\[ W_w^1 = W_w^0 \\oplus \\Delta, " +
+              "\\quad W_c^0 = W_a^0 \\oplus W_b^0 \\]"
+          },
+          {
+            name: "Half-Gate Construction",
+            formula:
+              "\\[ \\tilde{g} = " +
+              "(\\text{Enc}_{W_a^0}(W_c^{\\text{G}}), " +
+              "\\; \\text{Enc}_{W_b^0}(W_c^{\\text{E}})), " +
+              "\\quad W_c = W_c^{\\text{G}} " +
+              "\\oplus W_c^{\\text{E}} \\]"
+          }
+        ]
+      },
+
+      /* ───────── Fully Homomorphic Encryption (FHE) ───────── */
+      {
+        name: "Fully Homomorphic Encryption (FHE)",
+        formalDefinition:
+          "\\( (\\text{KeyGen}, \\text{Enc}, \\text{Dec}, " +
+          "\\text{Eval}) \\) where " +
+          "\\( \\text{Eval}(\\text{pk}, f, " +
+          "\\text{Enc}(m)) = \\text{Enc}(f(m)) \\) " +
+          "for any function \\( f \\), without decrypting.",
+        mathDetails: [
+          {
+            subtitle: "Learning With Errors (LWE)",
+            content:
+              "Public key: \\( (A, b = As + e) \\) where " +
+              "\\( A \\in \\mathbb{Z}_q^{n \\times m} \\), " +
+              "\\( s \\in \\mathbb{Z}_q^n \\) secret, " +
+              "\\( e \\) small error. Encrypt: " +
+              "\\( (c_1, c_2) = (rA, \\; rb + " +
+              "\\lfloor q/2 \\rfloor \\cdot m) \\). " +
+              "Decrypt: \\( m = \\lfloor (c_2 - " +
+              "c_1 \\cdot s) / (q/2) \\rceil \\)."
+          },
+          {
+            subtitle: "Noise Growth",
+            content:
+              "Each homomorphic operation increases noise. " +
+              "Addition: \\( \\|e_{\\text{add}}\\| \\leq " +
+              "\\|e_1\\| + \\|e_2\\| \\). " +
+              "Multiplication: \\( \\|e_{\\text{mult}}\\| " +
+              "\\approx \\|e_1\\| \\cdot \\|e_2\\| \\). " +
+              "After too many multiplications, noise " +
+              "exceeds threshold " +
+              "\\( \\rightarrow \\) decryption fails."
+          },
+          {
+            subtitle: "Bootstrapping (Gentry)",
+            content:
+              "Homomorphically evaluate the decryption " +
+              "circuit to refresh noise. " +
+              "\\( \\text{Eval}(\\text{pk}, \\text{Dec}, " +
+              "\\text{Enc}(\\text{Enc}(m))) = " +
+              "\\text{Enc}(m) \\) with fresh noise. " +
+              "Enables unlimited depth but expensive " +
+              "(~100ms per bootstrap)."
+          },
+          {
+            subtitle: "Key Schemes",
+            content:
+              "BFV: integer arithmetic, batching via CRT. " +
+              "BGV: modulus switching for noise management. " +
+              "CKKS: approximate computation on " +
+              "real/complex numbers (ML-friendly). " +
+              "TFHE: boolean gates, fast bootstrapping " +
+              "(~10ms), used for boolean circuits."
+          },
+          {
+            subtitle: "SIMD Batching",
+            content:
+              "Pack \\( n \\) plaintexts into one " +
+              "ciphertext using CRT/NTT. Single operation " +
+              "processes all \\( n \\) values. Amortized " +
+              "cost \\( O(1) \\) per plaintext element."
+          }
+        ],
+        securityAnalysis:
+          "Based on (R)LWE: believed quantum-safe. " +
+          "Security parameter \\( n \\geq 1024 \\) for " +
+          "128-bit security. IND-CPA secure (not " +
+          "IND-CCA — malleable by design). Circular " +
+          "security assumption for bootstrapping key.",
+        practicalNotes:
+          "CKKS multiply: ~10ms. BFV multiply: ~5ms. " +
+          "TFHE bootstrap: ~10ms. Ciphertext size: " +
+          "~32KB-1MB depending on parameters. " +
+          "Libraries: Microsoft SEAL (BFV/CKKS), " +
+          "TFHE-rs (Rust), OpenFHE. Current overhead: " +
+          "1000-10000x vs plaintext.",
+        keyFormulas: [
+          {
+            name: "LWE Encryption/Decryption",
+            formula:
+              "\\[ \\text{Enc}: (c_1, c_2) = " +
+              "(rA, \\; rb + \\lfloor q/2 \\rfloor " +
+              "\\cdot m), \\quad " +
+              "\\text{Dec}: m = \\lfloor " +
+              "\\tfrac{c_2 - c_1 s}{q/2} \\rceil \\]"
+          },
+          {
+            name: "Noise Growth Bounds",
+            formula:
+              "\\[ \\|e_{\\text{add}}\\| \\leq " +
+              "\\|e_1\\| + \\|e_2\\|, \\quad " +
+              "\\|e_{\\text{mult}}\\| \\approx " +
+              "\\|e_1\\| \\cdot \\|e_2\\| \\]"
+          },
+          {
+            name: "Bootstrapping Equation",
+            formula:
+              "\\[ \\text{Eval}(\\text{pk}, " +
+              "\\text{Dec}_{\\text{sk}}, " +
+              "\\text{Enc}(\\text{Enc}(m))) = " +
+              "\\text{Enc}(m) \\]"
+          }
+        ]
+      },
+
+      /* ───────── Oblivious RAM (ORAM) ───────── */
+      {
+        name: "Oblivious RAM (ORAM)",
+        formalDefinition:
+          "Client accesses server memory such that " +
+          "access pattern " +
+          "\\( \\text{AP}(\\vec{x}) \\) is " +
+          "computationally indistinguishable from " +
+          "\\( \\text{AP}(\\vec{y}) \\) for any two " +
+          "request sequences \\( \\vec{x}, \\vec{y} \\) " +
+          "of same length.",
+        mathDetails: [
+          {
+            subtitle: "Path ORAM",
+            content:
+              "Server stores \\( N \\) blocks in a binary " +
+              "tree of depth " +
+              "\\( L = \\lceil \\log N \\rceil \\). " +
+              "Each block mapped to a random leaf. " +
+              "Access: read entire path from root to leaf, " +
+              "find block, re-encrypt and shuffle stash, " +
+              "write back. Bandwidth: " +
+              "\\( O(L \\cdot B) = O(B \\log N) \\) per " +
+              "access where \\( B \\) is block size."
+          },
+          {
+            subtitle: "Position Map",
+            content:
+              "Maps block ID \\( \\rightarrow \\) leaf. " +
+              "Stored recursively in smaller ORAMs. " +
+              "\\( O(\\log N) \\) levels of recursion, " +
+              "each with \\( N/B \\) entries."
+          },
+          {
+            subtitle: "Stash Management",
+            content:
+              "Client-side buffer holding blocks that " +
+              "don't fit on their path. Stash size: " +
+              "\\( O(\\log N) \\) with high probability. " +
+              "If stash overflows " +
+              "\\( \\rightarrow \\) security breach."
+          },
+          {
+            subtitle: "Circuit ORAM",
+            content:
+              "Improves over Path ORAM with " +
+              "reverse-lexicographic eviction. Amortized " +
+              "\\( O(\\log N) \\) with smaller stash. " +
+              "Better for sequential access patterns."
+          },
+          {
+            subtitle: "TEE + ORAM",
+            content:
+              "TEE encrypts data but access patterns " +
+              "visible on memory bus. ORAM inside TEE " +
+              "hides access patterns. ZeroTrace: Path " +
+              "ORAM inside SGX enclave. Overhead: ~10x " +
+              "for TEE + ORAM vs ~100x for pure ORAM."
+          }
+        ],
+        securityAnalysis:
+          "Path ORAM: simulation-based security, " +
+          "negligible stash overflow probability. " +
+          "Assumes PRF for re-encryption. Combined with " +
+          "TEE: hides access patterns even from " +
+          "OS/hypervisor.",
+        practicalNotes:
+          "Path ORAM: ~10\\(\\mu\\)s per access (RAM), " +
+          "~1ms per access (disk). ZeroTrace: " +
+          "~100\\(\\mu\\)s per access in SGX. Practical " +
+          "for small databases (~1M entries). For larger: " +
+          "use oblivious data structures instead of " +
+          "generic ORAM.",
+        keyFormulas: [
+          {
+            name: "Path ORAM Bandwidth",
+            formula:
+              "\\[ \\text{BW} = O(B \\cdot \\log N) " +
+              "\\text{ per access}, \\quad " +
+              "L = \\lceil \\log N \\rceil \\]"
+          },
+          {
+            name: "Stash Overflow Probability",
+            formula:
+              "\\[ \\Pr[|\\text{Stash}| > R] \\leq " +
+              "14 \\cdot e^{-R} \\quad " +
+              "\\text{(exponentially small)} \\]"
+          },
+          {
+            name: "Recursive Position Map Depth",
+            formula:
+              "\\[ \\text{Levels} = " +
+              "O(\\log_B N), \\quad " +
+              "\\text{total cost } = " +
+              "O(B \\cdot \\log^2 N / \\log B) \\]"
+          }
+        ]
       }
     ]
   },
