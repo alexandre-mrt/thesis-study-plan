@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   CHECKED: 'thesis-study-checked',
   TIMER_STATE: 'thesis-study-timer',
   ACTIVE_DAY: 'thesis-study-active-day',
+  STUDY_GUIDE_STATE: 'studyGuideState',
 };
 
 const POMODORO = {
@@ -42,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   updateProgress();
   restoreActiveDay();
+  renderStudyGuides();
 });
 
 /* === Checkbox / Progress === */
@@ -446,4 +448,184 @@ function initMobileMenu() {
 
   mediaQuery.addEventListener('change', handleResize);
   handleResize(mediaQuery);
+}
+
+/* === Study Guides === */
+
+const GUIDE_DATA_MAP = {
+  1: () => window.DAY1_GUIDE,
+  2: () => window.DAY2_GUIDE,
+  3: () => window.DAY3_GUIDE,
+};
+
+const BLOCK_KEYS = { 1: 'block1', 2: 'block2' };
+
+function loadGuideState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.STUDY_GUIDE_STATE);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveGuideState(state) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.STUDY_GUIDE_STATE, JSON.stringify(state));
+  } catch {
+    console.error('Failed to save study guide state to localStorage');
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function renderStudyGuides() {
+  const containers = $$('.study-guide-container[data-day][data-block]');
+  const savedState = loadGuideState();
+
+  containers.forEach((container) => {
+    const dayNum = Number(container.dataset.day);
+    const blockNum = Number(container.dataset.block);
+    const guideGetter = GUIDE_DATA_MAP[dayNum];
+    if (!guideGetter) return;
+
+    const guide = guideGetter();
+    if (!guide) return;
+
+    const blockKey = BLOCK_KEYS[blockNum];
+    if (!blockKey || !guide[blockKey]) return;
+
+    const blockData = guide[blockKey];
+    const stateKey = 'd' + dayNum + 'b' + blockNum;
+
+    const guideEl = document.createElement('div');
+    guideEl.className = 'study-guide';
+    guideEl.style.setProperty('--day-color', 'var(--color-day' + dayNum + ')');
+
+    guideEl.appendChild(buildConnectionsSummary(blockData.connectionsSummary, dayNum));
+
+    const concepts = blockData.concepts || [];
+    concepts.forEach((concept, idx) => {
+      guideEl.appendChild(buildConceptCard(concept, dayNum, stateKey, idx, savedState));
+    });
+
+    container.appendChild(guideEl);
+
+    if (savedState[stateKey + '-open']) {
+      guideEl.classList.add('open');
+      const toggle = container.previousElementSibling;
+      if (toggle && toggle.classList.contains('study-guide-toggle')) {
+        toggle.classList.add('active');
+      }
+    }
+  });
+
+  initStudyGuideToggles();
+}
+
+function buildConnectionsSummary(text, dayNum) {
+  const el = document.createElement('div');
+  el.className = 'connections-summary';
+  el.style.setProperty('--day-color', 'var(--color-day' + dayNum + ')');
+  el.innerHTML =
+    '<span class="connections-summary-label">Thesis Connections</span>' +
+    escapeHtml(text);
+  return el;
+}
+
+function buildConceptCard(concept, dayNum, stateKey, idx, savedState) {
+  const card = document.createElement('div');
+  card.className = 'concept-card';
+  card.style.setProperty('--day-color', 'var(--color-day' + dayNum + ')');
+
+  const conceptKey = stateKey + '-c' + idx;
+
+  const header = document.createElement('div');
+  header.className = 'concept-header';
+  header.innerHTML =
+    '<span class="concept-header-title">' + escapeHtml(concept.name) + '</span>' +
+    '<span class="concept-chevron">&#9660;</span>';
+
+  header.addEventListener('click', () => {
+    card.classList.toggle('open');
+    const state = loadGuideState();
+    const updated = { ...state, [conceptKey]: card.classList.contains('open') };
+    saveGuideState(updated);
+  });
+
+  card.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'concept-body';
+
+  if (concept.analogy) {
+    const analogy = document.createElement('blockquote');
+    analogy.className = 'concept-analogy';
+    analogy.textContent = concept.analogy;
+    body.appendChild(analogy);
+  }
+
+  if (concept.diagram) {
+    const diagram = document.createElement('pre');
+    diagram.className = 'concept-diagram';
+    diagram.textContent = concept.diagram;
+    body.appendChild(diagram);
+  }
+
+  if (concept.keyPoints && concept.keyPoints.length > 0) {
+    const ul = document.createElement('ul');
+    ul.className = 'concept-keypoints';
+    concept.keyPoints.forEach((point) => {
+      const li = document.createElement('li');
+      li.textContent = point;
+      ul.appendChild(li);
+    });
+    body.appendChild(ul);
+  }
+
+  if (concept.connections) {
+    const conn = document.createElement('p');
+    conn.className = 'concept-connections';
+    conn.innerHTML =
+      '<span class="concept-connections-prefix">&#128279; Thesis link: </span>' +
+      escapeHtml(concept.connections);
+    body.appendChild(conn);
+  }
+
+  card.appendChild(body);
+
+  if (savedState[conceptKey]) {
+    card.classList.add('open');
+  }
+
+  return card;
+}
+
+function initStudyGuideToggles() {
+  const toggles = $$('.study-guide-toggle');
+
+  toggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const container = toggle.nextElementSibling;
+      if (!container) return;
+
+      const guideEl = container.querySelector('.study-guide');
+      if (!guideEl) return;
+
+      const isOpen = guideEl.classList.toggle('open');
+      toggle.classList.toggle('active', isOpen);
+
+      const dayNum = container.dataset.day;
+      const blockNum = container.dataset.block;
+      const stateKey = 'd' + dayNum + 'b' + blockNum + '-open';
+
+      const state = loadGuideState();
+      const updated = { ...state, [stateKey]: isOpen };
+      saveGuideState(updated);
+    });
+  });
 }
