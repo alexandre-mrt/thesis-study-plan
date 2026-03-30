@@ -9,6 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="technical.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
 
@@ -33,6 +37,11 @@
         </div>
       </div>
       <div class="nav-right">
+        <div class="global-view-toggle" id="global-view-toggle">
+          <span class="global-view-label">Mode</span>
+          <button class="global-view-btn active" data-view="intuitive">Intuitive</button>
+          <button class="global-view-btn" data-view="technical">Technical</button>
+        </div>
         <div class="pomodoro-compact" id="pomodoro-toggle" title="Toggle Pomodoro Timer">
           <span class="pomodoro-icon">&#9201;</span>
           <span class="pomodoro-time" id="pomodoro-display">25:00</span>
@@ -625,12 +634,16 @@
 
   <!-- Keyboard Shortcuts Help -->
   <div class="shortcuts-hint" id="shortcuts-hint">
-    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>Space</kbd> Timer
+    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode
   </div>
 
   <script src="day1-guide.js"></script>
   <script src="day2-guide.js"></script>
   <script src="day3-guide.js"></script>
+  <script src="day1-technical.js"></script>
+  <script src="day2-technical.js"></script>
+  <script src="day3-technical.js"></script>
+  <script src="study-guide.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
