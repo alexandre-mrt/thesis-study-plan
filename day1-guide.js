@@ -17,7 +17,12 @@ window.DAY1_GUIDE = {
       "disclosure possible. Zero-knowledge proofs and Sigma " +
       "protocols let holders prove credential attributes to " +
       "verifiers on Sui without revealing the credential " +
-      "itself. Together, these form the cryptographic " +
+      "itself. The Privacy-Enhancing Technology (PET) " +
+      "primitives — Oblivious Transfer, MPC, Secret Sharing, " +
+      "Garbled Circuits, FHE, and ORAM — extend this " +
+      "foundation with techniques for distributed trust, " +
+      "computation on private data, and secure memory access " +
+      "inside TEEs. Together, these form the cryptographic " +
       "foundation for privacy-preserving identity on-chain.",
     concepts: [
       {
@@ -332,6 +337,294 @@ window.DAY1_GUIDE = {
           "certain predicates. The Schnorr protocol proves " +
           "knowledge of the secret key binding the credential " +
           "to the holder, preventing credential transfer."
+      },
+      {
+        name: "Oblivious Transfer (OT)",
+        analogy:
+          "A vending machine where the seller does not see " +
+          "what you picked, and you only get the item you " +
+          "chose — neither learns the other's secret. Like " +
+          "choosing a card from a deck face-down: dealer " +
+          "does not know which card you took, you do not " +
+          "see the other cards.",
+        diagram:
+          '┌──────────────────────────────────────────────┐\n' +
+          '│         1-of-2 Oblivious Transfer             │\n' +
+          '├──────────────────────────────────────────────┤\n' +
+          '│                                              │\n' +
+          '│   Sender                    Receiver         │\n' +
+          '│   ┌──────────┐             ┌──────────┐      │\n' +
+          '│   │ m0 , m1  │             │ choice b │      │\n' +
+          '│   └─────┬────┘             └─────┬────┘      │\n' +
+          '│         │      OT protocol       │           │\n' +
+          '│         │◄──────────────────────►│           │\n' +
+          '│         │                        │           │\n' +
+          '│   ┌─────┴────────────────────────┴─────┐     │\n' +
+          '│   │  Receiver gets: m_b                │     │\n' +
+          '│   │  Sender learns: nothing about b    │     │\n' +
+          '│   │  Receiver learns: nothing about    │     │\n' +
+          '│   │    m_(1-b)                         │     │\n' +
+          '│   └────────────────────────────────────┘     │\n' +
+          '│                                              │\n' +
+          '│   OT EXTENSION (IKNP)                        │\n' +
+          '│   few base OTs ──→ many cheap OTs            │\n' +
+          '└──────────────────────────────────────────────┘',
+        keyPoints: [
+          "Foundation of MPC — all MPC can be built from OT",
+          "1-of-2 OT: sender has 2 messages, receiver picks one without sender knowing which",
+          "OT extension: few 'real' OTs produce many cheap OTs (IKNP protocol)",
+          "Base OT from Diffie-Hellman assumption, extended OT is nearly free",
+          "Variants: 1-of-n OT, k-of-n OT, string OT"
+        ],
+        connections:
+          "OT enables private credential issuance — the " +
+          "issuer can sign a credential without learning " +
+          "which attributes the user chose to include. " +
+          "Combined with blind signatures, OT is a building " +
+          "block for privacy-preserving identity systems."
+      },
+      {
+        name: "Multi-Party Computation (MPC)",
+        analogy:
+          "Three millionaires want to know who is richest " +
+          "without revealing their exact wealth. MPC lets " +
+          "them compute the answer collaboratively — each " +
+          "inputs their secret, the protocol outputs only " +
+          "the final result, and no one learns anyone " +
+          "else's input.",
+        diagram:
+          '┌──────────────────────────────────────────────┐\n' +
+          '│         Multi-Party Computation               │\n' +
+          '├──────────────────────────────────────────────┤\n' +
+          '│                                              │\n' +
+          '│   P1 (x1)    P2 (x2)    ...    Pn (xn)      │\n' +
+          '│     │           │                │           │\n' +
+          '│     └───────────┼────────────────┘           │\n' +
+          '│                 ↓                            │\n' +
+          '│        ┌────────────────┐                    │\n' +
+          '│        │  MPC Protocol  │                    │\n' +
+          '│        │ f(x1,...,xn)   │                    │\n' +
+          '│        └───────┬────────┘                    │\n' +
+          '│                ↓                             │\n' +
+          '│   ┌────────────────────────────────┐         │\n' +
+          '│   │ Each party learns only output  │         │\n' +
+          '│   │ y = f(x1, ..., xn)             │         │\n' +
+          '│   │ No party learns other inputs    │         │\n' +
+          '│   └────────────────────────────────┘         │\n' +
+          '│                                              │\n' +
+          '│   PARADIGMS                                  │\n' +
+          '│   Garbled circuits: 2-party, const rounds    │\n' +
+          '│   Secret sharing:  n-party, per-gate comm    │\n' +
+          '└──────────────────────────────────────────────┘',
+        keyPoints: [
+          "Compute any function on private inputs without a trusted third party",
+          "Two main paradigms: garbled circuits (2-party, constant rounds) and secret sharing (n-party, interaction per gate)",
+          "Semi-honest vs malicious security models",
+          "Practical applications: threshold signatures, private auctions, salary benchmarking",
+          "MPC-in-the-head: use MPC simulation for ZK proofs (Ligero, MPC-in-the-head paradigm)"
+        ],
+        connections:
+          "MPC can distribute trust in credential issuance " +
+          "— no single issuer sees all attributes. Threshold " +
+          "BBS+ signatures use MPC so multiple authorities " +
+          "jointly sign credentials. For your thesis, MPC " +
+          "could enable distributed TEE key management."
+      },
+      {
+        name: "Secret Sharing",
+        analogy:
+          "A treasure map torn into 5 pieces — you need at " +
+          "least 3 pieces to find the treasure, but any 2 " +
+          "pieces reveal absolutely nothing. Shamir's " +
+          "scheme uses polynomial interpolation: the secret " +
+          "is the y-intercept of a random polynomial, and " +
+          "each share is a point on the curve.",
+        diagram:
+          '┌──────────────────────────────────────────────┐\n' +
+          '│      Shamir Secret Sharing (t,n)              │\n' +
+          '├──────────────────────────────────────────────┤\n' +
+          '│                                              │\n' +
+          '│   secret s = f(0)                            │\n' +
+          '│   f(x) = s + a1*x + ... + a(t-1)*x^(t-1)    │\n' +
+          '│   (random polynomial of degree t-1)          │\n' +
+          '│                                              │\n' +
+          '│     f(x)                                     │\n' +
+          '│      │   *                                   │\n' +
+          '│      │  * share3                             │\n' +
+          '│      │ *     * share4                        │\n' +
+          '│   s ─*────────────── (y-intercept)           │\n' +
+          '│      │  * share1                             │\n' +
+          '│      │     * share2                          │\n' +
+          '│      └──────────────────── x                 │\n' +
+          '│                                              │\n' +
+          '│   t shares → reconstruct s (interpolation)   │\n' +
+          '│   < t shares → zero information about s      │\n' +
+          '└──────────────────────────────────────────────┘',
+        keyPoints: [
+          "Shamir (t,n): secret is f(0), shares are f(1),...,f(n) on degree-(t-1) polynomial",
+          "Additive sharing: secret = sum of shares (simpler, t=n only)",
+          "Information-theoretic security: fewer than t shares reveal nothing (not even computationally)",
+          "Foundation for MPC protocols (SPDZ, BGW)",
+          "Verifiable secret sharing (VSS): detect cheating dealers"
+        ],
+        connections:
+          "Secret sharing enables threshold credential " +
+          "issuance — t-of-n issuers must cooperate to sign " +
+          "a credential, preventing single-point compromise. " +
+          "For TEE key management, secret sharing distributes " +
+          "the enclave sealing key across multiple TEE " +
+          "instances."
+      },
+      {
+        name: "Garbled Circuits",
+        analogy:
+          "Imagine encrypting every wire in a circuit with " +
+          "a different random key, then shuffling (garbling) " +
+          "the truth tables so they work with encrypted " +
+          "values. One party garbles the circuit and sends " +
+          "it; the other evaluates it on their encrypted " +
+          "input. Neither sees the other's input.",
+        diagram:
+          '┌──────────────────────────────────────────────┐\n' +
+          '│            Garbled Circuit (Yao)              │\n' +
+          '├──────────────────────────────────────────────┤\n' +
+          '│                                              │\n' +
+          '│   Garbler                  Evaluator         │\n' +
+          '│   ┌──────────┐            ┌──────────┐       │\n' +
+          '│   │ input a  │            │ input b  │       │\n' +
+          '│   └─────┬────┘            └─────┬────┘       │\n' +
+          '│         │                       │            │\n' +
+          '│   ┌─────┴──────┐          (gets labels       │\n' +
+          '│   │ Garble     │           via OT)           │\n' +
+          '│   │ circuit    │                │            │\n' +
+          '│   └─────┬──────┘                │            │\n' +
+          '│         │ garbled tables         │            │\n' +
+          '│         │──────────────────────→│            │\n' +
+          '│         │                       │            │\n' +
+          '│         │              ┌────────┴───────┐    │\n' +
+          '│         │              │ Evaluate gate  │    │\n' +
+          '│         │              │ by gate        │    │\n' +
+          '│         │              └────────┬───────┘    │\n' +
+          '│         │                       ↓            │\n' +
+          '│         │              output = f(a, b)      │\n' +
+          '│                                              │\n' +
+          '│   OPTIMIZATIONS                              │\n' +
+          '│   Free XOR: XOR gates cost 0 ciphertexts     │\n' +
+          '│   Half-gates: AND needs only 2 ciphertexts   │\n' +
+          '└──────────────────────────────────────────────┘',
+        keyPoints: [
+          "Yao's protocol: one party garbles, other evaluates (constant rounds, 2-party)",
+          "Each wire has two random labels (0-label and 1-label)",
+          "Garbled gate: encrypt each output label under the two input labels",
+          "Point-and-permute optimization: 1 bit tells which row to decrypt",
+          "Free XOR: XOR gates cost nothing (labels differ by global offset)",
+          "Half-gates: AND gates need only 2 ciphertexts instead of 4"
+        ],
+        connections:
+          "Garbled circuits enable efficient 2-party " +
+          "computation for credential operations. A user and " +
+          "verifier can jointly evaluate a policy function on " +
+          "the user's private credential without revealing " +
+          "attributes to the verifier."
+      },
+      {
+        name: "Fully Homomorphic Encryption (FHE)",
+        analogy:
+          "A magical glove box — you put your encrypted " +
+          "data inside, perform operations on it while it " +
+          "is still encrypted, and take out an encrypted " +
+          "result. Decrypt to get the answer. The box " +
+          "(server) never sees your data, but processes " +
+          "it correctly.",
+        diagram:
+          '┌──────────────────────────────────────────────┐\n' +
+          '│       Fully Homomorphic Encryption            │\n' +
+          '├──────────────────────────────────────────────┤\n' +
+          '│                                              │\n' +
+          '│   Client                    Server           │\n' +
+          '│                                              │\n' +
+          '│   plaintext x                                │\n' +
+          '│       │                                      │\n' +
+          '│   ┌───┴────┐                                 │\n' +
+          '│   │Encrypt │──→ Enc(x) ──→┌──────────┐      │\n' +
+          '│   └────────┘              │Compute   │      │\n' +
+          '│                           │ f() on   │      │\n' +
+          '│                           │ Enc(x)   │      │\n' +
+          '│                           └────┬─────┘      │\n' +
+          '│                                ↓            │\n' +
+          '│   ┌─────────┐         Enc(f(x))             │\n' +
+          '│   │ Decrypt │←──────────────────            │\n' +
+          '│   └────┬────┘                               │\n' +
+          '│        ↓                                    │\n' +
+          '│     f(x)  (result in the clear)             │\n' +
+          '│                                              │\n' +
+          '│   SCHEMES                                    │\n' +
+          '│   BFV:  integer arithmetic                   │\n' +
+          '│   CKKS: approximate real numbers             │\n' +
+          '│   TFHE: boolean circuits, fast bootstrap     │\n' +
+          '└──────────────────────────────────────────────┘',
+        keyPoints: [
+          "Compute arbitrary functions on encrypted data without decryption",
+          "Leveled FHE: supports bounded-depth circuits. Fully HE: bootstrapping refreshes noise for unlimited depth",
+          "Lattice-based (LWE/RLWE): quantum-resistant",
+          "Key schemes: BFV (integer arithmetic), CKKS (approximate real numbers), TFHE (boolean circuits, fast bootstrapping)",
+          "Current state: approximately 10,000x overhead vs plaintext, improving rapidly"
+        ],
+        connections:
+          "FHE could enable private credential verification " +
+          "without TEE — the verifier encrypts the policy, " +
+          "user evaluates it homomorphically on their " +
+          "credential. Too slow today for real-time use, but " +
+          "a long-term alternative to TEE-based privacy."
+      },
+      {
+        name: "Oblivious RAM (ORAM)",
+        analogy:
+          "A librarian who fetches books for you, but " +
+          "shuffles the entire library after every request " +
+          "so that an observer cannot tell which book you " +
+          "asked for — even if they watch every shelf " +
+          "access. Expensive (read the whole library each " +
+          "time) but perfectly hides your access pattern.",
+        diagram:
+          '┌──────────────────────────────────────────────┐\n' +
+          '│           Oblivious RAM (ORAM)                │\n' +
+          '├──────────────────────────────────────────────┤\n' +
+          '│                                              │\n' +
+          '│   Client               Server Memory         │\n' +
+          '│   ┌────────┐          ┌──────────────┐       │\n' +
+          '│   │ wants  │          │ encrypted    │       │\n' +
+          '│   │ addr 5 │          │ data blocks  │       │\n' +
+          '│   └───┬────┘          └──────┬───────┘       │\n' +
+          '│       │                      │               │\n' +
+          '│       │  access path + dummies                │\n' +
+          '│       │──────────────────────→│               │\n' +
+          '│       │                      │               │\n' +
+          '│       │  ┌────────────────────────────┐      │\n' +
+          '│       │  │ Server sees: random reads  │      │\n' +
+          '│       │  │ Cannot distinguish real    │      │\n' +
+          '│       │  │ access from dummy access   │      │\n' +
+          '│       │  └────────────────────────────┘      │\n' +
+          '│       │                      │               │\n' +
+          '│       │  reshuffled blocks   │               │\n' +
+          '│       │←─────────────────────│               │\n' +
+          '│                                              │\n' +
+          '│   Path ORAM: O(log n) overhead               │\n' +
+          '│   Circuit ORAM: O(log n), smaller constants  │\n' +
+          '└──────────────────────────────────────────────┘',
+        keyPoints: [
+          "Hides memory access patterns from the server/observer",
+          "Path ORAM: store data in a binary tree, access a random path each time, O(log n) overhead",
+          "Circuit ORAM: O(log n) with smaller constants",
+          "Critical for TEE: even if enclave memory is encrypted, access patterns leak information",
+          "Practical overhead: 10-100x, often prohibitive"
+        ],
+        connections:
+          "ORAM is essential for TEE security — without it, " +
+          "memory access patterns in SGX enclaves leak " +
+          "credential attributes during verification. Your " +
+          "thesis may need ORAM or ORAM-like techniques when " +
+          "credentials are stored and accessed inside TEEs."
       }
     ]
   },
