@@ -71,6 +71,43 @@ function findTechnicalConcept(techBlock, conceptName) {
   return techBlock.concepts.find((c) => c.name === conceptName) || null;
 }
 
+/* === Build Public/Private Table (shared by both views) === */
+
+function buildPublicPrivateTable(entries) {
+  if (!entries || entries.length === 0) return null;
+
+  const section = document.createElement('div');
+  section.className = 'public-private-section';
+
+  const title = document.createElement('h4');
+  title.className = 'pp-title';
+  title.textContent = 'Who Knows What';
+  section.appendChild(title);
+
+  const table = document.createElement('table');
+  table.className = 'pp-table';
+
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th>Item</th><th>Status</th><th>Holder</th><th>When</th></tr>';
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  entries.forEach((entry) => {
+    const tr = document.createElement('tr');
+    tr.className = 'pp-status-' + entry.status;
+    tr.innerHTML =
+      '<td>' + escapeHtml(entry.item) + '</td>' +
+      '<td><span class="pp-badge pp-' + entry.status + '">' + entry.status + '</span></td>' +
+      '<td>' + escapeHtml(entry.holder) + '</td>' +
+      '<td>' + escapeHtml(entry.when) + '</td>';
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+
+  section.appendChild(table);
+  return section;
+}
+
 /* === KaTeX Rendering === */
 
 const KATEX_DELIMITERS = [
@@ -134,6 +171,11 @@ function buildIntuitiveContent(concept, dayNum) {
     container.appendChild(diagram);
   }
 
+  const ppTable = buildPublicPrivateTable(concept.publicPrivate);
+  if (ppTable) {
+    container.appendChild(ppTable);
+  }
+
   if (concept.keyPoints && concept.keyPoints.length > 0) {
     const ul = document.createElement('ul');
     ul.className = 'concept-keypoints';
@@ -159,7 +201,7 @@ function buildIntuitiveContent(concept, dayNum) {
 
 /* === Build Technical Content === */
 
-function buildTechnicalContent(techConcept, dayNum) {
+function buildTechnicalContent(techConcept, dayNum, publicPrivateData) {
   const container = document.createElement('div');
   container.className = 'technical-content';
 
@@ -247,6 +289,11 @@ function buildTechnicalContent(techConcept, dayNum) {
     container.appendChild(formulas);
   }
 
+  const ppTable = buildPublicPrivateTable(publicPrivateData);
+  if (ppTable) {
+    container.appendChild(ppTable);
+  }
+
   return container;
 }
 
@@ -296,7 +343,7 @@ function buildConceptCard(concept, techConcept, dayNum, conceptKey, savedState, 
 
   /* Build both views */
   const intuitiveContent = buildIntuitiveContent(concept, dayNum);
-  const technicalContent = buildTechnicalContent(techConcept, dayNum);
+  const technicalContent = buildTechnicalContent(techConcept, dayNum, concept.publicPrivate);
 
   if (currentView === 'technical') {
     intuitiveContent.classList.add('hidden');

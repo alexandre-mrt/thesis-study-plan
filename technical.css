@@ -113,6 +113,88 @@
 }
 .formula-content { font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
 
+/* === Who Knows What Table === */
+.public-private-section {
+  margin: 1rem 0;
+}
+
+.pp-title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.pp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.pp-table th {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #666;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.pp-table td {
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: #ccc;
+}
+
+.pp-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status badges */
+.pp-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pp-public {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pp-private {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pp-revealed {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.pp-destroyed {
+  background: rgba(107, 114, 128, 0.15);
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  text-decoration: line-through;
+}
+
+/* Row hover */
+.pp-table tbody tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
 /* === KaTeX Overrides === */
 .katex { color: var(--text-primary); }
 .katex-display { text-align: center; padding: 8px 0; overflow-x: auto; overflow-y: hidden; }
@@ -124,6 +206,7 @@
   .global-view-label { display: none; }
   .formula-grid { grid-template-columns: 1fr; }
   .katex-display { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .pp-table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
 }
 
 /* === Print Overrides === */
@@ -139,4 +222,8 @@
   .formula-name { color: #555; }
   .formula-content { color: #333; }
   .katex { color: #111; }
+  .pp-badge { border: 1px solid #333; color: #333 !important; background: none !important; }
+  .pp-table td, .pp-table th { color: #333; }
+  .pp-title { color: #555; }
+  .pp-destroyed { text-decoration: line-through; }
 }
