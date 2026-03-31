@@ -195,6 +195,33 @@
   background: rgba(255,255,255,0.03);
 }
 
+/* === Thesis Example Callout === */
+.thesis-example {
+  margin: 1rem 0;
+  padding: 1rem 1.2rem;
+  background: rgba(99, 102, 241, 0.08);
+  border-left: 3px solid var(--day-color, #6366f1);
+  border-radius: 0 6px 6px 0;
+}
+
+.thesis-example-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--day-color, #6366f1);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.thesis-example p {
+  margin: 0;
+  color: #d1d5db;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
 /* === KaTeX Overrides === */
 .katex { color: var(--text-primary); }
 .katex-display { text-align: center; padding: 8px 0; overflow-x: auto; overflow-y: hidden; }
@@ -226,4 +253,7 @@
   .pp-table td, .pp-table th { color: #333; }
   .pp-title { color: #555; }
   .pp-destroyed { text-decoration: line-through; }
+  .thesis-example { border-left-color: #333; background: #f5f5f5; }
+  .thesis-example-label { color: #333; }
+  .thesis-example p { color: #333; }
 }

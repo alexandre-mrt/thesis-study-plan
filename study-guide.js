@@ -196,12 +196,20 @@ function buildIntuitiveContent(concept, dayNum) {
     container.appendChild(conn);
   }
 
+  if (concept.thesisExample) {
+    const example = document.createElement('div');
+    example.className = 'thesis-example';
+    example.innerHTML = '<span class="thesis-example-label">Applied to your thesis</span>' +
+      '<p>' + escapeHtml(concept.thesisExample) + '</p>';
+    container.appendChild(example);
+  }
+
   return container;
 }
 
 /* === Build Technical Content === */
 
-function buildTechnicalContent(techConcept, dayNum, publicPrivateData) {
+function buildTechnicalContent(techConcept, dayNum, publicPrivateData, thesisExample) {
   const container = document.createElement('div');
   container.className = 'technical-content';
 
@@ -294,6 +302,14 @@ function buildTechnicalContent(techConcept, dayNum, publicPrivateData) {
     container.appendChild(ppTable);
   }
 
+  if (thesisExample) {
+    const example = document.createElement('div');
+    example.className = 'thesis-example';
+    example.innerHTML = '<span class="thesis-example-label">Applied to your thesis</span>' +
+      '<p>' + escapeHtml(thesisExample) + '</p>';
+    container.appendChild(example);
+  }
+
   return container;
 }
 
@@ -343,7 +359,7 @@ function buildConceptCard(concept, techConcept, dayNum, conceptKey, savedState, 
 
   /* Build both views */
   const intuitiveContent = buildIntuitiveContent(concept, dayNum);
-  const technicalContent = buildTechnicalContent(techConcept, dayNum, concept.publicPrivate);
+  const technicalContent = buildTechnicalContent(techConcept, dayNum, concept.publicPrivate, concept.thesisExample);
 
   if (currentView === 'technical') {
     intuitiveContent.classList.add('hidden');
