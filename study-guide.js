@@ -369,6 +369,10 @@ function buildConceptCard(concept, techConcept, dayNum, conceptKey, savedState, 
   body.appendChild(intuitiveContent);
   body.appendChild(technicalContent);
 
+  /* Annotate acronyms in both views (first occurrence per card) */
+  annotateAcronyms(intuitiveContent);
+  annotateAcronyms(technicalContent);
+
   /* Toggle logic */
   const switchView = (view) => {
     const isIntuitive = view === 'intuitive';
@@ -408,6 +412,163 @@ function buildConnectionsSummary(text, dayNum) {
     '<span class="connections-summary-label">Thesis Connections</span>' +
     escapeHtml(text);
   return el;
+}
+
+/* === Acronym Annotation === */
+
+const SKIP_ACRONYM_TAGS = new Set(['PRE', 'CODE', 'A', 'ABBR', 'KBD', 'SCRIPT', 'STYLE']);
+
+function annotateAcronyms(element) {
+  const lexicon = window.LEXICON;
+  if (!lexicon) return;
+
+  const annotated = new Set();
+
+  function walkTextNodes(node) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      if (SKIP_ACRONYM_TAGS.has(node.tagName)) return;
+      const children = Array.from(node.childNodes);
+      children.forEach(walkTextNodes);
+      return;
+    }
+
+    if (node.nodeType !== Node.TEXT_NODE) return;
+
+    const text = node.textContent;
+    if (!text || text.trim().length === 0) return;
+
+    const keys = Object.keys(lexicon).sort((a, b) => b.length - a.length);
+    const unannotated = keys.filter((k) => !annotated.has(k));
+    if (unannotated.length === 0) return;
+
+    const escaped = unannotated.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const pattern = escaped.join('|');
+    /* Use lookbehind/lookahead for boundary detection — supports keys with special chars like BBS+ */
+    const regex = new RegExp('(?<![\\w])(' + pattern + ')(?![\\w])');
+
+    const match = regex.exec(text);
+    if (!match) return;
+
+    const acronym = match[1];
+    const entry = lexicon[acronym];
+    if (!entry) return;
+
+    annotated.add(acronym);
+
+    const before = text.substring(0, match.index);
+    const after = text.substring(match.index + acronym.length);
+
+    const abbr = document.createElement('abbr');
+    abbr.className = 'acronym-tooltip';
+    abbr.setAttribute('data-acronym', acronym);
+    abbr.setAttribute('data-tooltip', entry.full + ' \u2014 ' + entry.desc);
+    abbr.textContent = acronym;
+
+    const parent = node.parentNode;
+    if (before) {
+      parent.insertBefore(document.createTextNode(before), node);
+    }
+    parent.insertBefore(abbr, node);
+    if (after) {
+      const afterNode = document.createTextNode(after);
+      parent.insertBefore(afterNode, node);
+      walkTextNodes(afterNode);
+    }
+    parent.removeChild(node);
+  }
+
+  walkTextNodes(element);
+}
+
+/* === Lexicon Panel === */
+
+function buildLexiconPanel() {
+  const lexicon = window.LEXICON;
+  if (!lexicon) return;
+
+  const panel = document.createElement('div');
+  panel.className = 'lexicon-panel';
+  panel.id = 'lexicon-panel';
+
+  const header = document.createElement('div');
+  header.className = 'lexicon-header';
+
+  const title = document.createElement('h3');
+  title.textContent = 'Lexicon';
+
+  const search = document.createElement('input');
+  search.type = 'text';
+  search.className = 'lexicon-search';
+  search.placeholder = 'Search acronyms...';
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'lexicon-close';
+  closeBtn.innerHTML = '&times;';
+  closeBtn.setAttribute('aria-label', 'Close lexicon');
+
+  header.appendChild(title);
+  header.appendChild(search);
+  header.appendChild(closeBtn);
+  panel.appendChild(header);
+
+  const list = document.createElement('div');
+  list.className = 'lexicon-list';
+
+  const sortedKeys = Object.keys(lexicon).sort((a, b) =>
+    a.toLowerCase().localeCompare(b.toLowerCase())
+  );
+
+  sortedKeys.forEach((key) => {
+    const entry = lexicon[key];
+    const item = document.createElement('div');
+    item.className = 'lexicon-entry';
+    item.dataset.key = key.toLowerCase();
+    item.dataset.full = entry.full.toLowerCase();
+
+    const acronymEl = document.createElement('span');
+    acronymEl.className = 'lexicon-acronym';
+    acronymEl.textContent = key;
+
+    const fullEl = document.createElement('span');
+    fullEl.className = 'lexicon-full';
+    fullEl.textContent = ' \u2014 ' + entry.full;
+
+    const descEl = document.createElement('div');
+    descEl.className = 'lexicon-desc';
+    descEl.textContent = entry.desc;
+
+    item.appendChild(acronymEl);
+    item.appendChild(fullEl);
+    item.appendChild(descEl);
+    list.appendChild(item);
+  });
+
+  panel.appendChild(list);
+
+  search.addEventListener('input', () => {
+    const query = search.value.toLowerCase().trim();
+    const entries = list.querySelectorAll('.lexicon-entry');
+    entries.forEach((entry) => {
+      const matchesKey = entry.dataset.key.includes(query);
+      const matchesFull = entry.dataset.full.includes(query);
+      entry.style.display = (matchesKey || matchesFull) ? '' : 'none';
+    });
+  });
+
+  closeBtn.addEventListener('click', toggleLexiconPanel);
+
+  document.body.appendChild(panel);
+}
+
+function toggleLexiconPanel() {
+  const panel = document.getElementById('lexicon-panel');
+  if (!panel) return;
+  panel.classList.toggle('open');
+
+  if (panel.classList.contains('open')) {
+    const search = panel.querySelector('.lexicon-search');
+    if (search) search.focus();
+  }
 }
 
 /* === Main Render === */
@@ -465,6 +626,8 @@ function renderStudyGuides() {
 
   initStudyGuideToggles();
   initGlobalViewToggle();
+  buildLexiconPanel();
+  initLexiconToggle();
 
   /* Render KaTeX for any technical views that are already active */
   waitForKaTeX(() => {
@@ -559,4 +722,12 @@ function switchAllViewsOnDay(view) {
       btn.click();
     }
   });
+}
+
+/* === Lexicon Toggle Button === */
+
+function initLexiconToggle() {
+  const btn = document.getElementById('lexicon-toggle-btn');
+  if (!btn) return;
+  btn.addEventListener('click', toggleLexiconPanel);
 }

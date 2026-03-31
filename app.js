@@ -419,6 +419,12 @@ function initKeyboardShortcuts() {
       case 'T':
         toggleGlobalView();
         break;
+      case 'l':
+      case 'L':
+        if (typeof toggleLexiconPanel === 'function') {
+          toggleLexiconPanel();
+        }
+        break;
     }
   });
 }

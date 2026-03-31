@@ -761,7 +761,7 @@ body {
 @media print {
   .nav, .pomodoro-panel, .pomodoro-compact, .shortcuts-hint,
   .mobile-menu-btn, .yt-thumbnail, .yt-play-btn,
-  .checkbox-wrap, .pomo-btn { display: none !important; }
+  .checkbox-wrap, .pomo-btn, .lexicon-toggle, .lexicon-panel { display: none !important; }
   body { background: white; color: #111; font-size: 11pt; }
   .main { max-width: 100%; padding: 0; }
   .day-section { display: block !important; page-break-before: always; }
