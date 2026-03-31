@@ -70,7 +70,16 @@ window.DAY1_GUIDE = {
           { item: "input x", status: "private", holder: "whoever holds the data", when: "can be public or private depending on context" },
           { item: "output H(x)", status: "public", holder: "everyone", when: "after computation" },
           { item: "pre-image x from H(x)", status: "private", holder: "original data holder", when: "computationally infeasible to recover (one-way property)" }
-        ]
+        ],
+        thesisExample:
+          "In your thesis, Poseidon hash is used inside ZK circuits for " +
+          "the credential commitment tree on Sui. When a user's BBS+ " +
+          "credential is issued, a Poseidon hash of the credential " +
+          "commitment is inserted into an on-chain Merkle tree. During " +
+          "payment verification, the ZK circuit proves membership in " +
+          "this tree — Poseidon's ZK-friendly design keeps the circuit " +
+          "under 1000 constraints per hash, making on-chain verification " +
+          "affordable."
       },
       {
         name: "Commitment Schemes",
@@ -126,7 +135,16 @@ window.DAY1_GUIDE = {
           { item: "generators g, h", status: "public", holder: "everyone", when: "always (system parameters)" },
           { item: "message m", status: "revealed", holder: "everyone", when: "after reveal phase — committer sends (m, r) to verifier" },
           { item: "randomness r", status: "revealed", holder: "everyone", when: "after reveal phase — verifier checks C = g^m * h^r" }
-        ]
+        ],
+        thesisExample:
+          "Your credential system uses Pedersen commitments to hide " +
+          "attribute values. When a user presents an age credential, " +
+          "C = g^age · h^r keeps the exact age private. The " +
+          "homomorphic property enables range proofs: prove age ≥ 18 " +
+          "without revealing the exact value. In the payment layer, " +
+          "Pedersen commitments hide transaction amounts while enabling " +
+          "balance verification: sum of input commitments = sum of " +
+          "output commitments."
       },
       {
         name: "Digital Signatures",
@@ -187,7 +205,16 @@ window.DAY1_GUIDE = {
           { item: "blinding factor r (blind signatures)", status: "private", holder: "user/requester", when: "always (never revealed to signer)" },
           { item: "blinded message m' (blind signatures)", status: "public", holder: "signer sees only m'", when: "during blind signing protocol" },
           { item: "unblinded signature sigma (blind signatures)", status: "private", holder: "user/requester", when: "until user chooses to present it" }
-        ]
+        ],
+        thesisExample:
+          "BBS+ signatures (a specialized multi-message signature " +
+          "scheme) are the core of your credential layer. The issuer " +
+          "signs the user's attribute vector (name, age, nationality, " +
+          "KYC level) with a single BBS+ signature. Blind issuance " +
+          "ensures the issuer doesn't learn all attributes. The user " +
+          "can later derive unlinkable proofs from this signature, " +
+          "showing only selected attributes to different verifiers " +
+          "on Sui."
       },
       {
         name: "Elliptic Curve Cryptography",
@@ -251,7 +278,15 @@ window.DAY1_GUIDE = {
           { item: "public key pk = [sk]G", status: "public", holder: "everyone", when: "always (derived from sk, published)" },
           { item: "pairing parameters (G1, G2, GT, e)", status: "public", holder: "everyone", when: "always (curve specification)" },
           { item: "discrete log sk from pk", status: "private", holder: "key owner", when: "computationally infeasible to recover (ECDLP hardness)" }
-        ]
+        ],
+        thesisExample:
+          "Your entire system runs on BLS12-381 — the same " +
+          "pairing-friendly curve used by Sui's cryptography module. " +
+          "BBS+ signatures require bilinear pairings e(A, [x]₂) for " +
+          "verification. Groth16 proofs for on-chain verification " +
+          "also use BLS12-381. This curve choice means credential " +
+          "operations and ZK verification share the same algebraic " +
+          "foundation, simplifying your Sui Move verifier contract."
       },
       {
         name: "Zero-Knowledge Proofs (Fundamentals)",
@@ -315,7 +350,16 @@ window.DAY1_GUIDE = {
           { item: "verifier's challenge e", status: "public", holder: "everyone", when: "during/after protocol (or derived via Fiat-Shamir)" },
           { item: "prover's internal randomness", status: "private", holder: "prover", when: "always (used during proof generation, never revealed)" },
           { item: "verification result (accept/reject)", status: "public", holder: "everyone", when: "after verification" }
-        ]
+        ],
+        thesisExample:
+          "ZKPs are the privacy backbone of your thesis. During " +
+          "credential presentation, a ZK proof convinces the Sui " +
+          "verifier that the user holds a valid BBS+ credential with " +
+          "certain attributes, without revealing the credential " +
+          "itself. During payment, another ZK proof shows the user " +
+          "has sufficient balance without revealing the amount. The " +
+          "proof is posted on-chain — anyone can verify, but no one " +
+          "learns private data."
       },
       {
         name: "Sigma Protocols",
@@ -382,7 +426,16 @@ window.DAY1_GUIDE = {
           { item: "prover's random nonce k", status: "private", holder: "prover", when: "always (used to compute a = g^k, never revealed)" },
           { item: "secret x (discrete log)", status: "private", holder: "prover", when: "always (the value being proved, never revealed)" },
           { item: "transcript (a, e, z)", status: "public", holder: "everyone", when: "after protocol completes" }
-        ]
+        ],
+        thesisExample:
+          "Your BBS+ selective disclosure uses Sigma protocols " +
+          "internally. When proving knowledge of hidden attributes, " +
+          "the prover runs a Schnorr-like protocol: commit to " +
+          "randomized values, receive a challenge (Fiat-Shamir), " +
+          "respond. The OR-composition of Sigma protocols could " +
+          "enable 'prove I'm from EU OR I have premium KYC' without " +
+          "revealing which condition is met — useful for flexible " +
+          "credential policies on Sui."
       },
       {
         name: "Oblivious Transfer (OT)",
@@ -433,7 +486,16 @@ window.DAY1_GUIDE = {
           { item: "receiver's choice bit b", status: "private", holder: "receiver", when: "always (sender learns nothing about b)" },
           { item: "chosen message m_b", status: "private", holder: "receiver", when: "after protocol (only receiver learns it)" },
           { item: "unchosen message m_(1-b)", status: "private", holder: "sender", when: "always (receiver learns nothing about it)" }
-        ]
+        ],
+        thesisExample:
+          "OT could enable private credential issuance in your " +
+          "system. The issuer holds signing capabilities for multiple " +
+          "attribute types, and the user selects which attributes to " +
+          "include without the issuer learning the selection. This " +
+          "is especially relevant for selective attribute enrollment: " +
+          "a user might want to include their nationality but not " +
+          "their employer in a credential, without revealing this " +
+          "choice to the issuer."
       },
       {
         name: "Multi-Party Computation (MPC)",
@@ -486,7 +548,15 @@ window.DAY1_GUIDE = {
           { item: "function f", status: "public", holder: "everyone", when: "always (agreed upon before protocol)" },
           { item: "output y = f(x1,...,xn)", status: "public", holder: "all parties (or designated recipients)", when: "after protocol completes" },
           { item: "intermediate computation values", status: "private", holder: "distributed as secret shares", when: "during protocol (no single party sees cleartext intermediates)" }
-        ]
+        ],
+        thesisExample:
+          "Threshold BBS+ issuance uses MPC: 3 out of 5 issuers " +
+          "jointly sign a credential, so no single issuer sees all " +
+          "attributes or holds the full signing key. This distributes " +
+          "trust in your identity system. MPC-in-the-head could also " +
+          "provide an alternative ZK proof system for credential " +
+          "verification, avoiding the trusted setup of Groth16 at " +
+          "the cost of larger proofs."
       },
       {
         name: "Secret Sharing",
@@ -537,7 +607,15 @@ window.DAY1_GUIDE = {
           { item: "share s_i", status: "private", holder: "party i", when: "always (each party holds only their share)" },
           { item: "threshold t and total n", status: "public", holder: "everyone", when: "always (scheme parameters)" },
           { item: "reconstructed secret s", status: "revealed", holder: "reconstructing parties", when: "when >= t shares are combined (information-theoretic security: < t shares reveal nothing)" }
-        ]
+        ],
+        thesisExample:
+          "In your thesis architecture, the issuer's BBS+ signing " +
+          "key could be Shamir-shared among multiple TEE instances. " +
+          "If one TEE is compromised, the attacker gets one share — " +
+          "useless alone. Threshold reconstruction (e.g., 3-of-5) " +
+          "ensures the system remains operational even if 2 TEE " +
+          "instances fail, while keeping the full signing key safe " +
+          "from any single point of compromise."
       },
       {
         name: "Garbled Circuits",
@@ -597,7 +675,16 @@ window.DAY1_GUIDE = {
           { item: "garbler's input", status: "private", holder: "garbler", when: "always (evaluator never learns it)" },
           { item: "evaluator's input", status: "private", holder: "evaluator", when: "always (garbler never learns it; labels obtained via OT)" },
           { item: "output f(a, b)", status: "revealed", holder: "both parties", when: "after evaluation completes" }
-        ]
+        ],
+        thesisExample:
+          "Garbled circuits could enable a privacy-preserving " +
+          "credential policy evaluation between user and verifier " +
+          "on Sui. The verifier garbles a policy circuit ('age ≥ 18 " +
+          "AND country ∈ EU AND risk_score < 5'), the user evaluates " +
+          "it on their private credential attributes via OT, and " +
+          "both learn only the boolean result. This keeps the full " +
+          "policy logic private to the verifier and attributes " +
+          "private to the user."
       },
       {
         name: "Fully Homomorphic Encryption (FHE)",
@@ -654,7 +741,16 @@ window.DAY1_GUIDE = {
           { item: "ciphertext Enc(m)", status: "public", holder: "server", when: "during computation (server computes on ciphertext)" },
           { item: "result ciphertext Enc(f(m))", status: "public", holder: "server returns to client", when: "after homomorphic computation" },
           { item: "plaintext m and result f(m)", status: "private", holder: "data owner/client", when: "only client can decrypt; server never sees plaintext" }
-        ]
+        ],
+        thesisExample:
+          "FHE represents a future alternative to TEEs in your " +
+          "architecture. Instead of running credential verification " +
+          "inside an SGX enclave, a Sui node could verify BBS+ " +
+          "proofs homomorphically on encrypted credentials. Currently " +
+          "too slow (~10,000x overhead), but lattice-based FHE is " +
+          "quantum-safe — if TEE trust assumptions weaken and FHE " +
+          "performance improves, it could replace the TEE layer in " +
+          "your post-quantum migration strategy."
       },
       {
         name: "Oblivious RAM (ORAM)",
@@ -710,7 +806,16 @@ window.DAY1_GUIDE = {
           { item: "physical access pattern (observed)", status: "public", holder: "server/observer", when: "always visible but reveals nothing about logical accesses" },
           { item: "position map", status: "private", holder: "client", when: "always (stored client-side, maps logical to physical addresses)" },
           { item: "stash (overflow buffer)", status: "private", holder: "client", when: "always (stored client-side, holds evicted blocks)" }
-        ]
+        ],
+        thesisExample:
+          "In your TEE layer, the enclave processes credential " +
+          "verification requests. Without ORAM, an OS-level " +
+          "attacker observing memory access patterns during BBS+ " +
+          "verification could infer which credential attributes are " +
+          "being checked (different attributes cause different memory " +
+          "accesses). Path ORAM inside the SGX enclave hides these " +
+          "patterns at ~10x overhead, protecting attribute privacy " +
+          "even against side-channel adversaries."
       }
     ]
   },
@@ -784,7 +889,16 @@ window.DAY1_GUIDE = {
           { item: "public inputs", status: "public", holder: "everyone", when: "always (known to both prover and verifier)" },
           { item: "private inputs (witness)", status: "private", holder: "prover", when: "always (the secret satisfying assignment)" },
           { item: "constraint matrices (A, B, C)", status: "public", holder: "everyone", when: "always (derived from the circuit)" }
-        ]
+        ],
+        thesisExample:
+          "Your credential verification circuit in R1CS encodes: " +
+          "'I know a BBS+ signature σ on attributes (a1,...,aL) " +
+          "where the signature verifies against issuer public key " +
+          "ipk, the credential is in the Merkle tree with root R, " +
+          "the nullifier is correctly derived, and attributes " +
+          "satisfy the disclosure policy.' This circuit has ~100K " +
+          "constraints for a 10-attribute credential — the R1CS " +
+          "representation is what Groth16 actually proves."
       },
       {
         name: "ZK-SNARKs (Groth16)",
@@ -850,7 +964,16 @@ window.DAY1_GUIDE = {
           { item: "public inputs", status: "public", holder: "everyone", when: "always (statement being verified)" },
           { item: "witness (private inputs)", status: "private", holder: "prover", when: "always (never revealed to verifier)" },
           { item: "verification result (accept/reject)", status: "public", holder: "everyone", when: "after verification (3 pairing checks)" }
-        ]
+        ],
+        thesisExample:
+          "Groth16 is your on-chain verification workhorse. The " +
+          "BBS+ selective disclosure proof is wrapped in a Groth16 " +
+          "proof for gas efficiency on Sui: instead of verifying " +
+          "multiple pairing equations, the Sui Move contract " +
+          "verifies a single Groth16 proof (3 pairings, ~50ms, " +
+          "~200K gas). The per-circuit setup is acceptable since " +
+          "your credential verification circuit is stable — one " +
+          "ceremony covers all presentations."
       },
       {
         name: "ZK-STARKs",
@@ -904,7 +1027,16 @@ window.DAY1_GUIDE = {
           { item: "proof", status: "public", holder: "everyone", when: "after proof generation (~50-200 KB)" },
           { item: "witness", status: "private", holder: "prover", when: "always (never revealed)" },
           { item: "FRI commitments (Merkle roots)", status: "public", holder: "everyone", when: "included in proof (verifier checks against them)" }
-        ]
+        ],
+        thesisExample:
+          "STARKs offer a quantum-safe alternative for your " +
+          "post-quantum migration. While Groth16 is broken by " +
+          "quantum computers (pairing-based), STARKs rely only on " +
+          "hash functions. The tradeoff: ~100KB proofs vs 288B for " +
+          "Groth16, meaning higher gas costs on Sui. Your migration " +
+          "strategy could use STARKs for high-value transactions " +
+          "(where quantum safety matters more) and keep Groth16 for " +
+          "low-value payments."
       },
       {
         name: "PLONK",
@@ -963,7 +1095,16 @@ window.DAY1_GUIDE = {
           { item: "proof", status: "public", holder: "everyone", when: "after proof generation" },
           { item: "witness (private inputs)", status: "private", holder: "prover", when: "always (never revealed)" },
           { item: "KZG polynomial commitments", status: "public", holder: "everyone", when: "included in proof (verifier checks openings)" }
-        ]
+        ],
+        thesisExample:
+          "PLONK's universal setup is attractive for your system: " +
+          "as you iterate on the credential circuit during your " +
+          "thesis, you don't need a new trusted ceremony for each " +
+          "circuit change. The lookup argument (plookup) could " +
+          "efficiently implement the 'country ∈ EU' set membership " +
+          "check inside the circuit. PLONK proofs are ~400B (vs " +
+          "Groth16's 288B) with ~5ms verification — a reasonable " +
+          "tradeoff for development flexibility."
       },
       {
         name: "Bulletproofs",
@@ -1028,7 +1169,16 @@ window.DAY1_GUIDE = {
           { item: "opening (value v, blinding factor r)", status: "private", holder: "committer/prover", when: "always (never revealed to verifier)" },
           { item: "proof (inner product argument)", status: "public", holder: "everyone", when: "after proof generation (O(log n) group elements)" },
           { item: "range being proved (e.g., v in [0, 2^64))", status: "public", holder: "everyone", when: "always (part of the public statement)" }
-        ]
+        ],
+        thesisExample:
+          "Bulletproofs handle range proofs in your payment layer: " +
+          "prove that the transaction amount v ∈ [0, 2^64) without " +
+          "revealing v. No trusted setup needed (unlike Groth16 " +
+          "range proofs). Aggregated Bulletproofs let you prove " +
+          "ranges for multiple outputs in one proof. Monero's " +
+          "adoption of Bulletproofs validates their practicality " +
+          "for private payments — your system applies the same " +
+          "technique on Sui."
       }
     ]
   }
