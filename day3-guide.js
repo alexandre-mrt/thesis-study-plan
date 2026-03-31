@@ -48,6 +48,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'The transparency problem is the core motivation for the thesis. On Sui, all objects and transactions are public. The thesis builds a privacy layer using anonymous credentials and ZKP so users can transact without revealing identity or amounts.',
+        thesisExample:
+          'In your thesis, this is the problem your system solves for Sui. Every Sui transaction today is fully transparent: if Alice pays Bob 100 SUI, the sender address, receiver address, amount, and Move function call are all visible forever. Your system adds a privacy layer where the same payment reveals only a ZK proof of validity — the Sui state records a commitment, not the actual payment details.',
       },
       {
         name: 'Zcash & Shielded Transactions',
@@ -94,6 +96,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'Zcash proves that ZK-based private payments work at scale. The thesis adopts a similar commitment/nullifier model for private payments on Sui, but adds credential-gated access so that privacy does not preclude compliance.',
+        thesisExample:
+          'For your system, the payment layer borrows directly from Zcash\'s design. Like Zcash notes, your system uses note commitments (cm = PedersenHash(pk, v, rho)) stored in a Sui Merkle tree object, nullifiers to prevent double-spending, and Groth16 proofs for spend authorization. The key difference: your system adds a credential check — users must prove they hold a valid identity credential before they can create shielded transactions, solving the compliance gap that led to Zcash\'s limited adoption.',
       },
       {
         name: 'Monero Privacy',
@@ -135,6 +139,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'Monero shows that mandatory privacy improves anonymity sets dramatically compared to opt-in (Zcash). The thesis considers mandatory privacy for its payment layer but needs compliance hooks that Monero deliberately avoids.',
+        thesisExample:
+          'For your system, Monero proves that mandatory privacy (no transparent option) maximizes anonymity sets. Optional privacy (like Zcash) leads to low shielded adoption (~5%), shrinking the anonymity set. For your low-value payment tier on Sui, consider making privacy the default — all payments below the threshold are automatically shielded, ensuring a large anonymity set without requiring user opt-in.',
       },
       {
         name: 'Tornado Cash & Mixer Model',
@@ -178,6 +184,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'Tornado Cash demonstrates the commitment/nullifier pattern the thesis reuses. However, its regulatory troubles highlight why the thesis includes compliance mechanisms (viewing keys, credential-gated access) that Tornado Cash lacked.',
+        thesisExample:
+          'In your thesis, Tornado Cash demonstrates both the power and the regulatory risk of on-chain privacy. Your system directly addresses TC\'s failure mode: TC had no compliance mechanism, leading to OFAC sanctions. Your system solves this with credential-gated access — only KYC\'d users (proven via BBS+ credential) can create private payments, and auditors with viewing keys can decrypt transaction details when legally required. Privacy WITH compliance, not privacy OR compliance.',
       },
       {
         name: 'Sui Architecture & Privacy Gaps',
@@ -223,6 +231,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'Sui is the target chain for the thesis. Its object model is ideal for representing credentials as objects, and its parallel execution means privacy operations on owned objects do not bottleneck the chain. The gap is privacy, which the thesis fills.',
+        thesisExample:
+          'For your system, Sui\'s object-centric model is actually ideal for your privacy layer. Each private payment note becomes a Sui object (owned, encrypted). The object model\'s natural parallelism means private transactions on different note objects don\'t conflict — unlike account-based chains where all private transactions touch the same global state. Your Move module defines Note, Nullifier, and Credential objects with ZK verification as the access control mechanism.',
       },
       {
         name: 'Private Payment Requirements',
@@ -265,6 +275,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'This concept frames the exact design space of the thesis. The goal is to achieve sender/receiver/amount privacy on Sui while retaining compliance via anonymous credentials (KYC without identity disclosure) and viewing keys for auditors.',
+        thesisExample:
+          'In your thesis, you define three payment tiers on Sui: (1) Micro-payments (<EUR10): TEE verification only, no on-chain proof, sub-second settlement. (2) Low-value (EUR10-EUR1000): standard ZK proof with simplified credential check (just \'valid credential exists\'). (3) High-value (>EUR1000): full credential disclosure (KYC_level >= 3), detailed compliance memo, on-chain Groth16 verification. Each tier balances privacy, compliance, and performance differently.',
       },
     ],
   },
@@ -318,6 +330,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'The thesis uses this hybrid model as its core architecture. TEE handles the expensive witness generation (credential decryption, balance checks) while ZKP provides the on-chain verification that requires no trust in hardware.',
+        thesisExample:
+          'In your thesis, this is the core insight. Pure ZKP on Sui: ~500ms proof generation + 390ms finality = ~1s per payment. Too slow for coffee. Pure TEE: ~1ms verification, but trust Intel. Your hybrid: TEE verifies credentials at payment terminals (fast path), ZKP settles batches on-chain (trust path). If Intel SGX is compromised tomorrow, all payments verified on-chain remain secure — the TEE was only a performance optimization, not a security assumption.',
       },
       {
         name: 'Hybrid Architecture Patterns',
@@ -369,6 +383,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'This pipeline is the thesis proving architecture. User private data enters the TEE, gets processed into a witness, and the ZK proof is generated and verified on Sui. The TEE never exposes private data; the ZKP ensures correctness publicly.',
+        thesisExample:
+          'For your system, this implements Pattern 3 (TEE real-time + ZKP settlement). The merchant\'s TEE enclave verifies 100 credential-gated payments in real-time (~100ms total). Every 10 minutes, the TEE generates a batch Groth16 proof: \'I honestly verified 100 payments, here are the note commitments and nullifiers.\' This single proof settles all 100 payments on Sui for the gas cost of one. The TEE attestation is verified on-chain once per session, not per payment.',
       },
       {
         name: 'Anonymous Credentials on Sui',
@@ -422,6 +438,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'This is the credential layer of the thesis. BBS+ issuance creates Sui objects that users own. Selective disclosure via ZKP allows proving KYC compliance without revealing identity, which gates access to the private payment layer.',
+        thesisExample:
+          'In your thesis, this IS your implementation. A Sui Move module defines the credential schema as a Move struct. The issuer (e.g., SuiNS identity provider) issues a BBS+ signature on (did, name, age, country, kyc_level). The credential lives as an encrypted Sui object in the user\'s wallet. At payment time: user generates a Groth16 proof wrapping the BBS+ selective disclosure, submits to the Sui verifier contract, contract checks proof against issuer\'s on-chain public key, and payment note is created in the shielded pool.',
       },
       {
         name: 'Private Payment Flow',
@@ -478,6 +496,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'This is the payment layer of the thesis. It combines the credential check (Block 2, concept 3) with the commitment/nullifier model (from Zcash/Tornado Cash in Block 1) and adds compliance via viewing keys. This flow runs on Sui with TEE-accelerated proving.',
+        thesisExample:
+          'For your system, the complete flow on Sui: (1) User\'s wallet reads their BBS+ credential object, (2) generates ZK proof: \'I have valid credential + sufficient balance + correct nullifier + amount in range,\' (3) submits transaction with proof + commitments + nullifier + encrypted auditor memo, (4) Sui Move contract verifies Groth16 proof in ~50ms, (5) updates note Merkle tree + nullifier set as shared objects, (6) receiver detects incoming note via encrypted memo. Total user-facing latency: ~1s (proof gen) + ~390ms (Sui finality).',
       },
       {
         name: 'Post-Quantum Considerations',
@@ -523,6 +543,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'The thesis addresses post-quantum readiness by designing a modular architecture where cryptographic primitives (BBS+, Groth16) can be swapped for lattice-based alternatives without changing the overall system design. The Lether paper (Day 3 reading) provides a concrete post-quantum payment scheme.',
+        thesisExample:
+          'In your thesis, you include a migration section. BBS+ signatures on BLS12-381 will be broken by quantum computers (Shor\'s algorithm solves the q-SDH problem). Lether (ePrint 2026/076) shows lattice-based private payments are practical (~68KB proof, sub-second). Your migration path: (1) start issuing dual credentials (BBS+ AND lattice-based) today, (2) verifier contracts accept both proof types, (3) phase out BBS+ when quantum threat materializes. TEE layer is unaffected by quantum — hardware isolation does not depend on computational hardness.',
       },
       {
         name: 'Full Thesis Architecture',
@@ -617,6 +639,8 @@ window.DAY3_GUIDE = {
         ],
         connections:
           'This diagram IS the thesis. Every concept from all three study days feeds into one component: elliptic curves power BBS+ and Pedersen commitments, ZKP systems (Groth16) verify credentials and payments, TEEs accelerate proving, and Sui provides the programmable base layer. The thesis contribution is integrating these into a coherent privacy-preserving payment system with compliance.',
+        thesisExample:
+          'In your thesis, this is the architecture diagram brought to life. Layer 1 (Credential): BBS+ issuance by identity provider, credential as encrypted Sui object, selective disclosure via Sigma protocols. Layer 2 (Payment): Pedersen commitments + nullifiers + Merkle tree stored as Sui shared objects, Groth16 proof for on-chain settlement. Layer 3 (TEE): SGX enclaves at payment terminals, remote attestation verified on-chain, real-time credential verification, batch proof generation. Layer 4 (Compliance): viewing keys distributed to regulators, encrypted memos per transaction, threshold volume proofs for AML. All four layers compose into a single Sui transaction package.',
       },
     ],
   },
