@@ -42,6 +42,7 @@
           <button class="global-view-btn active" data-view="intuitive">Intuitive</button>
           <button class="global-view-btn" data-view="technical">Technical</button>
         </div>
+        <button class="lexicon-toggle" id="lexicon-toggle-btn" title="Open Lexicon (L)">ABC</button>
         <div class="pomodoro-compact" id="pomodoro-toggle" title="Toggle Pomodoro Timer">
           <span class="pomodoro-icon">&#9201;</span>
           <span class="pomodoro-time" id="pomodoro-display">25:00</span>
@@ -634,9 +635,10 @@
 
   <!-- Keyboard Shortcuts Help -->
   <div class="shortcuts-hint" id="shortcuts-hint">
-    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode
+    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
   </div>
 
+  <script src="lexicon.js"></script>
   <script src="day1-guide.js"></script>
   <script src="day2-guide.js"></script>
   <script src="day3-guide.js"></script>
