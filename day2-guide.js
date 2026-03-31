@@ -45,6 +45,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "Your thesis builds an anonymous credential system on Sui. Users receive credentials (e.g., KYC-verified, accredited investor) and prove properties without revealing identity, enabling private payments and compliant DeFi.",
+        thesisExample:
+          "In your thesis, anonymous credentials are the bridge between identity and privacy on Sui. A government issues a credential containing (name, age, nationality, KYC_level) signed with BBS+. When the user wants to make a private payment, they present a zero-knowledge proof that they hold a valid credential with KYC_level >= 2 — the Sui verifier learns only this fact, not the user's identity. The same credential works at different merchants without creating a traceable profile.",
       },
       {
         name: "CL Signatures (Camenisch-Lysyanskaya)",
@@ -84,6 +86,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "CL signatures were the first practical anonymous credential scheme. Understanding CL helps you appreciate why BBS+ is preferred for Sui: CL keys are too large for on-chain storage and verification is expensive in circuits.",
+        thesisExample:
+          "CL signatures were the original anonymous credential scheme (IBM's Idemix). For your thesis comparison, CL uses RSA groups (~256B keys, slow modular exponentiation) while BBS+ uses pairings (~48B keys, faster operations). Your thesis argues for BBS+ over CL: BBS+ is 5x faster for selective disclosure, has smaller proofs, and aligns with BLS12-381 already used by Sui — making on-chain verification significantly cheaper.",
       },
       {
         name: "BBS+ Signatures",
@@ -126,6 +130,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "BBS+ is the primary candidate for your thesis credential system. It uses the same pairing-friendly curves as Groth16 (BLS12-381), making it efficient to verify BBS+ signature proofs inside SNARKs on Sui.",
+        thesisExample:
+          "BBS+ is THE signature scheme for your credential layer. The issuer signs attributes (a1,...,a10) with one BBS+ signature. During payment on Sui, the user randomizes the signature (A' = A^r) making each presentation unlinkable, then proves in zero-knowledge that specific attributes satisfy the verifier's policy. The pairing equation e(A', X~) = e(A_bar, g~_2) is what your Groth16 circuit encodes for on-chain verification.",
       },
       {
         name: "Selective Disclosure",
@@ -164,6 +170,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "Selective disclosure is the key feature for your thesis use cases. A user can prove 'I am KYC-verified and accredited' to a DeFi protocol on Sui without revealing their name, nationality, or any other personal data.",
+        thesisExample:
+          "Selective disclosure is the UX differentiator of your system. A user with credential (name, age=25, country=CH, KYC=3) can prove 'age >= 18 AND country in EU/CH' to a Sui DeFi protocol without revealing their exact age (25), name, or KYC level. For payments below the threshold, they only prove 'valid credential exists.' This flexibility means one credential covers convenience stores, DeFi protocols, and regulated exchanges with different disclosure levels.",
       },
       {
         name: "W3C Verifiable Credentials & DIDs",
@@ -208,6 +216,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "Your thesis maps the VC/DID model onto Sui. DIDs could be Sui addresses, VCs are issued off-chain (or anchored on-chain), and VPs are ZK proofs verified by Sui smart contracts. This bridges W3C standards with blockchain verification.",
+        thesisExample:
+          "Your system implements W3C Verifiable Credentials on Sui. Each user has a DID (did:sui:<wallet_object_id>) resolved from a Sui object. Credentials follow the VC data model with BBS+ as the proof mechanism. The VP (Verifiable Presentation) sent to a Sui smart contract contains the selective disclosure proof. This standards compliance means your thesis system could interoperate with the EU Digital Identity Wallet (eIDAS 2.0) — a massive real-world adoption vector.",
       },
       {
         name: "Revocation Mechanisms",
@@ -247,6 +257,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "On Sui, the revocation accumulator can be stored as a shared object, updated by the issuer. Users fetch the latest accumulator and generate a non-membership proof as part of their credential presentation ZK circuit.",
+        thesisExample:
+          "Your thesis uses an on-chain RSA accumulator for revocation. When an issuer revokes a credential (e.g., expired passport), they update the accumulator on Sui. During each payment, the user includes a non-revocation proof: 'my credential is NOT in the revoked set.' This proof is bundled into the Groth16 circuit alongside the credential proof — one on-chain verification covers both validity and non-revocation, keeping gas costs constant.",
       },
     ],
   },
@@ -294,6 +306,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "In your thesis, TEEs can run credential issuance or ZK proof generation in a protected environment. This enables a hybrid trust model where TEE handles performance-critical operations while ZKPs provide the mathematical guarantee.",
+        thesisExample:
+          "In your thesis, TEEs provide the fast path for credential verification. When low latency matters (point-of-sale payments), the merchant's TEE verifies the BBS+ credential in ~1ms instead of waiting for on-chain ZKP verification (~500ms proof generation + block time). The TEE guarantees the merchant's software honestly checks the credential without seeing the hidden attributes — hardware-enforced privacy at payment-terminal speed.",
       },
       {
         name: "Intel SGX Enclaves",
@@ -334,6 +348,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "SGX enclaves can host a credential issuer or a ZK prover on Sui validators. The enclave ensures that secret keys (issuer signing key, user private data) never leave the protected environment, even if the host machine is compromised.",
+        thesisExample:
+          "Your TEE layer uses SGX enclaves on Sui validator nodes or payment processors. The enclave loads the BBS+ verification logic and issuer public keys, sealed to MRENCLAVE. Users submit encrypted credential presentations to the enclave via ECALL. The enclave verifies the BBS+ proof, checks the policy, and returns only accept/reject — the credential attributes never leave the encrypted enclave memory, even if the validator node's OS is compromised.",
       },
       {
         name: "Remote Attestation",
@@ -374,6 +390,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "Remote attestation is critical for your thesis trust model. A Sui smart contract (or off-chain verifier) can verify that a TEE-based credential issuer is running the correct code, bridging hardware trust guarantees into the blockchain protocol.",
+        thesisExample:
+          "Before sending their credential to a TEE, the user verifies via remote attestation that the enclave is running the correct verification code (MRENCLAVE matches the audited binary). The attestation report includes a fresh nonce from the user, preventing replay. On Sui, the attestation could be verified on-chain once, and subsequent users trust the attested enclave — amortizing the attestation cost across many credential verifications.",
       },
       {
         name: "Side-Channel Attacks",
@@ -415,6 +433,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "Side-channel risk is why your thesis does not rely on TEEs alone. The hybrid architecture uses ZKPs as the trust anchor (math-based, no side channels) and TEEs as a performance optimization. If the TEE is compromised, the ZKP layer still guarantees correctness.",
+        thesisExample:
+          "Side channels are the main threat to your TEE layer. During BBS+ verification inside SGX, the pairing computation accesses different memory locations depending on the credential attributes. A cache-timing attack could infer which attributes are present. Your thesis mitigates this with constant-time BBS+ implementation — all attribute slots are processed regardless of disclosure policy, ensuring uniform memory access patterns.",
       },
       {
         name: "Trust Model: TEE vs ZKP",
@@ -460,6 +480,8 @@ window.DAY2_GUIDE = {
         ],
         connections:
           "This is the central architectural insight of your thesis. On Sui, TEEs accelerate credential issuance and proof generation while ZKP circuits provide the on-chain verification. If a TEE is compromised, users can fall back to pure ZK proofs, maintaining the system security guarantees.",
+        thesisExample:
+          "Your thesis makes an explicit architectural choice: TEE for speed, ZKP for trust. Low-value payments (coffee, transit) use TEE verification (~1ms, trusting hardware). High-value payments or DeFi interactions use on-chain Groth16 (~500ms, trustless math). If an SGX vulnerability is discovered, the system gracefully degrades to ZKP-only mode — slower but still secure. This dual-path architecture is the core contribution of your thesis.",
       },
     ],
   },
