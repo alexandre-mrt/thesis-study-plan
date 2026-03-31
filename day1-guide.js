@@ -64,7 +64,13 @@ window.DAY1_GUIDE = {
           "In anonymous credentials, hashes bind attributes " +
           "inside Pedersen commitments and form the backbone " +
           "of Fiat-Shamir transforms that make ZKPs " +
-          "non-interactive for on-chain verification."
+          "non-interactive for on-chain verification.",
+        publicPrivate: [
+          { item: "hash function H", status: "public", holder: "everyone", when: "always (algorithm is public)" },
+          { item: "input x", status: "private", holder: "whoever holds the data", when: "can be public or private depending on context" },
+          { item: "output H(x)", status: "public", holder: "everyone", when: "after computation" },
+          { item: "pre-image x from H(x)", status: "private", holder: "original data holder", when: "computationally infeasible to recover (one-way property)" }
+        ]
       },
       {
         name: "Commitment Schemes",
@@ -112,7 +118,15 @@ window.DAY1_GUIDE = {
           "keeping others hidden inside commitments. The " +
           "homomorphic property enables efficient range proofs " +
           "and attribute predicate proofs without revealing " +
-          "underlying values."
+          "underlying values.",
+        publicPrivate: [
+          { item: "commitment C = g^m * h^r", status: "public", holder: "everyone", when: "after commit phase" },
+          { item: "message m", status: "private", holder: "committer", when: "until reveal phase" },
+          { item: "randomness r", status: "private", holder: "committer", when: "until reveal phase" },
+          { item: "generators g, h", status: "public", holder: "everyone", when: "always (system parameters)" },
+          { item: "message m", status: "revealed", holder: "everyone", when: "after reveal phase — committer sends (m, r) to verifier" },
+          { item: "randomness r", status: "revealed", holder: "everyone", when: "after reveal phase — verifier checks C = g^m * h^r" }
+        ]
       },
       {
         name: "Digital Signatures",
@@ -164,7 +178,16 @@ window.DAY1_GUIDE = {
           "selectively disclose any subset. On Sui, credential " +
           "issuance uses blind signing so the issuer never " +
           "learns the full credential. Verification happens " +
-          "on-chain using pairing-based signature checks."
+          "on-chain using pairing-based signature checks.",
+        publicPrivate: [
+          { item: "public key pk", status: "public", holder: "everyone", when: "always (published by signer)" },
+          { item: "secret key sk", status: "private", holder: "signer", when: "always (never revealed)" },
+          { item: "message m", status: "public", holder: "everyone", when: "always (signed in the clear)" },
+          { item: "signature sigma", status: "public", holder: "everyone", when: "after signing" },
+          { item: "blinding factor r (blind signatures)", status: "private", holder: "user/requester", when: "always (never revealed to signer)" },
+          { item: "blinded message m' (blind signatures)", status: "public", holder: "signer sees only m'", when: "during blind signing protocol" },
+          { item: "unblinded signature sigma (blind signatures)", status: "private", holder: "user/requester", when: "until user chooses to present it" }
+        ]
       },
       {
         name: "Elliptic Curve Cryptography",
@@ -221,7 +244,14 @@ window.DAY1_GUIDE = {
           "signed without seeing them. On Sui, Groth16 proof " +
           "verification uses BN254 pairings natively. " +
           "Understanding EC math is essential for grasping how " +
-          "credentials are issued, held, and verified."
+          "credentials are issued, held, and verified.",
+        publicPrivate: [
+          { item: "curve parameters (a, b, p, G, n)", status: "public", holder: "everyone", when: "always (standardized parameters)" },
+          { item: "private key sk (scalar)", status: "private", holder: "key owner", when: "always (never revealed)" },
+          { item: "public key pk = [sk]G", status: "public", holder: "everyone", when: "always (derived from sk, published)" },
+          { item: "pairing parameters (G1, G2, GT, e)", status: "public", holder: "everyone", when: "always (curve specification)" },
+          { item: "discrete log sk from pk", status: "private", holder: "key owner", when: "computationally infeasible to recover (ECDLP hardness)" }
+        ]
       },
       {
         name: "Zero-Knowledge Proofs (Fundamentals)",
@@ -277,7 +307,15 @@ window.DAY1_GUIDE = {
           "attributes. On Sui, these proofs must be " +
           "non-interactive (Fiat-Shamir) so they can be " +
           "verified in a single transaction without " +
-          "multi-round interaction."
+          "multi-round interaction.",
+        publicPrivate: [
+          { item: "statement x", status: "public", holder: "everyone", when: "always (what is being proved)" },
+          { item: "witness w", status: "private", holder: "prover", when: "always (never revealed to verifier)" },
+          { item: "proof pi", status: "public", holder: "everyone", when: "after proof generation" },
+          { item: "verifier's challenge e", status: "public", holder: "everyone", when: "during/after protocol (or derived via Fiat-Shamir)" },
+          { item: "prover's internal randomness", status: "private", holder: "prover", when: "always (used during proof generation, never revealed)" },
+          { item: "verification result (accept/reject)", status: "public", holder: "everyone", when: "after verification" }
+        ]
       },
       {
         name: "Sigma Protocols",
@@ -336,7 +374,15 @@ window.DAY1_GUIDE = {
           "signature and that the hidden attributes satisfy " +
           "certain predicates. The Schnorr protocol proves " +
           "knowledge of the secret key binding the credential " +
-          "to the holder, preventing credential transfer."
+          "to the holder, preventing credential transfer.",
+        publicPrivate: [
+          { item: "first message a (commitment)", status: "public", holder: "everyone", when: "after prover sends it (step 1)" },
+          { item: "challenge e", status: "public", holder: "everyone", when: "after verifier sends it (step 2)" },
+          { item: "response z", status: "public", holder: "everyone", when: "after prover sends it (step 3)" },
+          { item: "prover's random nonce k", status: "private", holder: "prover", when: "always (used to compute a = g^k, never revealed)" },
+          { item: "secret x (discrete log)", status: "private", holder: "prover", when: "always (the value being proved, never revealed)" },
+          { item: "transcript (a, e, z)", status: "public", holder: "everyone", when: "after protocol completes" }
+        ]
       },
       {
         name: "Oblivious Transfer (OT)",
@@ -381,7 +427,13 @@ window.DAY1_GUIDE = {
           "issuer can sign a credential without learning " +
           "which attributes the user chose to include. " +
           "Combined with blind signatures, OT is a building " +
-          "block for privacy-preserving identity systems."
+          "block for privacy-preserving identity systems.",
+        publicPrivate: [
+          { item: "sender's messages (m0, m1)", status: "private", holder: "sender", when: "always (sender never reveals both)" },
+          { item: "receiver's choice bit b", status: "private", holder: "receiver", when: "always (sender learns nothing about b)" },
+          { item: "chosen message m_b", status: "private", holder: "receiver", when: "after protocol (only receiver learns it)" },
+          { item: "unchosen message m_(1-b)", status: "private", holder: "sender", when: "always (receiver learns nothing about it)" }
+        ]
       },
       {
         name: "Multi-Party Computation (MPC)",
@@ -428,7 +480,13 @@ window.DAY1_GUIDE = {
           "— no single issuer sees all attributes. Threshold " +
           "BBS+ signatures use MPC so multiple authorities " +
           "jointly sign credentials. For your thesis, MPC " +
-          "could enable distributed TEE key management."
+          "could enable distributed TEE key management.",
+        publicPrivate: [
+          { item: "each party's input x_i", status: "private", holder: "party i", when: "always (no other party learns it)" },
+          { item: "function f", status: "public", holder: "everyone", when: "always (agreed upon before protocol)" },
+          { item: "output y = f(x1,...,xn)", status: "public", holder: "all parties (or designated recipients)", when: "after protocol completes" },
+          { item: "intermediate computation values", status: "private", holder: "distributed as secret shares", when: "during protocol (no single party sees cleartext intermediates)" }
+        ]
       },
       {
         name: "Secret Sharing",
@@ -473,7 +531,13 @@ window.DAY1_GUIDE = {
           "a credential, preventing single-point compromise. " +
           "For TEE key management, secret sharing distributes " +
           "the enclave sealing key across multiple TEE " +
-          "instances."
+          "instances.",
+        publicPrivate: [
+          { item: "secret s", status: "private", holder: "dealer (initially)", when: "before sharing; reconstructed only when >= t shares combine" },
+          { item: "share s_i", status: "private", holder: "party i", when: "always (each party holds only their share)" },
+          { item: "threshold t and total n", status: "public", holder: "everyone", when: "always (scheme parameters)" },
+          { item: "reconstructed secret s", status: "revealed", holder: "reconstructing parties", when: "when >= t shares are combined (information-theoretic security: < t shares reveal nothing)" }
+        ]
       },
       {
         name: "Garbled Circuits",
@@ -525,7 +589,15 @@ window.DAY1_GUIDE = {
           "computation for credential operations. A user and " +
           "verifier can jointly evaluate a policy function on " +
           "the user's private credential without revealing " +
-          "attributes to the verifier."
+          "attributes to the verifier.",
+        publicPrivate: [
+          { item: "circuit structure C", status: "public", holder: "everyone", when: "always (function to compute is agreed upon)" },
+          { item: "garbled circuit C~", status: "public", holder: "evaluator (sent by garbler)", when: "during protocol" },
+          { item: "all wire labels", status: "private", holder: "garbler", when: "garbler knows all labels; evaluator learns only their input labels via OT" },
+          { item: "garbler's input", status: "private", holder: "garbler", when: "always (evaluator never learns it)" },
+          { item: "evaluator's input", status: "private", holder: "evaluator", when: "always (garbler never learns it; labels obtained via OT)" },
+          { item: "output f(a, b)", status: "revealed", holder: "both parties", when: "after evaluation completes" }
+        ]
       },
       {
         name: "Fully Homomorphic Encryption (FHE)",
@@ -575,7 +647,14 @@ window.DAY1_GUIDE = {
           "without TEE — the verifier encrypts the policy, " +
           "user evaluates it homomorphically on their " +
           "credential. Too slow today for real-time use, but " +
-          "a long-term alternative to TEE-based privacy."
+          "a long-term alternative to TEE-based privacy.",
+        publicPrivate: [
+          { item: "public key pk", status: "public", holder: "everyone (server included)", when: "always (used for encryption)" },
+          { item: "secret key sk", status: "private", holder: "data owner/client", when: "always (only party that can decrypt)" },
+          { item: "ciphertext Enc(m)", status: "public", holder: "server", when: "during computation (server computes on ciphertext)" },
+          { item: "result ciphertext Enc(f(m))", status: "public", holder: "server returns to client", when: "after homomorphic computation" },
+          { item: "plaintext m and result f(m)", status: "private", holder: "data owner/client", when: "only client can decrypt; server never sees plaintext" }
+        ]
       },
       {
         name: "Oblivious RAM (ORAM)",
@@ -624,7 +703,14 @@ window.DAY1_GUIDE = {
           "memory access patterns in SGX enclaves leak " +
           "credential attributes during verification. Your " +
           "thesis may need ORAM or ORAM-like techniques when " +
-          "credentials are stored and accessed inside TEEs."
+          "credentials are stored and accessed inside TEEs.",
+        publicPrivate: [
+          { item: "data contents", status: "private", holder: "client (encrypted in server memory)", when: "always (server stores only encrypted blocks)" },
+          { item: "logical access pattern", status: "private", holder: "client", when: "always (ORAM's core purpose: hide which data is accessed)" },
+          { item: "physical access pattern (observed)", status: "public", holder: "server/observer", when: "always visible but reveals nothing about logical accesses" },
+          { item: "position map", status: "private", holder: "client", when: "always (stored client-side, maps logical to physical addresses)" },
+          { item: "stash (overflow buffer)", status: "private", holder: "client", when: "always (stored client-side, holds evicted blocks)" }
+        ]
       }
     ]
   },
@@ -692,7 +778,13 @@ window.DAY1_GUIDE = {
           "verification logic (pairing checks, attribute " +
           "predicates, range proofs) is flattened into R1CS " +
           "constraints. The circuit size directly determines " +
-          "proving time and on-chain verification cost on Sui."
+          "proving time and on-chain verification cost on Sui.",
+        publicPrivate: [
+          { item: "circuit C (structure)", status: "public", holder: "everyone", when: "always (defines the computation to be proved)" },
+          { item: "public inputs", status: "public", holder: "everyone", when: "always (known to both prover and verifier)" },
+          { item: "private inputs (witness)", status: "private", holder: "prover", when: "always (the secret satisfying assignment)" },
+          { item: "constraint matrices (A, B, C)", status: "public", holder: "everyone", when: "always (derived from the circuit)" }
+        ]
       },
       {
         name: "ZK-SNARKs (Groth16)",
@@ -750,7 +842,15 @@ window.DAY1_GUIDE = {
           "direct proof verification in Move smart contracts. " +
           "The trusted setup requirement means each credential " +
           "circuit version needs a ceremony, which is a " +
-          "deployment consideration for the thesis system."
+          "deployment consideration for the thesis system.",
+        publicPrivate: [
+          { item: "CRS (proving key pk, verification key vk)", status: "public", holder: "everyone", when: "after trusted setup ceremony" },
+          { item: "toxic waste tau", status: "destroyed", holder: "no one (must be destroyed)", when: "after setup — if leaked, fake proofs become possible" },
+          { item: "proof pi = (A, B, C)", status: "public", holder: "everyone", when: "after proof generation" },
+          { item: "public inputs", status: "public", holder: "everyone", when: "always (statement being verified)" },
+          { item: "witness (private inputs)", status: "private", holder: "prover", when: "always (never revealed to verifier)" },
+          { item: "verification result (accept/reject)", status: "public", holder: "everyone", when: "after verification (3 pairing checks)" }
+        ]
       },
       {
         name: "ZK-STARKs",
@@ -798,7 +898,13 @@ window.DAY1_GUIDE = {
           "resistance which may matter for long-lived identity " +
           "credentials. The thesis should acknowledge the " +
           "SNARK-to-STARK migration path and its implications " +
-          "for credential longevity."
+          "for credential longevity.",
+        publicPrivate: [
+          { item: "all verification parameters", status: "public", holder: "everyone", when: "always (transparent setup — no trusted ceremony)" },
+          { item: "proof", status: "public", holder: "everyone", when: "after proof generation (~50-200 KB)" },
+          { item: "witness", status: "private", holder: "prover", when: "always (never revealed)" },
+          { item: "FRI commitments (Merkle roots)", status: "public", holder: "everyone", when: "included in proof (verifier checks against them)" }
+        ]
       },
       {
         name: "PLONK",
@@ -850,7 +956,14 @@ window.DAY1_GUIDE = {
           "not require new ceremonies. PLONK-based systems like " +
           "Halo2 are used in privacy protocols (Zcash Orchard). " +
           "If Sui adds native PLONK verification, it could " +
-          "simplify credential system upgrades."
+          "simplify credential system upgrades.",
+        publicPrivate: [
+          { item: "universal SRS (structured reference string)", status: "public", holder: "everyone", when: "after trusted setup (universal, reusable across circuits)" },
+          { item: "circuit-specific preprocessed data", status: "public", holder: "everyone", when: "after circuit compilation (derived from SRS + circuit)" },
+          { item: "proof", status: "public", holder: "everyone", when: "after proof generation" },
+          { item: "witness (private inputs)", status: "private", holder: "prover", when: "always (never revealed)" },
+          { item: "KZG polynomial commitments", status: "public", holder: "everyone", when: "included in proof (verifier checks openings)" }
+        ]
       },
       {
         name: "Bulletproofs",
@@ -908,7 +1021,14 @@ window.DAY1_GUIDE = {
           "O(n) verification cost makes them unsuitable for " +
           "direct on-chain use on Sui. The thesis may use " +
           "Bulletproof range proofs inside a Groth16 wrapper " +
-          "for efficient on-chain verification."
+          "for efficient on-chain verification.",
+        publicPrivate: [
+          { item: "generators G, H", status: "public", holder: "everyone", when: "always (system parameters, no trusted setup)" },
+          { item: "commitment C = vG + rH", status: "public", holder: "everyone", when: "always (published by committer)" },
+          { item: "opening (value v, blinding factor r)", status: "private", holder: "committer/prover", when: "always (never revealed to verifier)" },
+          { item: "proof (inner product argument)", status: "public", holder: "everyone", when: "after proof generation (O(log n) group elements)" },
+          { item: "range being proved (e.g., v in [0, 2^64))", status: "public", holder: "everyone", when: "always (part of the public statement)" }
+        ]
       }
     ]
   }
