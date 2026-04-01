@@ -36,6 +36,11 @@
           </button>
         </div>
       </div>
+      <div class="search-container">
+        <input type="text" class="concept-search" id="concept-search" placeholder="Search concepts..." autocomplete="off">
+        <span class="search-kbd-hint">/</span>
+        <div class="search-results" id="search-results"></div>
+      </div>
       <div class="nav-right">
         <div class="global-view-toggle" id="global-view-toggle">
           <span class="global-view-label">Mode</span>
@@ -635,7 +640,7 @@
 
   <!-- Keyboard Shortcuts Help -->
   <div class="shortcuts-hint" id="shortcuts-hint">
-    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
+    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
   </div>
 
   <script src="lexicon.js"></script>
@@ -646,6 +651,7 @@
   <script src="day2-technical.js"></script>
   <script src="day3-technical.js"></script>
   <script src="study-guide.js"></script>
+  <script src="search.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

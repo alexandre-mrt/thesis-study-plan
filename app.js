@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProgress();
   restoreActiveDay();
   renderStudyGuides();
+  if (typeof initConceptSearch === 'function') {
+    initConceptSearch();
+  }
 });
 
 /* === Checkbox / Progress === */
@@ -423,6 +426,12 @@ function initKeyboardShortcuts() {
       case 'L':
         if (typeof toggleLexiconPanel === 'function') {
           toggleLexiconPanel();
+        }
+        break;
+      case '/':
+        e.preventDefault();
+        if (typeof focusSearch === 'function') {
+          focusSearch();
         }
         break;
     }
