@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="technical.css">
+  <link rel="stylesheet" href="zk-deepdive.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
@@ -33,6 +34,10 @@
           <button class="day-tab" data-day="3" role="tab" aria-selected="false" aria-controls="day-3">
             <span class="day-tab-dot" style="background: var(--color-day3)"></span>
             Day 3
+          </button>
+          <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
+            <span class="day-tab-dot" style="background: #8B5CF6"></span>
+            ZK Deep Dive
           </button>
         </div>
       </div>
@@ -636,11 +641,16 @@
       </div>
     </section>
 
+    <!-- ZK DEEP DIVE -->
+    <section id="zk-deepdive" role="tabpanel" hidden>
+      <div id="zk-deepdive-content"></div>
+    </section>
+
   </main>
 
   <!-- Keyboard Shortcuts Help -->
   <div class="shortcuts-hint" id="shortcuts-hint">
-    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
+    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>Z</kbd> ZK Deep Dive &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
   </div>
 
   <script src="lexicon.js"></script>
@@ -650,6 +660,9 @@
   <script src="day1-technical.js"></script>
   <script src="day2-technical.js"></script>
   <script src="day3-technical.js"></script>
+  <script src="zk-deepdive-data.js"></script>
+  <script src="zk-deepdive-data2.js"></script>
+  <script src="zk-deepdive.js"></script>
   <script src="study-guide.js"></script>
   <script src="search.js"></script>
   <script src="app.js"></script>

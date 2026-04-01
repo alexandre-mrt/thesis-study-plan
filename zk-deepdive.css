@@ -1,0 +1,781 @@
+/**
+ * ZK Deep Dive — Styles
+ * Polished article-style layout for the Zero-Knowledge Deep Dive section.
+ * Accent color: #8B5CF6 (purple — between indigo day1 and cyan day2)
+ */
+
+/* === Design Tokens === */
+:root {
+  --color-zk: #8B5CF6;
+  --color-zk-dim: rgba(139, 92, 246, 0.15);
+  --color-zk-border: rgba(139, 92, 246, 0.3);
+  --color-zk-glow: rgba(139, 92, 246, 0.08);
+}
+
+/* === Deep Dive Tab === */
+.day-tab[data-day="zk"] .day-tab-dot {
+  background: var(--color-zk) !important;
+}
+
+.search-result-day[data-day="zk"] {
+  background: rgba(139, 92, 246, 0.2);
+  color: #8B5CF6;
+}
+
+/* === Section Container === */
+#zk-deepdive {
+  display: none;
+  animation: fadeIn var(--transition-base) ease;
+}
+
+#zk-deepdive.active {
+  display: block;
+}
+
+/* === Page Header === */
+.zk-dd-page-header {
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.zk-dd-page-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-zk);
+  margin-bottom: 8px;
+}
+
+.zk-dd-page-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--color-day1), var(--color-zk), var(--color-day2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.zk-dd-page-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 700px;
+}
+
+/* === Table of Contents === */
+.zk-dd-toc {
+  margin-bottom: 32px;
+  padding: 20px 24px;
+  background: var(--color-zk-glow);
+  border: 1px solid var(--color-zk-border);
+  border-radius: var(--radius-md);
+}
+
+.zk-dd-toc-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-zk);
+  margin-bottom: 12px;
+}
+
+.zk-dd-toc-list {
+  list-style: none;
+  counter-reset: toc-counter;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 24px;
+}
+
+.zk-dd-toc-list li {
+  counter-increment: toc-counter;
+}
+
+.zk-dd-toc-list li::before {
+  content: counter(toc-counter) '.';
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-zk);
+  margin-right: 8px;
+}
+
+.zk-dd-toc-list a {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.zk-dd-toc-list a:hover {
+  color: var(--color-zk);
+}
+
+/* === Controls === */
+.zk-dd-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.zk-dd-control-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.zk-dd-control-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border-color: var(--color-zk-border);
+}
+
+/* === Section Card === */
+.zk-dd-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.zk-dd-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.zk-dd-card.open {
+  border-color: var(--color-zk-border);
+}
+
+/* === Card Header === */
+.zk-dd-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast);
+}
+
+.zk-dd-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.zk-dd-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-zk-dim);
+  color: var(--color-zk);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.zk-dd-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.zk-dd-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.zk-dd-chevron {
+  font-size: 12px;
+  color: var(--text-muted);
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.zk-dd-card.open .zk-dd-chevron {
+  transform: rotate(180deg);
+}
+
+/* === Card Body === */
+.zk-dd-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding: 0 20px;
+  transition: max-height var(--transition-slow), opacity var(--transition-base), padding var(--transition-base);
+}
+
+.zk-dd-card.open .zk-dd-body {
+  max-height: 50000px;
+  opacity: 1;
+  padding: 0 20px 24px;
+}
+
+/* === Content Typography === */
+.zk-dd-content {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.zk-dd-content h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 20px 0 10px 0;
+  letter-spacing: -0.01em;
+}
+
+.zk-dd-content h4:first-child {
+  margin-top: 0;
+}
+
+.zk-dd-content p {
+  margin-bottom: 12px;
+}
+
+.zk-dd-content strong {
+  color: var(--text-primary);
+}
+
+.zk-dd-content em {
+  color: var(--color-zk);
+  font-style: italic;
+}
+
+.zk-dd-content code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--color-zk);
+}
+
+/* === Lists === */
+.zk-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.zk-list li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.zk-list li::before {
+  content: '\2022';
+  position: absolute;
+  left: 4px;
+  color: var(--color-zk);
+  font-weight: 700;
+}
+
+ol.zk-list {
+  counter-reset: zk-list-counter;
+}
+
+ol.zk-list li {
+  counter-increment: zk-list-counter;
+}
+
+ol.zk-list li::before {
+  content: counter(zk-list-counter) '.';
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.zk-detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+}
+
+.zk-detail-list li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.zk-detail-list li::before {
+  content: '\25B8';
+  position: absolute;
+  left: 0;
+  color: var(--color-zk);
+}
+
+.zk-detail-list li strong {
+  color: var(--text-primary);
+}
+
+/* === Property Grid === */
+.zk-property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.zk-property-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.zk-property-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-zk);
+  margin: 0 0 10px 0;
+}
+
+.zk-formal {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.zk-intuition {
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--text-muted);
+  padding-left: 12px;
+  border-left: 2px solid var(--color-zk-border);
+  margin-bottom: 8px;
+}
+
+.zk-formal-math {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  margin-bottom: 0;
+}
+
+/* === Callout Boxes === */
+.zk-callout {
+  padding: 16px 20px;
+  margin: 16px 0;
+  background: var(--color-zk-glow);
+  border: 1px solid var(--color-zk-border);
+  border-left-width: 3px;
+  border-radius: var(--radius-md);
+}
+
+.zk-callout-critical {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.zk-callout-critical .zk-callout-label {
+  color: #f87171;
+}
+
+.zk-callout-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-zk);
+  margin-bottom: 8px;
+}
+
+.zk-callout p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.zk-callout p:last-child {
+  margin-bottom: 0;
+}
+
+/* === Diagram === */
+.zk-dd-diagram-wrap {
+  margin: 20px 0;
+}
+
+.zk-dd-diagram-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-zk);
+  margin-bottom: 8px;
+}
+
+.zk-dd-diagram {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  background: #0a0a0a;
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--text-secondary);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* === Public/Private Table in Deep Dive === */
+.zk-pp-section {
+  margin: 20px 0;
+}
+
+.zk-pp-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+/* === Comparison Tables === */
+.zk-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 12px 0;
+}
+
+.zk-comparison-table thead {
+  border-bottom: 2px solid var(--border-card);
+}
+
+.zk-comparison-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.zk-comparison-table td {
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.zk-comparison-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.zk-comparison-table strong {
+  color: var(--text-primary);
+}
+
+.zk-table-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 8px;
+}
+
+/* === Knowledge Table (wider) === */
+.zk-knowledge-table td,
+.zk-knowledge-table th {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+/* === Status Badges === */
+.zk-status-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.zk-status-public {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.zk-status-private {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.zk-status-destroyed {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+/* === Step Flow (Section 4) === */
+.zk-step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.zk-step::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 40px;
+  bottom: -20px;
+  width: 2px;
+  background: var(--color-zk-border);
+}
+
+.zk-step:last-of-type::before {
+  display: none;
+}
+
+.zk-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-zk);
+  color: white;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.zk-step-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.zk-step-content h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 6px 0 8px 0;
+}
+
+.zk-step-content p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+/* === Thesis Step Flow (Section 7) === */
+.zk-thesis-step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+
+.zk-thesis-step:hover {
+  border-color: var(--color-zk-border);
+}
+
+.zk-thesis-step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-day1), var(--color-zk));
+  color: white;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.zk-thesis-step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.zk-thesis-step-body h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 4px 0 8px 0;
+}
+
+.zk-thesis-step-body p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+/* === Thesis Example Callout === */
+.zk-dd-thesis {
+  margin-top: 20px;
+  padding: 14px 18px;
+  background: rgba(139, 92, 246, 0.04);
+  border: 1px solid var(--color-zk-border);
+  border-left-width: 3px;
+  border-radius: var(--radius-md);
+}
+
+.zk-dd-thesis-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-zk);
+  margin-bottom: 6px;
+}
+
+.zk-dd-thesis p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* === Highlight Animation (search navigation) === */
+.zk-dd-card.highlighted {
+  animation: zk-card-highlight 1.5s ease-out;
+}
+
+@keyframes zk-card-highlight {
+  0% { box-shadow: 0 0 0 2px var(--color-zk); }
+  100% { box-shadow: 0 0 0 0px transparent; }
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .zk-dd-page-title {
+    font-size: 24px;
+  }
+
+  .zk-dd-toc-list {
+    grid-template-columns: 1fr;
+  }
+
+  .zk-property-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .zk-dd-diagram {
+    font-size: 10px;
+    padding: 12px;
+  }
+
+  .zk-comparison-table {
+    font-size: 11px;
+  }
+
+  .zk-comparison-table th,
+  .zk-comparison-table td {
+    padding: 6px 8px;
+  }
+
+  .zk-dd-header {
+    padding: 12px 16px;
+  }
+
+  .zk-dd-card.open .zk-dd-body {
+    padding: 0 16px 20px;
+  }
+
+  .zk-step-content h4,
+  .zk-thesis-step-body h4 {
+    font-size: 14px;
+  }
+
+  .zk-knowledge-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .zk-dd-page-title {
+    font-size: 20px;
+  }
+
+  .zk-dd-title {
+    font-size: 14px;
+  }
+
+  .zk-dd-icon {
+    display: none;
+  }
+}
+
+/* === Print Styles === */
+@media print {
+  #zk-deepdive { display: block !important; }
+  .zk-dd-controls { display: none !important; }
+  .zk-dd-body { max-height: none !important; opacity: 1 !important; overflow: visible !important; padding: 0 12px 12px !important; }
+  .zk-dd-card { border: 1px solid #ddd; background: none; page-break-inside: avoid; }
+  .zk-dd-card.open .zk-dd-body { padding: 0 12px 12px !important; }
+  .zk-dd-header { padding: 10px 12px; }
+  .zk-dd-page-title { background: none; -webkit-text-fill-color: #000; color: #000; }
+  .zk-dd-page-label, .zk-dd-toc-title, .zk-dd-diagram-label, .zk-dd-thesis-label, .zk-callout-label { color: #333; }
+  .zk-dd-diagram { background: #f5f5f5; border: 1px solid #ddd; color: #333; }
+  .zk-callout, .zk-dd-thesis { background: #f9f9f9; border-color: #333; }
+  .zk-comparison-table th { color: #333; }
+  .zk-comparison-table td { color: #333; border-bottom-color: #ddd; }
+  .zk-dd-chevron { display: none; }
+  .zk-dd-toc { background: #f5f5f5; border-color: #333; }
+}
