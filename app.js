@@ -113,7 +113,12 @@ function initDayTabs() {
   const tabs = $$('.day-tab');
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      switchDay(Number(tab.dataset.day));
+      const day = tab.dataset.day;
+      if (day === 'zk') {
+        switchToZKDeepdive();
+      } else {
+        switchDay(Number(day));
+      }
     });
   });
 }
@@ -121,6 +126,7 @@ function initDayTabs() {
 function switchDay(dayNum) {
   const tabs = $$('.day-tab');
   const sections = $$('.day-section');
+  const zkSection = $('#zk-deepdive');
 
   tabs.forEach((tab) => {
     const isActive = Number(tab.dataset.day) === dayNum;
@@ -133,6 +139,12 @@ function switchDay(dayNum) {
     sec.classList.toggle('active', isActive);
     sec.hidden = !isActive;
   });
+
+  /* Hide ZK deep dive when switching to a day */
+  if (zkSection) {
+    zkSection.classList.remove('active');
+    zkSection.hidden = true;
+  }
 
   try {
     localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, String(dayNum));
@@ -148,13 +160,55 @@ function switchDay(dayNum) {
   }
 }
 
+function switchToZKDeepdive() {
+  const tabs = $$('.day-tab');
+  const sections = $$('.day-section');
+  const zkSection = $('#zk-deepdive');
+
+  /* Deactivate all day tabs and sections */
+  tabs.forEach((tab) => {
+    const isZK = tab.dataset.day === 'zk';
+    tab.classList.toggle('active', isZK);
+    tab.setAttribute('aria-selected', String(isZK));
+  });
+
+  sections.forEach((sec) => {
+    sec.classList.remove('active');
+    sec.hidden = true;
+  });
+
+  /* Show ZK deep dive */
+  if (zkSection) {
+    zkSection.classList.add('active');
+    zkSection.hidden = false;
+
+    /* Render on first open (lazy init) */
+    const content = $('#zk-deepdive-content');
+    if (content && content.children.length === 0 && typeof renderZKDeepdive === 'function') {
+      renderZKDeepdive();
+    }
+  }
+
+  try {
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, 'zk');
+  } catch {
+    /* non-critical */
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function restoreActiveDay() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.ACTIVE_DAY);
     if (saved) {
-      const dayNum = Number(saved);
-      if (dayNum >= 1 && dayNum <= 3) {
-        switchDay(dayNum);
+      if (saved === 'zk') {
+        switchToZKDeepdive();
+      } else {
+        const dayNum = Number(saved);
+        if (dayNum >= 1 && dayNum <= 3) {
+          switchDay(dayNum);
+        }
       }
     }
   } catch {
@@ -409,6 +463,10 @@ function initKeyboardShortcuts() {
         break;
       case '3':
         switchDay(3);
+        break;
+      case 'z':
+      case 'Z':
+        switchToZKDeepdive();
         break;
       case ' ':
         e.preventDefault();

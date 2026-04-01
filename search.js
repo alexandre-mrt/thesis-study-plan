@@ -85,6 +85,12 @@ function buildSearchIndex() {
     });
   }
 
+  /* Add ZK Deep Dive entries to the search index */
+  if (typeof getZKDeepdiveSearchEntries === 'function') {
+    const ddEntries = getZKDeepdiveSearchEntries();
+    ddEntries.forEach((entry) => index.push(entry));
+  }
+
   return index;
 }
 
@@ -141,8 +147,9 @@ function renderSearchResults(results, query) {
 
     const dayBadge = document.createElement('span');
     dayBadge.className = 'search-result-day';
-    dayBadge.dataset.day = String(result.day);
-    dayBadge.textContent = 'D' + result.day;
+    const isDeepDive = result.isDeepDive === true;
+    dayBadge.dataset.day = isDeepDive ? 'zk' : String(result.day);
+    dayBadge.textContent = isDeepDive ? 'ZK' : ('D' + result.day);
 
     const name = document.createElement('span');
     name.className = 'search-result-name';
@@ -242,6 +249,12 @@ function handleSearchKeydown(e) {
 /* === Navigation to Concept === */
 
 function navigateToConcept(result) {
+  /* Handle ZK Deep Dive results */
+  if (result.isDeepDive) {
+    navigateToZKDeepdive(result);
+    return;
+  }
+
   /* 1. Switch to the correct day */
   if (typeof switchDay === 'function') {
     switchDay(result.day);
@@ -286,6 +299,33 @@ function navigateToConcept(result) {
         }, HIGHLIGHT_DURATION_MS);
       }, SCROLL_DELAY_MS);
     }, EXPAND_DELAY_MS);
+  }, EXPAND_DELAY_MS);
+}
+
+function navigateToZKDeepdive(result) {
+  /* 1. Switch to ZK deep dive tab */
+  if (typeof switchToZKDeepdive === 'function') {
+    switchToZKDeepdive();
+  }
+
+  /* 2. Find and open the target section card */
+  setTimeout(() => {
+    const targetCard = document.getElementById(result.sectionId);
+    if (!targetCard) return;
+
+    if (!targetCard.classList.contains('open')) {
+      const header = targetCard.querySelector('.zk-dd-header');
+      if (header) header.click();
+    }
+
+    setTimeout(() => {
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      targetCard.classList.add('highlighted');
+      setTimeout(() => {
+        targetCard.classList.remove('highlighted');
+      }, HIGHLIGHT_DURATION_MS);
+    }, SCROLL_DELAY_MS);
   }, EXPAND_DELAY_MS);
 }
 
