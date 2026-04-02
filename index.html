@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thesis Deep Work Plan — 3-Day Study</title>
-  <meta name="description" content="Interactive 3-day study plan for master thesis: Anonymous Credentials, ZKP, TEE, and Blockchain Privacy">
+  <title>Thesis Study Plan &mdash; By Chapter</title>
+  <meta name="description" content="Interactive thesis study plan organized by chapter: Anonymous Credentials, Confidential TX, TEE, Private Payments, ZK Proof Systems, and Rust">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,19 +21,31 @@
   <nav id="nav" class="nav">
     <div class="nav-inner">
       <div class="nav-left">
-        <span class="nav-title">Thesis Study Plan</span>
+        <span class="nav-title">Thesis Prep</span>
         <div class="day-tabs" role="tablist">
-          <button class="day-tab active" data-day="1" role="tab" aria-selected="true" aria-controls="day-1">
-            <span class="day-tab-dot" style="background: var(--color-day1)"></span>
-            Day 1
+          <button class="day-tab active" data-day="ch21" role="tab" aria-selected="true" aria-controls="ch-21">
+            <span class="day-tab-dot" style="background: var(--color-ch21)"></span>
+            Ch 2.1
           </button>
-          <button class="day-tab" data-day="2" role="tab" aria-selected="false" aria-controls="day-2">
-            <span class="day-tab-dot" style="background: var(--color-day2)"></span>
-            Day 2
+          <button class="day-tab" data-day="ch22" role="tab" aria-selected="false" aria-controls="ch-22">
+            <span class="day-tab-dot" style="background: var(--color-ch22)"></span>
+            Ch 2.2
           </button>
-          <button class="day-tab" data-day="3" role="tab" aria-selected="false" aria-controls="day-3">
-            <span class="day-tab-dot" style="background: var(--color-day3)"></span>
-            Day 3
+          <button class="day-tab" data-day="ch23" role="tab" aria-selected="false" aria-controls="ch-23">
+            <span class="day-tab-dot" style="background: var(--color-ch23)"></span>
+            Ch 2.3
+          </button>
+          <button class="day-tab" data-day="ch24" role="tab" aria-selected="false" aria-controls="ch-24">
+            <span class="day-tab-dot" style="background: var(--color-ch24)"></span>
+            Ch 2.4
+          </button>
+          <button class="day-tab" data-day="ch25" role="tab" aria-selected="false" aria-controls="ch-25">
+            <span class="day-tab-dot" style="background: var(--color-ch25)"></span>
+            Ch 2.5
+          </button>
+          <button class="day-tab" data-day="rust" role="tab" aria-selected="false" aria-controls="ch-rust">
+            <span class="day-tab-dot" style="background: var(--color-rust)"></span>
+            Rust
           </button>
           <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
             <span class="day-tab-dot" style="background: #8B5CF6"></span>
@@ -88,183 +100,26 @@
   <!-- Main Content -->
   <main class="main" id="main">
 
-    <!-- DAY 1 -->
-    <section class="day-section active" id="day-1" data-day="1" role="tabpanel">
-      <div class="day-header" style="--day-color: var(--color-day1)">
-        <div class="day-label">Day 1</div>
-        <h1 class="day-title">Crypto Foundations + ZKP</h1>
-        <p class="day-date">Tuesday, March 31</p>
+    <!-- ===== CH 2.1 — Anonymous Credentials ===== -->
+    <section class="day-section active" id="ch-21" data-day="ch21" role="tabpanel">
+      <div class="day-header" style="--day-color: var(--color-ch21)">
+        <div class="day-label">Chapter 2.1</div>
+        <h1 class="day-title">Anonymous Credentials</h1>
+        <p class="day-date">Thesis Background Section</p>
       </div>
 
-      <!-- Block 1 -->
+      <!-- Credential Systems & Selective Disclosure -->
       <div class="block">
         <div class="block-header">
-          <span class="block-time">9h &mdash; 11h</span>
-          <h2 class="block-title">Crypto Primitives + ZKP Fundamentals</h2>
+          <h2 class="block-title">Credential Systems &amp; Selective Disclosure</h2>
         </div>
         <div class="block-objectives">
-          <strong>Objectives:</strong> Understand hash functions, commitment schemes, digital signatures, elliptic curves. Learn ZKP properties (completeness, soundness, zero-knowledge), sigma protocols, interactive vs non-interactive proofs.
+          <strong>Objectives:</strong> Understand anonymous credential systems, CL signatures, BBS+ signatures and selective disclosure, W3C Verifiable Credentials, DIDs, SSI model, revocation mechanisms, eIDAS 2.0 compliance.
         </div>
         <div class="resources-grid">
 
-          <div class="resource-card" data-id="d1b1r1" style="--day-color: var(--color-day1)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d1b1r1">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-video">Video</span>
-              <span class="time-badge">45min</span>
-            </div>
-            <div class="yt-thumbnail" data-ytid="9yNsOg3_Y3k">
-              <img src="https://img.youtube.com/vi/9yNsOg3_Y3k/maxresdefault.jpg" alt="Video thumbnail" loading="lazy">
-              <div class="yt-play-btn"></div>
-            </div>
-            <h3 class="resource-title">Cryptography for blockchains: Avoiding common mistakes</h3>
-            <p class="resource-author">Dan Boneh (a16z crypto)</p>
-            <a class="resource-link" href="https://www.youtube.com/watch?v=9yNsOg3_Y3k" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
-          </div>
-
-          <div class="resource-card" data-id="d1b1r2" style="--day-color: var(--color-day1)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d1b1r2">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-course">Course</span>
-              <span class="time-badge">30min</span>
-            </div>
-            <h3 class="resource-title">Berkeley ZK MOOC &mdash; Lectures 1-2</h3>
-            <p class="resource-author">UC Berkeley RDI</p>
-            <a class="resource-link" href="https://zk-learning.org/" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
-          </div>
-
-          <div class="resource-card" data-id="d1b1r3" style="--day-color: var(--color-day1)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d1b1r3">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-book">Book</span>
-              <span class="time-badge">30min</span>
-            </div>
-            <h3 class="resource-title">RareSkills ZK Book &mdash; Module 1: Foundational Math</h3>
-            <p class="resource-author">RareSkills</p>
-            <a class="resource-link" href="https://rareskills.io/zk-book" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
-          </div>
-
-          <div class="resource-card" data-id="d1b1r4" style="--day-color: var(--color-day1)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d1b1r4">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-course">Course</span>
-              <span class="time-badge">15min</span>
-            </div>
-            <h3 class="resource-title">Fundamentals of Zero-Knowledge Proofs</h3>
-            <p class="resource-author">Updraft Cyfrin</p>
-            <a class="resource-link" href="https://updraft.cyfrin.io/courses/fundamentals-of-zero-knowledge-proofs" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
-          </div>
-
-        </div>
-        <button class="study-guide-toggle" style="--day-color: var(--color-day1)">&#128214; Study Guide</button>
-        <div class="study-guide-container" data-day="1" data-block="1"></div>
-      </div>
-
-      <!-- Block 2 -->
-      <div class="block">
-        <div class="block-header">
-          <span class="block-time">11h30 &mdash; 13h30</span>
-          <h2 class="block-title">Proving Systems (SNARKs, STARKs, PLONK)</h2>
-        </div>
-        <div class="block-objectives">
-          <strong>Objectives:</strong> Understand ZK-SNARKs vs ZK-STARKs trade-offs, Groth16 trusted setup, PLONK universal setup, arithmetic circuits and R1CS, proof size and verification costs.
-        </div>
-        <div class="resources-grid">
-
-          <div class="resource-card" data-id="d1b2r1" style="--day-color: var(--color-day1)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d1b2r1">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-paper">Paper</span>
-              <span class="time-badge">45min</span>
-            </div>
-            <h3 class="resource-title">PLONK: Permutations over Lagrange-bases for Oecumenical Noninteractive arguments of Knowledge</h3>
-            <p class="resource-author">Gabizon, Williamson, Ciobotaru</p>
-            <a class="resource-link" href="https://eprint.iacr.org/2019/953" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
-          </div>
-
-          <div class="resource-card" data-id="d1b2r2" style="--day-color: var(--color-day1)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d1b2r2">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-book">Book</span>
-              <span class="time-badge">30min</span>
-            </div>
-            <h3 class="resource-title">RareSkills ZK Book &mdash; Module 2: ZK-SNARKs (Groth16)</h3>
-            <p class="resource-author">RareSkills</p>
-            <a class="resource-link" href="https://rareskills.io/zk-book" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
-          </div>
-
-          <div class="resource-card" data-id="d1b2r3" style="--day-color: var(--color-day1)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d1b2r3">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-book">Book</span>
-              <span class="time-badge">20min</span>
-            </div>
-            <h3 class="resource-title">RareSkills ZK Book &mdash; Module 4: Bulletproofs</h3>
-            <p class="resource-author">RareSkills</p>
-            <a class="resource-link" href="https://rareskills.io/zk-book" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
-          </div>
-
-          <div class="resource-card" data-id="d1b2r4" style="--day-color: var(--color-day1)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d1b2r4">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-paper">Paper</span>
-              <span class="time-badge">25min</span>
-            </div>
-            <h3 class="resource-title">Zero-Knowledge Proof Frameworks: A Survey</h3>
-            <p class="resource-author">arXiv 2025</p>
-            <a class="resource-link" href="https://arxiv.org/html/2502.07063v1" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
-          </div>
-
-        </div>
-        <button class="study-guide-toggle" style="--day-color: var(--color-day1)">&#128214; Study Guide</button>
-        <div class="study-guide-container" data-day="1" data-block="2"></div>
-      </div>
-    </section>
-
-    <!-- DAY 2 -->
-    <section class="day-section" id="day-2" data-day="2" role="tabpanel" hidden>
-      <div class="day-header" style="--day-color: var(--color-day2)">
-        <div class="day-label">Day 2</div>
-        <h1 class="day-title">Anonymous Credentials + TEEs</h1>
-        <p class="day-date">Wednesday, April 1</p>
-      </div>
-
-      <!-- Block 1 -->
-      <div class="block">
-        <div class="block-header">
-          <span class="block-time">9h &mdash; 11h</span>
-          <h2 class="block-title">Anonymous Credentials (CL, BBS+, VCs)</h2>
-        </div>
-        <div class="block-objectives">
-          <strong>Objectives:</strong> Understand anonymous credential systems, CL signatures, BBS+ signatures and selective disclosure, W3C Verifiable Credentials, DIDs, SSI model, revocation mechanisms.
-        </div>
-        <div class="resources-grid">
-
-          <div class="resource-card" data-id="d2b1r1" style="--day-color: var(--color-day2)">
+          <!-- Existing Day 2 Block 1 resources -->
+          <div class="resource-card" data-id="d2b1r1" style="--day-color: var(--color-ch21)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b1r1">
@@ -282,7 +137,7 @@
             <a class="resource-link" href="https://www.youtube.com/watch?v=kgNcxQH-hMQ" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d2b1r2" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="d2b1r2" style="--day-color: var(--color-ch21)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b1r2">
@@ -300,7 +155,7 @@
             <a class="resource-link" href="https://www.youtube.com/watch?v=knyNFTfXcb4" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d2b1r3" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="d2b1r3" style="--day-color: var(--color-ch21)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b1r3">
@@ -314,7 +169,7 @@
             <a class="resource-link" href="https://eprint.iacr.org/2026/330" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d2b1r4" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="d2b1r4" style="--day-color: var(--color-ch21)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b1r4">
@@ -328,7 +183,7 @@
             <a class="resource-link" href="https://eprint.iacr.org/2026/251" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d2b1r5" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="d2b1r5" style="--day-color: var(--color-ch21)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b1r5">
@@ -342,23 +197,166 @@
             <a class="resource-link" href="https://docknetwork.github.io/sdk/tutorials/tutorial_anoncreds.html" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
+          <!-- From Day 3 Block 2: BBS/eIDAS papers -->
+          <div class="resource-card" data-id="d3b2r3" style="--day-color: var(--color-ch21)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d3b2r3">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">25min</span>
+            </div>
+            <h3 class="resource-title">Privacy-Preserving Credentials with BBS</h3>
+            <p class="resource-author">Unibe Thesis 2025</p>
+            <a class="resource-link" href="https://crypto.unibe.ch/archive/theses/2025.bsc.lukas.leuba.pdf" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="d3b2r6" style="--day-color: var(--color-ch21)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d3b2r6">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">15min</span>
+            </div>
+            <h3 class="resource-title">Making BBS Anonymous Credentials eIDAS 2.0 Compliant</h3>
+            <p class="resource-author">ePrint 2025/619</p>
+            <a class="resource-link" href="https://eprint.iacr.org/2025/619" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
         </div>
-        <button class="study-guide-toggle" style="--day-color: var(--color-day2)">&#128214; Study Guide</button>
+        <button class="study-guide-toggle" style="--day-color: var(--color-ch21)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="2" data-block="1"></div>
       </div>
+    </section>
 
-      <!-- Block 2 -->
+    <!-- ===== CH 2.2 — Confidential TX & Range Proofs ===== -->
+    <section class="day-section" id="ch-22" data-day="ch22" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: var(--color-ch22)">
+        <div class="day-label">Chapter 2.2</div>
+        <h1 class="day-title">Confidential TX &amp; Range Proofs</h1>
+        <p class="day-date">Thesis Background Section</p>
+      </div>
+
       <div class="block">
         <div class="block-header">
-          <span class="block-time">11h30 &mdash; 13h30</span>
-          <h2 class="block-title">TEEs (SGX, Attestation, Trust Model)</h2>
+          <h2 class="block-title">Bulletproofs, Mimblewimble &amp; Confidential Transactions</h2>
         </div>
         <div class="block-objectives">
-          <strong>Objectives:</strong> Understand TEE hardware isolation, Intel SGX enclaves and attestation, ARM TrustZone, side-channel attacks, trust assumptions vs ZKP trust assumptions.
+          <strong>Objectives:</strong> Understand Pedersen commitments and range proofs, Bulletproofs inner-product argument, Bulletproofs++ improvements, Mimblewimble transaction model, confidential transaction implementations in production.
         </div>
         <div class="resources-grid">
 
-          <div class="resource-card" data-id="d2b2r1" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="ch22r1" style="--day-color: var(--color-ch22)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch22r1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">45min</span>
+            </div>
+            <h3 class="resource-title">Bulletproofs: Short Proofs for Confidential Transactions</h3>
+            <p class="resource-author">B&uuml;nz et al., 2018</p>
+            <a class="resource-link" href="https://eprint.iacr.org/2017/1066" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="ch22r2" style="--day-color: var(--color-ch22)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch22r2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">Bulletproofs++</h3>
+            <p class="resource-author">Eagen &amp; Kanjalkar, 2024</p>
+            <a class="resource-link" href="https://eprint.iacr.org/2022/510" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="ch22r3" style="--day-color: var(--color-ch22)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch22r3">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">Mimblewimble</h3>
+            <p class="resource-author">Tom Elvis Jedusor, 2016</p>
+            <a class="resource-link" href="https://docs.beam.mw/Mimblewimble.pdf" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <!-- Moved from Day 1 Block 2: Bulletproofs tutorial -->
+          <div class="resource-card" data-id="d1b2r3" style="--day-color: var(--color-ch22)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d1b2r3">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-tutorial">Tutorial</span>
+              <span class="time-badge">20min</span>
+            </div>
+            <h3 class="resource-title">RareSkills ZK Book &mdash; Module 4: Bulletproofs</h3>
+            <p class="resource-author">RareSkills</p>
+            <a class="resource-link" href="https://rareskills.io/zk-book" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="ch22r5" style="--day-color: var(--color-ch22)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch22r5">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">dalek-cryptography/bulletproofs (Rust)</h3>
+            <p class="resource-author">dalek-cryptography</p>
+            <a class="resource-link" href="https://github.com/dalek-cryptography/bulletproofs" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="ch22r6" style="--day-color: var(--color-ch22)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch22r6">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">Grin &mdash; Mimblewimble Implementation</h3>
+            <p class="resource-author">mimblewimble</p>
+            <a class="resource-link" href="https://github.com/mimblewimble/grin" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CH 2.3 — TEE & Confidential Computing ===== -->
+    <section class="day-section" id="ch-23" data-day="ch23" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: var(--color-ch23)">
+        <div class="day-label">Chapter 2.3</div>
+        <h1 class="day-title">TEE &amp; Confidential Computing</h1>
+        <p class="day-date">Thesis Background Section</p>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Hardware Isolation, Attestation &amp; Trust Models</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Understand TEE hardware isolation, Intel SGX enclaves and attestation, ARM TrustZone, AWS Nitro Enclaves, side-channel attacks, trust assumptions vs ZKP trust assumptions, decentralized secrets management.
+        </div>
+        <div class="resources-grid">
+
+          <!-- Existing Day 2 Block 2 resources -->
+          <div class="resource-card" data-id="d2b2r1" style="--day-color: var(--color-ch23)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b2r1">
@@ -376,7 +374,7 @@
             <a class="resource-link" href="https://www.youtube.com/watch?v=Xq7oWtiwWII" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d2b2r2" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="d2b2r2" style="--day-color: var(--color-ch23)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b2r2">
@@ -394,7 +392,7 @@
             <a class="resource-link" href="https://www.youtube.com/watch?v=enAohl_yEL0" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d2b2r3" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="d2b2r3" style="--day-color: var(--color-ch23)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b2r3">
@@ -408,7 +406,7 @@
             <a class="resource-link" href="https://www.trezalabs.com/blog/what-is-a-trusted-execution-environment-tee-complete-guide" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d2b2r4" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="d2b2r4" style="--day-color: var(--color-ch23)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b2r4">
@@ -422,7 +420,7 @@
             <a class="resource-link" href="https://learn.microsoft.com/en-us/azure/confidential-computing/trusted-execution-environment" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d2b2r5" style="--day-color: var(--color-day2)">
+          <div class="resource-card" data-id="d2b2r5" style="--day-color: var(--color-ch23)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d2b2r5">
@@ -436,32 +434,60 @@
             <a class="resource-link" href="https://www.youtube.com/@lucamariot5689" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
+          <!-- New TEE resources -->
+          <div class="resource-card" data-id="ch23r1" style="--day-color: var(--color-ch23)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch23r1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-docs">Docs</span>
+              <span class="time-badge">20min</span>
+            </div>
+            <h3 class="resource-title">AWS Nitro Enclaves &mdash; Getting Started</h3>
+            <p class="resource-author">Amazon Web Services</p>
+            <a class="resource-link" href="https://docs.aws.amazon.com/enclaves/latest/user/getting-started.html" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="ch23r2" style="--day-color: var(--color-ch23)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch23r2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">25min</span>
+            </div>
+            <h3 class="resource-title">MystenLabs/seal &mdash; Decentralized Secrets</h3>
+            <p class="resource-author">Mysten Labs</p>
+            <a class="resource-link" href="https://github.com/MystenLabs/seal" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
         </div>
-        <button class="study-guide-toggle" style="--day-color: var(--color-day2)">&#128214; Study Guide</button>
+        <button class="study-guide-toggle" style="--day-color: var(--color-ch23)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="2" data-block="2"></div>
       </div>
     </section>
 
-    <!-- DAY 3 -->
-    <section class="day-section" id="day-3" data-day="3" role="tabpanel" hidden>
-      <div class="day-header" style="--day-color: var(--color-day3)">
-        <div class="day-label">Day 3</div>
-        <h1 class="day-title">Blockchain Privacy + Integration</h1>
-        <p class="day-date">Thursday, April 2</p>
+    <!-- ===== CH 2.4 — Private Payments ===== -->
+    <section class="day-section" id="ch-24" data-day="ch24" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: var(--color-ch24)">
+        <div class="day-label">Chapter 2.4</div>
+        <h1 class="day-title">Private Payments</h1>
+        <p class="day-date">Thesis Background Section</p>
       </div>
 
-      <!-- Block 1 -->
       <div class="block">
         <div class="block-header">
-          <span class="block-time">9h &mdash; 11h</span>
-          <h2 class="block-title">Blockchain Privacy (Zcash, Sui, Private Payments)</h2>
+          <h2 class="block-title">Privacy-Preserving Payment Systems</h2>
         </div>
         <div class="block-objectives">
-          <strong>Objectives:</strong> Understand Zcash shielded transactions, Monero ring signatures, Tornado Cash mixer model, Sui architecture and privacy gaps, low-value private payment requirements.
+          <strong>Objectives:</strong> Understand Zcash shielded transactions, Monero ring signatures, Tornado Cash mixer model, private payment channel networks, post-quantum payment approaches, accountable privacy in decentralized ecash.
         </div>
         <div class="resources-grid">
 
-          <div class="resource-card" data-id="d3b1r1" style="--day-color: var(--color-day3)">
+          <!-- Existing Day 3 Block 1 resources -->
+          <div class="resource-card" data-id="d3b1r1" style="--day-color: var(--color-ch24)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b1r1">
@@ -479,7 +505,7 @@
             <a class="resource-link" href="https://www.youtube.com/watch?v=YiPio_tYq9g" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d3b1r2" style="--day-color: var(--color-day3)">
+          <div class="resource-card" data-id="d3b1r2" style="--day-color: var(--color-ch24)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b1r2">
@@ -493,7 +519,7 @@
             <a class="resource-link" href="https://eprint.iacr.org/2022/452" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d3b1r3" style="--day-color: var(--color-day3)">
+          <div class="resource-card" data-id="d3b1r3" style="--day-color: var(--color-ch24)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b1r3">
@@ -507,7 +533,7 @@
             <a class="resource-link" href="https://eprint.iacr.org/2026/076" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d3b1r4" style="--day-color: var(--color-day3)">
+          <div class="resource-card" data-id="d3b1r4" style="--day-color: var(--color-ch24)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b1r4">
@@ -521,7 +547,7 @@
             <a class="resource-link" href="https://eprint.iacr.org/2024/1959" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d3b1r5" style="--day-color: var(--color-day3)">
+          <div class="resource-card" data-id="d3b1r5" style="--day-color: var(--color-ch24)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b1r5">
@@ -535,23 +561,8 @@
             <a class="resource-link" href="https://docs.sui.io/concepts/sui-architecture" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-        </div>
-        <button class="study-guide-toggle" style="--day-color: var(--color-day3)">&#128214; Study Guide</button>
-        <div class="study-guide-container" data-day="3" data-block="1"></div>
-      </div>
-
-      <!-- Block 2 -->
-      <div class="block">
-        <div class="block-header">
-          <span class="block-time">11h30 &mdash; 13h30</span>
-          <h2 class="block-title">ZKP+TEE Integration + Thesis Architecture</h2>
-        </div>
-        <div class="block-objectives">
-          <strong>Objectives:</strong> Understand why combine ZKP+TEE, complementary trust models, existing hybrid research, anonymous credentials on Sui, private payment architecture, open research gaps.
-        </div>
-        <div class="resources-grid">
-
-          <div class="resource-card" data-id="d3b2r1" style="--day-color: var(--color-day3)">
+          <!-- From Day 3 Block 2: privacy papers -->
+          <div class="resource-card" data-id="d3b2r1" style="--day-color: var(--color-ch24)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b2r1">
@@ -565,7 +576,7 @@
             <a class="resource-link" href="https://eprint.iacr.org/2026/453" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d3b2r2" style="--day-color: var(--color-day3)">
+          <div class="resource-card" data-id="d3b2r2" style="--day-color: var(--color-ch24)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b2r2">
@@ -579,21 +590,7 @@
             <a class="resource-link" href="https://onlinelibrary.wiley.com/doi/abs/10.1002/spy2.461" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d3b2r3" style="--day-color: var(--color-day3)">
-            <div class="resource-top">
-              <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d3b2r3">
-                <span class="checkmark"></span>
-              </label>
-              <span class="type-badge badge-paper">Paper</span>
-              <span class="time-badge">25min</span>
-            </div>
-            <h3 class="resource-title">Privacy-Preserving Credentials with BBS</h3>
-            <p class="resource-author">Unibe Thesis 2025</p>
-            <a class="resource-link" href="https://crypto.unibe.ch/archive/theses/2025.bsc.lukas.leuba.pdf" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
-          </div>
-
-          <div class="resource-card" data-id="d3b2r4" style="--day-color: var(--color-day3)">
+          <div class="resource-card" data-id="d3b2r4" style="--day-color: var(--color-ch24)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b2r4">
@@ -607,7 +604,220 @@
             <a class="resource-link" href="https://reports.tiger-research.com/p/privacy-blockchain-eng" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d3b2r5" style="--day-color: var(--color-day3)">
+          <!-- New Private Payments resources -->
+          <div class="resource-card" data-id="ch24r1" style="--day-color: var(--color-ch24)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch24r1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">Penumbra &mdash; Shielded Cosmos Chain</h3>
+            <p class="resource-author">Penumbra Zone</p>
+            <a class="resource-link" href="https://github.com/penumbra-zone/penumbra" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="ch24r2" style="--day-color: var(--color-ch24)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch24r2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">Aptos Confidential Token</h3>
+            <p class="resource-author">Aptos Labs</p>
+            <a class="resource-link" href="https://github.com/aptos-labs/aptos-core" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="ch24r3" style="--day-color: var(--color-ch24)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch24r3">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">25min</span>
+            </div>
+            <h3 class="resource-title">Hitchhiker&rsquo;s Guide to Privacy-Preserving Digital Payment Systems</h3>
+            <p class="resource-author">arXiv 2025</p>
+            <a class="resource-link" href="https://arxiv.org/abs/2505.21008" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="ch24r4" style="--day-color: var(--color-ch24)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="ch24r4">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-docs">Docs</span>
+              <span class="time-badge">20min</span>
+            </div>
+            <h3 class="resource-title">Canton Network Technical Primer</h3>
+            <p class="resource-author">Canton Network</p>
+            <a class="resource-link" href="https://www.canton.network/blog/a-technical-primer" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+        </div>
+        <button class="study-guide-toggle" style="--day-color: var(--color-ch24)">&#128214; Study Guide</button>
+        <div class="study-guide-container" data-day="3" data-block="1"></div>
+      </div>
+
+      <!-- ZKP+TEE Integration guide (from Day 3 Block 2) -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">ZKP+TEE Integration &amp; Thesis Architecture</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Understand why combine ZKP+TEE, complementary trust models, existing hybrid research, anonymous credentials on Sui, private payment architecture, open research gaps.
+        </div>
+        <button class="study-guide-toggle" style="--day-color: var(--color-ch24)">&#128214; Study Guide</button>
+        <div class="study-guide-container" data-day="3" data-block="2"></div>
+      </div>
+    </section>
+
+    <!-- ===== CH 2.5 — ZK Proof Systems ===== -->
+    <section class="day-section" id="ch-25" data-day="ch25" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: var(--color-ch25)">
+        <div class="day-label">Chapter 2.5</div>
+        <h1 class="day-title">ZK Proof Systems</h1>
+        <p class="day-date">Thesis Background Section</p>
+      </div>
+
+      <!-- Crypto Primitives & ZKP Fundamentals -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Crypto Primitives &amp; ZKP Fundamentals</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Understand hash functions, commitment schemes, digital signatures, elliptic curves. Learn ZKP properties (completeness, soundness, zero-knowledge), sigma protocols, interactive vs non-interactive proofs.
+        </div>
+        <div class="resources-grid">
+
+          <!-- Existing Day 1 Block 1 resources -->
+          <div class="resource-card" data-id="d1b1r1" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d1b1r1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-video">Video</span>
+              <span class="time-badge">45min</span>
+            </div>
+            <div class="yt-thumbnail" data-ytid="9yNsOg3_Y3k">
+              <img src="https://img.youtube.com/vi/9yNsOg3_Y3k/maxresdefault.jpg" alt="Video thumbnail" loading="lazy">
+              <div class="yt-play-btn"></div>
+            </div>
+            <h3 class="resource-title">Cryptography for blockchains: Avoiding common mistakes</h3>
+            <p class="resource-author">Dan Boneh (a16z crypto)</p>
+            <a class="resource-link" href="https://www.youtube.com/watch?v=9yNsOg3_Y3k" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="d1b1r2" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d1b1r2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-course">Course</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">Berkeley ZK MOOC &mdash; Lectures 1-2</h3>
+            <p class="resource-author">UC Berkeley RDI</p>
+            <a class="resource-link" href="https://zk-learning.org/" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="d1b1r3" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d1b1r3">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-book">Book</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">RareSkills ZK Book &mdash; Module 1: Foundational Math</h3>
+            <p class="resource-author">RareSkills</p>
+            <a class="resource-link" href="https://rareskills.io/zk-book" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="d1b1r4" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d1b1r4">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-course">Course</span>
+              <span class="time-badge">15min</span>
+            </div>
+            <h3 class="resource-title">Fundamentals of Zero-Knowledge Proofs</h3>
+            <p class="resource-author">Updraft Cyfrin</p>
+            <a class="resource-link" href="https://updraft.cyfrin.io/courses/fundamentals-of-zero-knowledge-proofs" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+        </div>
+        <button class="study-guide-toggle" style="--day-color: var(--color-ch25)">&#128214; Study Guide</button>
+        <div class="study-guide-container" data-day="1" data-block="1"></div>
+      </div>
+
+      <!-- Proving Systems -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Proving Systems (SNARKs, STARKs, PLONK)</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Understand ZK-SNARKs vs ZK-STARKs trade-offs, Groth16 trusted setup, PLONK universal setup, arithmetic circuits and R1CS, proof size and verification costs.
+        </div>
+        <div class="resources-grid">
+
+          <!-- Existing Day 1 Block 2 resources (except d1b2r3 moved to Ch 2.2) -->
+          <div class="resource-card" data-id="d1b2r1" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d1b2r1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">45min</span>
+            </div>
+            <h3 class="resource-title">PLONK: Permutations over Lagrange-bases for Oecumenical Noninteractive arguments of Knowledge</h3>
+            <p class="resource-author">Gabizon, Williamson, Ciobotaru</p>
+            <a class="resource-link" href="https://eprint.iacr.org/2019/953" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="d1b2r2" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d1b2r2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-book">Book</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">RareSkills ZK Book &mdash; Module 2: ZK-SNARKs (Groth16)</h3>
+            <p class="resource-author">RareSkills</p>
+            <a class="resource-link" href="https://rareskills.io/zk-book" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="d1b2r4" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="d1b2r4">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">25min</span>
+            </div>
+            <h3 class="resource-title">Zero-Knowledge Proof Frameworks: A Survey</h3>
+            <p class="resource-author">arXiv 2025</p>
+            <a class="resource-link" href="https://arxiv.org/html/2502.07063v1" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <!-- From Day 3 Block 2: Sui docs -->
+          <div class="resource-card" data-id="d3b2r5" style="--day-color: var(--color-ch25)">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="d3b2r5">
@@ -621,23 +831,86 @@
             <a class="resource-link" href="https://www.sui.io/developers" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="d3b2r6" style="--day-color: var(--color-day3)">
+        </div>
+        <button class="study-guide-toggle" style="--day-color: var(--color-ch25)">&#128214; Study Guide</button>
+        <div class="study-guide-container" data-day="1" data-block="2"></div>
+      </div>
+    </section>
+
+    <!-- ===== RUST — Production Rust & Codebases ===== -->
+    <section class="day-section" id="ch-rust" data-day="rust" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: var(--color-rust)">
+        <div class="day-label">Rust</div>
+        <h1 class="day-title">Production Rust &amp; Codebases</h1>
+        <p class="day-date">Thesis Background Section</p>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Advanced Rust &amp; Cryptographic Codebases</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Deepen Rust expertise for thesis implementation. Study production cryptographic libraries, understand ownership patterns in crypto code, learn concurrency primitives for high-performance proof generation.
+        </div>
+        <div class="resources-grid">
+
+          <div class="resource-card" data-id="rustr1" style="--day-color: var(--color-rust)">
             <div class="resource-top">
               <label class="checkbox-wrap">
-                <input type="checkbox" class="resource-check" data-id="d3b2r6">
+                <input type="checkbox" class="resource-check" data-id="rustr1">
                 <span class="checkmark"></span>
               </label>
-              <span class="type-badge badge-paper">Paper</span>
-              <span class="time-badge">15min</span>
+              <span class="type-badge badge-book">Book</span>
+              <span class="time-badge">60min</span>
             </div>
-            <h3 class="resource-title">Making BBS Anonymous Credentials eIDAS 2.0 Compliant</h3>
-            <p class="resource-author">ePrint 2025/619</p>
-            <a class="resource-link" href="https://eprint.iacr.org/2025/619" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+            <h3 class="resource-title">Rust for Rustaceans</h3>
+            <p class="resource-author">Jon Gjengset</p>
+            <a class="resource-link" href="https://rust-for-rustaceans.com" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="rustr2" style="--day-color: var(--color-rust)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="rustr2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">MystenLabs/fastcrypto</h3>
+            <p class="resource-author">Mysten Labs</p>
+            <a class="resource-link" href="https://github.com/MystenLabs/fastcrypto" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="rustr3" style="--day-color: var(--color-rust)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="rustr3">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">Zcash librustzcash &mdash; Orchard + Halo 2</h3>
+            <p class="resource-author">Zcash</p>
+            <a class="resource-link" href="https://github.com/zcash/librustzcash" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="rustr4" style="--day-color: var(--color-rust)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="rustr4">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-book">Book</span>
+              <span class="time-badge">45min</span>
+            </div>
+            <h3 class="resource-title">Rust Atomics and Locks</h3>
+            <p class="resource-author">Mara Bos</p>
+            <a class="resource-link" href="https://marabos.nl/atomics/" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
           </div>
 
         </div>
-        <button class="study-guide-toggle" style="--day-color: var(--color-day3)">&#128214; Study Guide</button>
-        <div class="study-guide-container" data-day="3" data-block="2"></div>
       </div>
     </section>
 
@@ -650,7 +923,7 @@
 
   <!-- Keyboard Shortcuts Help -->
   <div class="shortcuts-hint" id="shortcuts-hint">
-    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Switch days &middot; <kbd>Z</kbd> ZK Deep Dive &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
+    <kbd>1</kbd>-<kbd>6</kbd> Switch chapters &middot; <kbd>Z</kbd> ZK Deep Dive &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
   </div>
 
   <script src="lexicon.js"></script>

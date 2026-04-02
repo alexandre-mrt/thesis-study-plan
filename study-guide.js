@@ -706,9 +706,13 @@ function updateGlobalToggleColor() {
     return;
   }
 
-  const dayNum = activeSection.dataset.day;
-  const colors = { 1: 'var(--color-day1)', 2: 'var(--color-day2)', 3: 'var(--color-day3)' };
-  activeBtn.style.background = colors[dayNum] || 'var(--color-day1)';
+  const dayKey = activeSection.dataset.day;
+  const colors = {
+    1: 'var(--color-day1)', 2: 'var(--color-day2)', 3: 'var(--color-day3)',
+    ch21: 'var(--color-ch21)', ch22: 'var(--color-ch22)', ch23: 'var(--color-ch23)',
+    ch24: 'var(--color-ch24)', ch25: 'var(--color-ch25)', rust: 'var(--color-rust)',
+  };
+  activeBtn.style.background = colors[dayKey] || 'var(--color-ch25)';
 }
 
 /* === Switch All Views (called by global toggle) === */

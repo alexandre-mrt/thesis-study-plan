@@ -12,6 +12,12 @@
   --color-day1: #6366F1;
   --color-day2: #06B6D4;
   --color-day3: #10B981;
+  --color-ch21: #06B6D4;
+  --color-ch22: #F59E0B;
+  --color-ch23: #10B981;
+  --color-ch24: #EC4899;
+  --color-ch25: #6366F1;
+  --color-rust: #F97316;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   --radius-sm: 6px;
@@ -151,7 +157,7 @@ body {
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-day1), var(--color-day2), var(--color-day3));
+  background: linear-gradient(90deg, var(--color-ch21), var(--color-ch22), var(--color-ch23), var(--color-ch24), var(--color-ch25), var(--color-rust));
   border-radius: 3px;
   transition: width var(--transition-slow);
   min-width: 0;
@@ -499,6 +505,7 @@ body {
 .badge-docs { background: rgba(148,163,184,0.15); color: #94a3b8; }
 .badge-article { background: rgba(244,114,182,0.15); color: #f472b6; }
 .badge-channel { background: rgba(251,146,60,0.15); color: #fb923c; }
+.badge-codebase { background: rgba(249,115,22,0.15); color: #fb923c; }
 
 /* === Time Badge === */
 .time-badge {
@@ -806,6 +813,12 @@ body {
 .search-result-day[data-day="1"] { background: rgba(99,102,241,0.2); color: #6366f1; }
 .search-result-day[data-day="2"] { background: rgba(6,182,212,0.2); color: #06b6d4; }
 .search-result-day[data-day="3"] { background: rgba(16,185,129,0.2); color: #10b981; }
+.search-result-day[data-day="ch21"] { background: rgba(6,182,212,0.2); color: #06b6d4; }
+.search-result-day[data-day="ch22"] { background: rgba(245,158,11,0.2); color: #f59e0b; }
+.search-result-day[data-day="ch23"] { background: rgba(16,185,129,0.2); color: #10b981; }
+.search-result-day[data-day="ch24"] { background: rgba(236,72,153,0.2); color: #ec4899; }
+.search-result-day[data-day="ch25"] { background: rgba(99,102,241,0.2); color: #6366f1; }
+.search-result-day[data-day="rust"] { background: rgba(249,115,22,0.2); color: #f97316; }
 
 .search-result-name {
   font-size: 0.9rem;

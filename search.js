@@ -30,6 +30,25 @@ const DAY_TECHNICAL_ACCESSORS = {
 
 const BLOCK_KEYS = ['block1', 'block2'];
 
+/* Map old (day, block) pairs to chapter keys for navigation */
+const DAY_BLOCK_TO_CHAPTER = {
+  '1-1': 'ch25',
+  '1-2': 'ch25',
+  '2-1': 'ch21',
+  '2-2': 'ch23',
+  '3-1': 'ch24',
+  '3-2': 'ch24',
+};
+
+const CHAPTER_LABELS = {
+  'ch21': '2.1',
+  'ch22': '2.2',
+  'ch23': '2.3',
+  'ch24': '2.4',
+  'ch25': '2.5',
+  'rust': 'RS',
+};
+
 /* === State === */
 let searchIndex = [];
 let selectedResultIndex = -1;
@@ -148,8 +167,9 @@ function renderSearchResults(results, query) {
     const dayBadge = document.createElement('span');
     dayBadge.className = 'search-result-day';
     const isDeepDive = result.isDeepDive === true;
-    dayBadge.dataset.day = isDeepDive ? 'zk' : String(result.day);
-    dayBadge.textContent = isDeepDive ? 'ZK' : ('D' + result.day);
+    const chapterKey = isDeepDive ? 'zk' : (DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || 'ch25');
+    dayBadge.dataset.day = chapterKey;
+    dayBadge.textContent = isDeepDive ? 'ZK' : (CHAPTER_LABELS[chapterKey] || result.day);
 
     const name = document.createElement('span');
     name.className = 'search-result-name';
@@ -255,9 +275,10 @@ function navigateToConcept(result) {
     return;
   }
 
-  /* 1. Switch to the correct day */
+  /* 1. Switch to the correct chapter tab */
   if (typeof switchDay === 'function') {
-    switchDay(result.day);
+    const chKey = DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || 'ch25';
+    switchDay(chKey);
   }
 
   /* 2. Wait for day switch, then find and open the guide + concept */
