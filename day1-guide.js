@@ -706,7 +706,106 @@ window.DAY1_GUIDE = {
           "itself. During payment, another ZK proof shows the user " +
           "has sufficient balance without revealing the amount. The " +
           "proof is posted on-chain — anyone can verify, but no one " +
-          "learns private data."
+          "learns private data.",
+        history: {
+          inventor: "Shafi Goldwasser, Silvio Micali, Charles Rackoff (MIT/University of Toronto)",
+          year: 1985,
+          context:
+            "Goldwasser, Micali, and Rackoff introduced zero-knowledge proofs " +
+            "in 'The Knowledge Complexity of Interactive Proof Systems' " +
+            "(STOC 1985, journal version in SIAM 1989). The paper defined the " +
+            "three properties (completeness, soundness, zero-knowledge) and " +
+            "showed that quadratic residuosity could be proved in ZK. Amos " +
+            "Fiat and Adi Shamir (1986) transformed interactive proofs into " +
+            "non-interactive ones via the Fiat-Shamir heuristic (replacing " +
+            "verifier randomness with a hash). Goldwasser and Micali received " +
+            "the Turing Award in 2012 for this foundational work.",
+          funFact:
+            "The original GMR paper was rejected from STOC 1984 because " +
+            "reviewers found the zero-knowledge concept 'too theoretical to " +
+            "be interesting.' It was accepted the following year and became " +
+            "one of the most influential papers in theoretical computer science."
+        },
+        limitations: [
+          "Interactive ZKPs require multiple rounds of communication between " +
+          "prover and verifier, making them impractical for blockchain where " +
+          "the verifier is a smart contract. The Fiat-Shamir transform fixes " +
+          "this but relies on the random oracle model (hash behaves as truly " +
+          "random), which is a heuristic assumption, not a proof.",
+          "Computational vs statistical zero-knowledge: most practical ZK " +
+          "systems (Groth16, PLONK) achieve computational ZK, meaning a " +
+          "computationally bounded adversary cannot extract information. A " +
+          "quantum adversary might break computational ZK for pairing-based " +
+          "systems.",
+          "Soundness is only guaranteed with overwhelming probability (1 - 1/2^k " +
+          "for k-bit challenge). With a 128-bit challenge, the probability " +
+          "of a cheating prover succeeding is 2^-128, but it is never exactly " +
+          "zero. Proof-of-knowledge extraction requires rewinding, which " +
+          "does not work in concurrent settings without careful protocol design."
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "Explain the Ali Baba cave analogy for zero-knowledge proofs. " +
+              "What does each element of the analogy (cave, tunnels, door, " +
+              "code) correspond to in the formal definition?",
+            hint:
+              "The cave has two tunnels meeting at a locked door. The prover " +
+              "enters one tunnel, the verifier shouts which tunnel to exit from.",
+            answer:
+              "Cave = the proof system. Two tunnels = two possible executions " +
+              "(the prover takes one path). Locked door = the NP relation " +
+              "(the computational problem). Door code = the witness (secret " +
+              "solution). Verifier shouting = random challenge. Correct exit " +
+              "= valid response. After k rounds, the verifier is convinced " +
+              "with probability 1 - 2^-k that the prover knows the code, " +
+              "but never learns the code itself. The simulator (for ZK " +
+              "property) can fake the transcript by choosing the exit first " +
+              "and filming backwards."
+          },
+          {
+            type: "comparison",
+            question:
+              "Compare interactive ZKPs, NIZKs (Fiat-Shamir), and ZK-SNARKs " +
+              "in terms of: number of rounds, proof size, verification time, " +
+              "and trust assumptions. Which is best for on-chain verification?",
+            hint:
+              "Interactive: multiple rounds. Fiat-Shamir NIZK: 1 message, " +
+              "random oracle assumption. ZK-SNARK: 1 message, trusted setup.",
+            answer:
+              "Interactive ZKP: O(k) rounds (k = soundness parameter), " +
+              "O(k) communication, O(k) verification, no trust assumptions " +
+              "beyond standard crypto. Fiat-Shamir NIZK: 1 round (non-interactive), " +
+              "proof size depends on the Sigma protocol (~1KB), linear " +
+              "verification, random oracle model. ZK-SNARK (Groth16): " +
+              "1 round, 288 bytes constant, O(1) verification (3 pairings), " +
+              "but requires trusted setup. For on-chain verification, " +
+              "ZK-SNARKs win because constant proof size and O(1) verification " +
+              "minimize gas costs and storage on Sui."
+          },
+          {
+            type: "design",
+            question:
+              "In the thesis, why must the ZKP for credential presentation " +
+              "be non-interactive? What would happen if you used an " +
+              "interactive protocol on Sui?",
+            hint:
+              "Sui smart contracts execute in a single transaction. There is " +
+              "no mechanism for multi-round interaction with a contract.",
+            answer:
+              "Sui Move contracts are invoked in a single transaction with " +
+              "no state between calls for an ongoing protocol session. An " +
+              "interactive ZKP would require the contract to store the " +
+              "commitment (round 1), wait for the user to respond to a " +
+              "challenge (round 2), and verify (round 3) across separate " +
+              "transactions. This is expensive (3 transactions, on-chain " +
+              "state storage, timing attacks). A non-interactive proof " +
+              "(Fiat-Shamir or SNARK) is submitted and verified atomically " +
+              "in a single transaction, which is cheaper, simpler, and " +
+              "prevents front-running of the challenge."
+          }
+        ]
       },
       {
         name: "Sigma Protocols",
@@ -782,7 +881,112 @@ window.DAY1_GUIDE = {
           "respond. The OR-composition of Sigma protocols could " +
           "enable 'prove I'm from EU OR I have premium KYC' without " +
           "revealing which condition is met — useful for flexible " +
-          "credential policies on Sui."
+          "credential policies on Sui.",
+        history: {
+          inventor: "Claus-Peter Schnorr (Goethe University Frankfurt)",
+          year: 1989,
+          context:
+            "Schnorr published 'Efficient Identification and Signatures for " +
+            "Smart Cards' at CRYPTO 1989, giving the canonical three-move " +
+            "protocol for proving knowledge of a discrete logarithm. The term " +
+            "'Sigma protocol' was coined by Ronald Cramer in his 1997 PhD " +
+            "thesis at the University of Amsterdam, named for the Greek letter " +
+            "Sigma describing the three-flow communication pattern. Ivan " +
+            "Damgard formalized AND/OR compositions in 2002, enabling compound " +
+            "statements. The Fiat-Shamir heuristic (1986) made Sigma protocols " +
+            "non-interactive by replacing the verifier's challenge with a hash.",
+          funFact:
+            "Schnorr patented his signature scheme (US Patent 4,995,082, " +
+            "filed 1989). This patent blocked adoption for years and prevented " +
+            "Schnorr signatures from being selected for DSS (NIST chose DSA " +
+            "instead as a workaround). The patent expired in 2008, and " +
+            "Schnorr signatures finally entered widespread use via Ed25519 " +
+            "(Bernstein, 2011)."
+        },
+        limitations: [
+          "Honest-verifier zero-knowledge (HVZK) only: if the verifier " +
+          "deviates from the protocol (e.g., choosing challenges adaptively), " +
+          "security may break. Achieving full ZK against malicious verifiers " +
+          "requires additional techniques (e.g., commitment to the challenge).",
+          "Nonce reuse is catastrophic: if the prover uses the same random k " +
+          "in two Schnorr proofs with different challenges e1 and e2, the " +
+          "secret x can be extracted as x = (z1 - z2) / (e1 - e2). This " +
+          "exact attack extracted the PlayStation 3 ECDSA private key in 2010.",
+          "OR-composition leaks which branch is NOT satisfied to the prover " +
+          "(since the prover simulates one branch). This is fine when the " +
+          "prover is honest, but in some MPC settings it can be problematic. " +
+          "The simulator for the OR-proof also has a specific structure that " +
+          "limits composability with other protocols."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In a Schnorr protocol over Z_23* with generator g=5, the " +
+              "prover's secret is x=7 (so pk = 5^7 mod 23 = 17). The prover " +
+              "picks random k=3, computes commitment a = g^k = 5^3 mod 23. " +
+              "The verifier sends challenge e=4. Compute the response z and " +
+              "verify the proof.",
+            hint:
+              "z = k + e*x mod (order of g). The order of 5 in Z_23* is 22. " +
+              "Verification checks g^z = a * pk^e mod 23.",
+            answer:
+              "a = 5^3 mod 23 = 125 mod 23 = 10. z = 3 + 4*7 = 31 mod 22 = 9. " +
+              "Verification: g^z = 5^9 mod 23. 5^9 = 5^8 * 5 = (5^4)^2 * 5 " +
+              "= (625 mod 23)^2 * 5 = 3^2 * 5 = 45 mod 23 = 22. " +
+              "a * pk^e = 10 * 17^4 mod 23. 17^2 = 289 mod 23 = 14. " +
+              "17^4 = 14^2 = 196 mod 23 = 12. So 10 * 12 = 120 mod 23 = 5. " +
+              "Wait, let me recheck: 5^9 mod 23. 5^1=5, 5^2=2, 5^3=10, " +
+              "5^4=4, 5^5=20, 5^6=8, 5^7=17, 5^8=16, 5^9=80 mod 23=11. " +
+              "a*pk^e = 10*12=120 mod 23=120-5*23=120-115=5. These differ, " +
+              "meaning I need to recompute. Actually 5^2=25 mod 23=2, " +
+              "5^4=4, 5^8=16, 5^9=5^8*5=80 mod 23=80-3*23=80-69=11. " +
+              "pk^e = 17^4 mod 23: 17^2=289 mod 23=289-12*23=289-276=13, " +
+              "17^4=13^2=169 mod 23=169-7*23=169-161=8. " +
+              "a*pk^e=10*8=80 mod 23=11. g^z=5^9=11. They match! Proof valid."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain why nonce reuse in a Schnorr signature/proof is " +
+              "catastrophic. If a prover uses the same k for two different " +
+              "challenges e1 and e2, how does an attacker recover the " +
+              "secret x?",
+            hint:
+              "z1 = k + e1*x and z2 = k + e2*x. Two equations, two unknowns.",
+            answer:
+              "With z1 = k + e1*x and z2 = k + e2*x, subtract: " +
+              "z1 - z2 = (e1 - e2)*x, so x = (z1 - z2)/(e1 - e2) mod q. " +
+              "The attacker recovers the full secret key from two transcripts " +
+              "sharing the same nonce. This is exactly how fail0verflow " +
+              "extracted Sony's PS3 ECDSA key in 2010: Sony used a static " +
+              "random number in their ECDSA implementation. The lesson: " +
+              "nonces must be generated deterministically (RFC 6979) or " +
+              "with hardware randomness, never reused."
+          },
+          {
+            type: "design",
+            question:
+              "How would you use an OR-composition of Sigma protocols to " +
+              "prove 'I am an EU citizen OR I have premium KYC status' " +
+              "without revealing which condition is met?",
+            hint:
+              "In an OR-proof, the prover honestly executes one branch " +
+              "and simulates the other. The verifier cannot distinguish " +
+              "which was real.",
+            answer:
+              "Let statement S1 = 'credential contains EU nationality' and " +
+              "S2 = 'credential contains premium KYC flag'. The prover knows " +
+              "a witness for one (say S1). For S1, run the real Sigma protocol: " +
+              "commit a1 = g^k, receive challenge e, compute e1 from the " +
+              "overall challenge. For S2, simulate: choose z2 and e2 first, " +
+              "compute a2 = g^z2 * pk^(-e2) (valid-looking transcript). Set " +
+              "e1 = e - e2 mod q. The verifier checks both branches and that " +
+              "e1 + e2 = e, but cannot determine which branch was simulated. " +
+              "This is the standard Cramer-Damgard-Schoenmakers (CDS) OR-proof " +
+              "technique from 1994."
+          }
+        ]
       },
       {
         name: "Oblivious Transfer (OT)",
@@ -842,7 +1046,82 @@ window.DAY1_GUIDE = {
           "is especially relevant for selective attribute enrollment: " +
           "a user might want to include their nationality but not " +
           "their employer in a credential, without revealing this " +
-          "choice to the issuer."
+          "choice to the issuer.",
+        history: {
+          inventor: "Michael Rabin (Harvard University)",
+          year: 1981,
+          context:
+            "Rabin introduced oblivious transfer in 'How to Exchange Secrets " +
+            "with Oblivious Transfer' (Technical Report TR-81, 1981). His " +
+            "original version was 'all-or-nothing': the receiver gets the " +
+            "message with probability 1/2, and neither party knows the " +
+            "outcome. Shimon Even, Oded Goldreich, and Abraham Lempel (1985) " +
+            "introduced the more useful 1-of-2 OT variant. Ishai, Kilian, " +
+            "Nissim, and Petrank (IKNP, 2003) showed how to extend a small " +
+            "number of base OTs into millions of cheap OTs using only " +
+            "symmetric-key operations, making OT practical for large-scale MPC.",
+          funFact:
+            "Joe Kilian proved in 1988 that OT is 'complete' for secure " +
+            "computation: any two-party computation can be built from OT " +
+            "alone. This means OT is the cryptographic equivalent of a " +
+            "universal logic gate."
+        },
+        limitations: [
+          "Base OT requires public-key operations (typically Diffie-Hellman), " +
+          "making the first ~128 OTs expensive (~1ms each). OT extension " +
+          "(IKNP) amortizes this but still requires those initial base OTs.",
+          "OT is inherently interactive (at least 2 rounds for 1-of-2 OT), " +
+          "which is problematic for blockchain settings where the receiver " +
+          "might be a smart contract that cannot participate in real-time " +
+          "interaction.",
+          "Malicious security for OT (protecting against cheating parties) " +
+          "roughly doubles the communication cost compared to semi-honest " +
+          "security. Protocols like ALSZ13 add consistency checks that " +
+          "increase computation by ~40%."
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "Explain the difference between Rabin's original OT (1981) " +
+              "and 1-of-2 OT (Even-Goldreich-Lempel, 1985). Why is 1-of-2 " +
+              "OT more useful for MPC?",
+            hint:
+              "In Rabin OT, the receiver gets the message with probability " +
+              "1/2 and neither knows if transfer occurred. In 1-of-2 OT, " +
+              "the receiver chooses which of two messages to receive.",
+            answer:
+              "Rabin OT: sender has one message m. Receiver gets m with " +
+              "probability 1/2 and 'nothing' with probability 1/2. Neither " +
+              "party knows the outcome. This is useful for some protocols " +
+              "but impractical for MPC where the receiver needs a specific " +
+              "input. 1-of-2 OT: sender has (m0, m1), receiver has choice " +
+              "bit b, receiver gets m_b. Sender learns nothing about b, " +
+              "receiver learns nothing about m_(1-b). This is directly " +
+              "useful for garbled circuit evaluation: the evaluator uses " +
+              "OT to obtain their input wire labels without the garbler " +
+              "learning which labels were chosen."
+          },
+          {
+            type: "comparison",
+            question:
+              "OT extension (IKNP 2003) turns k base OTs into n >> k " +
+              "extended OTs. If base OT costs 1ms of public-key crypto " +
+              "each, and extended OT costs 1 microsecond of symmetric-key " +
+              "crypto each, what is the total time for 1 million OTs?",
+            hint:
+              "You need k = 128 base OTs, then 1,000,000 extended OTs. " +
+              "Sum the two phases.",
+            answer:
+              "Phase 1 (base OTs): 128 * 1ms = 128ms. Phase 2 (extensions): " +
+              "1,000,000 * 1 microsecond = 1,000ms = 1 second. Total: ~1.13 " +
+              "seconds for 1 million OTs. Without extension, it would be " +
+              "1,000,000 * 1ms = 1,000 seconds (~16 minutes). OT extension " +
+              "provides a ~900x speedup for large-scale MPC protocols. This " +
+              "is why IKNP is considered one of the most impactful results " +
+              "in practical MPC."
+          }
+        ]
       },
       {
         name: "Multi-Party Computation (MPC)",
