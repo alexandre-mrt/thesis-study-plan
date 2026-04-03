@@ -12,12 +12,16 @@ const GUIDE_DATA = {
   1: () => window.DAY1_GUIDE,
   2: () => window.DAY2_GUIDE,
   3: () => window.DAY3_GUIDE,
+  'ch22': () => window.CH22_GUIDE,
+  'rust': () => window.RUST_GUIDE,
 };
 
 const TECHNICAL_DATA = {
   1: () => window.DAY1_TECHNICAL,
   2: () => window.DAY2_TECHNICAL,
   3: () => window.DAY3_TECHNICAL,
+  'ch22': () => null,
+  'rust': () => null,
 };
 
 const BLOCK_KEY_MAP = { 1: 'block1', 2: 'block2' };
@@ -204,6 +208,21 @@ function buildIntuitiveContent(concept, dayNum) {
     container.appendChild(example);
   }
 
+  const historySection = buildHistorySection(concept.history);
+  if (historySection) {
+    container.appendChild(historySection);
+  }
+
+  const limitationsSection = buildLimitationsSection(concept.limitations);
+  if (limitationsSection) {
+    container.appendChild(limitationsSection);
+  }
+
+  const exercisesSection = buildExercisesSection(concept.exercises);
+  if (exercisesSection) {
+    container.appendChild(exercisesSection);
+  }
+
   return container;
 }
 
@@ -310,7 +329,169 @@ function buildTechnicalContent(techConcept, dayNum, publicPrivateData, thesisExa
     container.appendChild(example);
   }
 
+  const techExercises = techConcept ? techConcept.exercises : null;
+  const exercisesSection = buildExercisesSection(techExercises);
+  if (exercisesSection) {
+    container.appendChild(exercisesSection);
+  }
+
   return container;
+}
+
+/* === Build History Section === */
+
+function buildHistorySection(history) {
+  if (!history) return null;
+
+  const section = document.createElement('div');
+  section.className = 'concept-history';
+
+  const header = document.createElement('h4');
+  header.className = 'concept-history-header';
+  header.innerHTML = '\uD83D\uDCDC History';
+  section.appendChild(header);
+
+  if (history.inventor || history.year) {
+    const inventor = document.createElement('p');
+    inventor.className = 'concept-history-inventor';
+    const parts = [];
+    if (history.inventor) parts.push(escapeHtml(history.inventor));
+    if (history.year) parts.push(String(history.year));
+    inventor.innerHTML = '<strong>' + parts.join(', ') + '</strong>';
+    section.appendChild(inventor);
+  }
+
+  if (history.context) {
+    const context = document.createElement('p');
+    context.className = 'concept-history-context';
+    context.textContent = history.context;
+    section.appendChild(context);
+  }
+
+  if (history.funFact) {
+    const funFact = document.createElement('p');
+    funFact.className = 'concept-history-funfact';
+    funFact.textContent = history.funFact;
+    section.appendChild(funFact);
+  }
+
+  return section;
+}
+
+/* === Build Limitations Section === */
+
+function buildLimitationsSection(limitations) {
+  if (!limitations || limitations.length === 0) return null;
+
+  const section = document.createElement('div');
+  section.className = 'concept-limitations';
+
+  const header = document.createElement('h4');
+  header.className = 'concept-limitations-header';
+  header.innerHTML = '\u26A0\uFE0F Known Limitations';
+  section.appendChild(header);
+
+  const list = document.createElement('ul');
+  list.className = 'concept-limitations-list';
+
+  limitations.forEach(function (text) {
+    const li = document.createElement('li');
+    li.className = 'concept-limitation-item';
+    li.textContent = text;
+    list.appendChild(li);
+  });
+
+  section.appendChild(list);
+  return section;
+}
+
+/* === Build Exercises Section === */
+
+const EXERCISE_TYPE_COLORS = {
+  conceptual: '#6366F1',
+  calculation: '#F59E0B',
+  comparison: '#06B6D4',
+  design: '#10B981',
+};
+
+function buildExercisesSection(exercises) {
+  if (!exercises || exercises.length === 0) return null;
+
+  const section = document.createElement('div');
+  section.className = 'concept-exercises';
+
+  const header = document.createElement('h4');
+  header.className = 'concept-exercises-header';
+  header.innerHTML = '\u270F\uFE0F Exercises';
+  section.appendChild(header);
+
+  exercises.forEach(function (exercise, idx) {
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+
+    const typeColor = EXERCISE_TYPE_COLORS[exercise.type] || '#6366F1';
+
+    const badge = document.createElement('span');
+    badge.className = 'exercise-type-badge';
+    badge.style.setProperty('--exercise-type-color', typeColor);
+    badge.textContent = exercise.type || 'exercise';
+    card.appendChild(badge);
+
+    if (exercise.question) {
+      const question = document.createElement('p');
+      question.className = 'exercise-question';
+      question.textContent = exercise.question;
+      card.appendChild(question);
+    }
+
+    if (exercise.hint) {
+      const hintId = 'exercise-hint-' + Date.now() + '-' + idx;
+      const hintBtn = document.createElement('button');
+      hintBtn.className = 'exercise-toggle';
+      hintBtn.textContent = 'Show hint';
+      hintBtn.setAttribute('aria-expanded', 'false');
+
+      const hintContent = document.createElement('div');
+      hintContent.className = 'exercise-hint';
+      hintContent.id = hintId;
+      hintContent.textContent = exercise.hint;
+
+      hintBtn.addEventListener('click', function () {
+        const isVisible = hintContent.classList.toggle('visible');
+        hintBtn.textContent = isVisible ? 'Hide hint' : 'Show hint';
+        hintBtn.setAttribute('aria-expanded', String(isVisible));
+      });
+
+      card.appendChild(hintBtn);
+      card.appendChild(hintContent);
+    }
+
+    if (exercise.answer) {
+      const answerId = 'exercise-answer-' + Date.now() + '-' + idx;
+      const answerBtn = document.createElement('button');
+      answerBtn.className = 'exercise-toggle';
+      answerBtn.textContent = 'Show answer';
+      answerBtn.setAttribute('aria-expanded', 'false');
+
+      const answerContent = document.createElement('div');
+      answerContent.className = 'exercise-answer';
+      answerContent.id = answerId;
+      answerContent.textContent = exercise.answer;
+
+      answerBtn.addEventListener('click', function () {
+        const isVisible = answerContent.classList.toggle('visible');
+        answerBtn.textContent = isVisible ? 'Hide answer' : 'Show answer';
+        answerBtn.setAttribute('aria-expanded', String(isVisible));
+      });
+
+      card.appendChild(answerBtn);
+      card.appendChild(answerContent);
+    }
+
+    section.appendChild(card);
+  });
+
+  return section;
 }
 
 /* === Build Concept Card (both views) === */
@@ -318,7 +499,9 @@ function buildTechnicalContent(techConcept, dayNum, publicPrivateData, thesisExa
 function buildConceptCard(concept, techConcept, dayNum, conceptKey, savedState, viewState) {
   const card = document.createElement('div');
   card.className = 'concept-card';
-  card.style.setProperty('--day-color', 'var(--color-day' + dayNum + ')');
+  const colorMap = { 1: 'day1', 2: 'day2', 3: 'day3', 'ch21': 'ch21', 'ch22': 'ch22', 'ch23': 'ch23', 'ch24': 'ch24', 'ch25': 'ch25', 'rust': 'rust' };
+  const colorKey = colorMap[dayNum] || ('day' + dayNum);
+  card.style.setProperty('--day-color', 'var(--color-' + colorKey + ')');
 
   const header = document.createElement('div');
   header.className = 'concept-header';
@@ -407,7 +590,9 @@ function buildConceptCard(concept, techConcept, dayNum, conceptKey, savedState, 
 function buildConnectionsSummary(text, dayNum) {
   const el = document.createElement('div');
   el.className = 'connections-summary';
-  el.style.setProperty('--day-color', 'var(--color-day' + dayNum + ')');
+  const connColorMap = { 1: 'day1', 2: 'day2', 3: 'day3', 'ch21': 'ch21', 'ch22': 'ch22', 'ch23': 'ch23', 'ch24': 'ch24', 'ch25': 'ch25', 'rust': 'rust' };
+  const connColorKey = connColorMap[dayNum] || ('day' + dayNum);
+  el.style.setProperty('--day-color', 'var(--color-' + connColorKey + ')');
   el.innerHTML =
     '<span class="connections-summary-label">Thesis Connections</span>' +
     escapeHtml(text);
@@ -579,7 +764,8 @@ function renderStudyGuides() {
   const viewState = loadViewToggleState();
 
   containers.forEach((container) => {
-    const dayNum = Number(container.dataset.day);
+    const dayKey = container.dataset.day;
+    const dayNum = isNaN(dayKey) ? dayKey : Number(dayKey);
     const blockNum = Number(container.dataset.block);
 
     const guideGetter = GUIDE_DATA[dayNum];
@@ -600,7 +786,9 @@ function renderStudyGuides() {
 
     const guideEl = document.createElement('div');
     guideEl.className = 'study-guide';
-    guideEl.style.setProperty('--day-color', 'var(--color-day' + dayNum + ')');
+    const guideColorMap = { 1: 'day1', 2: 'day2', 3: 'day3', 'ch21': 'ch21', 'ch22': 'ch22', 'ch23': 'ch23', 'ch24': 'ch24', 'ch25': 'ch25', 'rust': 'rust' };
+    const guideColorKey = guideColorMap[dayNum] || ('day' + dayNum);
+    guideEl.style.setProperty('--day-color', 'var(--color-' + guideColorKey + ')');
 
     guideEl.appendChild(buildConnectionsSummary(blockData.connectionsSummary, dayNum));
 
