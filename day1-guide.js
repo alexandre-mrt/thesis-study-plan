@@ -1819,7 +1819,107 @@ window.DAY1_GUIDE = {
           "being checked (different attributes cause different memory " +
           "accesses). Path ORAM inside the SGX enclave hides these " +
           "patterns at ~10x overhead, protecting attribute privacy " +
-          "even against side-channel adversaries."
+          "even against side-channel adversaries.",
+        history: {
+          inventor: "Oded Goldreich and Rafail Ostrovsky (Technion / UCLA)",
+          year: 1996,
+          context:
+            "Goldreich and Ostrovsky published 'Software Protection and " +
+            "Simulation on Oblivious RAMs' in JACM 1996 (based on " +
+            "Goldreich's 1987 work and Ostrovsky's 1990 PhD thesis at MIT). " +
+            "The original scheme had O(sqrt(n)) overhead. Shi, Chan, Stefanov, " +
+            "and Li (2011) introduced Path ORAM, reducing overhead to " +
+            "O(log n) with a simple tree-based construction. Path ORAM " +
+            "became the standard for practical ORAM due to its simplicity. " +
+            "Circuit ORAM (Wang et al., 2015) improved constants. ORAM " +
+            "gained renewed importance with Intel SGX (2015), where memory " +
+            "access pattern leaks became a real threat to enclave privacy.",
+          funFact:
+            "Goldreich and Ostrovsky's lower bound proof shows that any " +
+            "ORAM scheme must have Omega(log n) overhead, meaning Path " +
+            "ORAM's O(log n) is asymptotically optimal. No future ORAM " +
+            "scheme can beat this logarithmic barrier."
+        },
+        limitations: [
+          "Practical overhead of 10-100x makes ORAM prohibitive for " +
+          "performance-critical applications. Path ORAM with 1 million " +
+          "blocks requires accessing ~20 blocks per real access (log2(10^6) " +
+          "= 20), and each block access involves re-encryption and reshuffling.",
+          "Client-side storage for the position map grows as O(n * log(n) / B) " +
+          "where B is the block size. For 1GB of server data with 4KB blocks, " +
+          "the position map is ~5MB, which must fit in trusted memory (e.g., " +
+          "SGX enclave's limited EPC of 128MB).",
+          "ORAM protects access patterns but not access timing or volume. " +
+          "An adversary can still observe when accesses happen and how many " +
+          "accesses occur. Hiding timing requires constant-rate access " +
+          "(dummy accesses when idle), further increasing overhead."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In Path ORAM with n = 2^20 blocks (approximately 1 million), " +
+              "the tree has depth log2(n) = 20. Each bucket holds Z = 4 " +
+              "blocks and each block is 4KB. What is the bandwidth overhead " +
+              "per real access (read one path + write one path)?",
+            hint:
+              "One path traversal reads/writes (depth + 1) buckets. Each " +
+              "access reads a full path and writes it back.",
+            answer:
+              "Path depth = 20 levels + 1 root = 21 buckets per path. Each " +
+              "bucket = Z * block_size = 4 * 4KB = 16KB. Per access: read " +
+              "21 * 16KB + write 21 * 16KB = 672KB total bandwidth for one " +
+              "4KB logical read. Overhead = 672KB / 4KB = 168x. This is " +
+              "the practical cost of hiding access patterns in Path ORAM. " +
+              "The overhead is why ORAM is typically used only for sensitive " +
+              "data structures (e.g., credential lookup tables inside TEEs), " +
+              "not for bulk data processing."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Why is ORAM specifically important for TEE-based credential " +
+              "verification? What information leaks through memory access " +
+              "patterns in an SGX enclave, even though the data is encrypted?",
+            hint:
+              "The OS controls page tables and can observe which memory pages " +
+              "the enclave accesses. Different credential attributes may be " +
+              "stored at different addresses.",
+            answer:
+              "SGX encrypts enclave memory but the untrusted OS manages page " +
+              "tables and can observe page-level access patterns. If " +
+              "credential attributes are stored at different addresses " +
+              "(e.g., age at page 5, nationality at page 12), the OS sees " +
+              "which pages are accessed during verification, revealing which " +
+              "attributes are being checked. This is a controlled-channel " +
+              "attack (Xu et al., 2015). Even cache-line granularity leaks " +
+              "(L1/L2 cache attacks). ORAM makes all access patterns " +
+              "indistinguishable: verifying 'age >= 18' produces the same " +
+              "memory trace as verifying 'nationality = Swiss'."
+          },
+          {
+            type: "design",
+            question:
+              "Given that full ORAM has 100x overhead, propose a practical " +
+              "middle ground for the thesis TEE layer that protects against " +
+              "the most likely access pattern attacks without full ORAM cost.",
+            hint:
+              "Consider what data structures inside the TEE are most " +
+              "sensitive to access pattern analysis, and protect only those.",
+            answer:
+              "Use ORAM selectively: (1) Store the credential attribute " +
+              "lookup table (small, ~1000 entries) in a Path ORAM structure " +
+              "inside the enclave. Cost: ~20x for a small dataset. " +
+              "(2) Process all credential types through the same code path " +
+              "(constant-time attribute comparison) to prevent " +
+              "instruction-level leaks. (3) Add dummy accesses to pad each " +
+              "verification to a fixed number of memory operations. " +
+              "(4) Keep the ZK circuit evaluation (Groth16 proving) outside " +
+              "the TEE where access patterns do not reveal credential " +
+              "contents. This selective approach achieves ~5-10x overhead " +
+              "instead of 100x while protecting the most sensitive operations."
+          }
+        ]
       }
     ]
   },
@@ -1902,7 +2002,110 @@ window.DAY1_GUIDE = {
           "the nullifier is correctly derived, and attributes " +
           "satisfy the disclosure policy.' This circuit has ~100K " +
           "constraints for a 10-attribute credential — the R1CS " +
-          "representation is what Groth16 actually proves."
+          "representation is what Groth16 actually proves.",
+        history: {
+          inventor: "Numerous contributors; R1CS formalized in the SNARKs literature (Ben-Sasson, Chiesa et al.)",
+          year: 2013,
+          context:
+            "Arithmetic circuits as a model of computation date back to " +
+            "Valiant (1976) and Strassen (1973) in algebraic complexity " +
+            "theory. Their use in zero-knowledge proofs was pioneered by " +
+            "Ishai, Kushilevitz, Ostrovsky, and Sahai (IKOS, 2007) with " +
+            "MPC-in-the-head. The R1CS (Rank-1 Constraint System) format was " +
+            "formalized and popularized by Ben-Sasson, Chiesa, Tromer, and " +
+            "Virza in the libsnark library (2013), which became the reference " +
+            "implementation for Groth16. Circom (Belles-Munoz, iden3, 2018) " +
+            "made R1CS circuit writing accessible via a domain-specific " +
+            "language that compiles to R1CS constraints.",
+          funFact:
+            "The first production R1CS circuit (Zcash Sprout, 2016) had " +
+            "about 1.2 million constraints and took ~40 seconds to prove. " +
+            "Modern circuits for zkLogin on Sui have similar constraint " +
+            "counts but prove in ~2 seconds thanks to hardware improvements " +
+            "and better libraries."
+        },
+        limitations: [
+          "R1CS only supports rank-1 constraints (A*w . B*w = C*w), meaning " +
+          "each constraint encodes exactly one multiplication. Operations " +
+          "like range checks or hash functions that require many " +
+          "multiplications result in bloated constraint systems — SHA-256 " +
+          "needs ~27,000 constraints.",
+          "Flattening complex expressions into elementary gates can " +
+          "dramatically increase the number of intermediate variables. A " +
+          "polynomial of degree d requires d-1 multiplication gates and " +
+          "d-1 auxiliary variables, even if the algebraic expression is " +
+          "compact.",
+          "R1CS is not universally efficient: PLONKish arithmetization " +
+          "(custom gates + lookup tables) can express the same computation " +
+          "with 5-10x fewer constraints for hash-heavy circuits. The choice " +
+          "of arithmetization format directly impacts proving time."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Flatten the expression y = x^3 + x + 5 into R1CS constraints. " +
+              "Introduce intermediate variables and write each constraint in " +
+              "the form A * B = C. How many constraints do you need?",
+            hint:
+              "You need one constraint per multiplication. x^3 requires " +
+              "computing x*x first, then (x*x)*x.",
+            answer:
+              "Introduce v1 = x*x and v2 = v1*x = x^3. " +
+              "Constraint 1: x * x = v1 (computes x^2). " +
+              "Constraint 2: v1 * x = v2 (computes x^3). " +
+              "Constraint 3: (v2 + x + 5) * 1 = y (addition is 'free' in " +
+              "R1CS as a linear combination, but we need a constraint to " +
+              "bind the output). Actually, addition is a linear combination " +
+              "that can be embedded into constraint 2's output: we can write " +
+              "v1 * x = y - x - 5, which gives 2 constraints total. The " +
+              "witness vector is w = [1, x, y, v1] with 2 R1CS constraints."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Why is R1CS the 'input format' for Groth16 but not for PLONK? " +
+              "What does PLONKish arithmetization offer that R1CS cannot?",
+            hint:
+              "PLONK uses custom gates that can encode multiple operations " +
+              "in a single constraint, plus lookup tables.",
+            answer:
+              "R1CS restricts each constraint to a single multiplication " +
+              "(rank-1). PLONK's arithmetization uses polynomial identity " +
+              "checks with custom gates that can encode arbitrary degree-d " +
+              "relations in a single constraint row. For example, a PLONK " +
+              "custom gate can check a * b + c * d = e in one constraint, " +
+              "which would need 2 R1CS constraints. Lookup tables (plookup, " +
+              "Gabizon-Williamson 2020) let PLONK check set membership " +
+              "(e.g., 'x is a valid byte') in O(1) constraints, whereas " +
+              "R1CS needs O(8) constraints for the same check. This makes " +
+              "PLONK 5-10x more efficient for hash circuits."
+          },
+          {
+            type: "design",
+            question:
+              "Estimate the R1CS constraint count for a credential " +
+              "verification circuit that checks: (1) BBS+ signature " +
+              "verification, (2) Merkle tree membership (depth 20, Poseidon " +
+              "hash), (3) nullifier derivation (1 Poseidon hash), and " +
+              "(4) one range proof (age >= 18, 8-bit range).",
+            hint:
+              "BBS+ verification involves ~3 pairings. Each pairing needs " +
+              "~50,000 constraints in R1CS. Poseidon hash is ~300 constraints. " +
+              "An 8-bit range proof needs ~8 bit-decomposition constraints.",
+            answer:
+              "BBS+ signature verification: ~150,000 constraints (3 pairing " +
+              "checks, each ~50K constraints for Miller loop + final " +
+              "exponentiation in R1CS). Merkle tree: 20 levels * 300 " +
+              "constraints/Poseidon = 6,000 constraints. Nullifier: 300 " +
+              "constraints (1 Poseidon hash). Range proof (8-bit): ~16 " +
+              "constraints (bit decomposition + binary checks). Total: " +
+              "~156,316 constraints. The BBS+ pairings dominate. This is " +
+              "why some systems prove BBS+ verification outside the circuit " +
+              "(via Sigma protocols) and only use the SNARK for Merkle " +
+              "membership and nullifier checks (~6,300 constraints)."
+          }
+        ]
       },
       {
         name: "ZK-SNARKs (Groth16)",
@@ -1977,7 +2180,109 @@ window.DAY1_GUIDE = {
           "verifies a single Groth16 proof (3 pairings, ~50ms, " +
           "~200K gas). The per-circuit setup is acceptable since " +
           "your credential verification circuit is stable — one " +
-          "ceremony covers all presentations."
+          "ceremony covers all presentations.",
+        history: {
+          inventor: "Jens Groth (University College London)",
+          year: 2016,
+          context:
+            "Groth published 'On the Size of Pairing-Based Non-interactive " +
+            "Arguments' at EUROCRYPT 2016, achieving the smallest possible " +
+            "SNARK proof (3 group elements, 192 bytes). Earlier SNARKs " +
+            "include Pinocchio (Parno, Howell, Gentry, Rabin, 2013) with " +
+            "8 group elements and GGPR (Gennaro, Gentry, Parno, Raykova, " +
+            "2013). The concept of 'succinct' arguments dates to Kilian " +
+            "(1992) and Micali (2000, CS proofs). Ben-Sasson and Chiesa " +
+            "et al. built libsnark (2013), the first practical SNARK " +
+            "library. Zcash (2016) was the first production deployment of " +
+            "SNARKs (Pinocchio-based Sprout, later Groth16-based Sapling). " +
+            "Sui added native Groth16 verification in 2023.",
+          funFact:
+            "Groth16 proofs are exactly 192 bytes (3 elements of G1/G2 on " +
+            "BN254) regardless of whether the circuit has 100 or 10 million " +
+            "constraints. This constant size is why Groth16 dominates " +
+            "on-chain verification despite being 8 years old."
+        },
+        limitations: [
+          "Trusted setup is circuit-specific: every new circuit (or circuit " +
+          "modification) requires a new MPC ceremony. Zcash's Sapling " +
+          "ceremony (2018) involved 90 participants over several months. " +
+          "If the toxic waste (secret tau) is not destroyed, an adversary " +
+          "can forge proofs for any statement.",
+          "Not quantum-safe: Groth16 relies on pairing-based assumptions " +
+          "(Knowledge of Exponent, q-SDH) that Shor's algorithm breaks. " +
+          "A sufficiently large quantum computer could forge Groth16 proofs, " +
+          "breaking all on-chain verification.",
+          "Proving time is O(n log n) where n is the number of constraints, " +
+          "with large constants due to FFT and multi-scalar multiplication. " +
+          "A 1 million constraint circuit takes ~5-15 seconds to prove on " +
+          "a modern laptop. This limits real-time applications where the " +
+          "user must generate a proof interactively."
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "What is 'toxic waste' in Groth16's trusted setup, and why " +
+              "is it called the 'most dangerous secret in cryptography'? " +
+              "How do MPC ceremonies mitigate this risk?",
+            hint:
+              "The toxic waste is the secret randomness (tau) used to " +
+              "generate the CRS. If any single party in the MPC ceremony " +
+              "destroys their share, the waste is unrecoverable.",
+            answer:
+              "Toxic waste is the secret randomness tau (and alpha, beta, " +
+              "gamma, delta) used to compute the CRS (proving/verification " +
+              "keys). With tau, an attacker can forge proofs for any false " +
+              "statement (e.g., 'I own 1 billion coins' or 'this invalid " +
+              "credential is valid'). MPC ceremonies distribute the " +
+              "generation: each participant i contributes tau_i, and the " +
+              "final tau = product(tau_i). Security holds if at least ONE " +
+              "participant honestly destroys their tau_i. Zcash Powers of " +
+              "Tau ceremony had 90 participants; the probability of all 90 " +
+              "being compromised is negligible."
+          },
+          {
+            type: "calculation",
+            question:
+              "Groth16 verification consists of 3 pairing checks. If each " +
+              "pairing on BN254 takes 1.5ms, and the verifier also needs to " +
+              "compute a multi-scalar multiplication of the public inputs " +
+              "(taking 0.2ms per input), what is the total verification time " +
+              "for a circuit with 5 public inputs?",
+            hint:
+              "Total = (3 pairings) + (public input MSM). The MSM cost is " +
+              "0.2ms * number of public inputs.",
+            answer:
+              "Pairings: 3 * 1.5ms = 4.5ms. Public input MSM: 5 * 0.2ms = " +
+              "1.0ms. Total: 5.5ms. In practice, Sui's native groth16 " +
+              "verification takes ~4-6ms for typical circuits. On-chain, " +
+              "this translates to ~200K gas units on Sui (comparable to a " +
+              "few simple Move function calls). Compare this to verifying " +
+              "the raw BBS+ proof directly (3 pairings + Sigma protocol " +
+              "verification), which would take 10-20ms and require " +
+              "custom Move code for each proof type."
+          },
+          {
+            type: "comparison",
+            question:
+              "Compare Groth16 with Pinocchio (the predecessor SNARK). " +
+              "What did Groth16 improve, and what remained the same?",
+            hint:
+              "Pinocchio has 8 group elements per proof. Both require " +
+              "trusted setup and use pairings.",
+            answer:
+              "Pinocchio (PHGR13): 8 group elements proof (~512B on BN254), " +
+              "7 pairing checks for verification, circuit-specific trusted " +
+              "setup, O(n log n) proving. Groth16: 3 group elements proof " +
+              "(192B), 3 pairing checks (2.3x faster verification), " +
+              "circuit-specific trusted setup (same limitation), O(n log n) " +
+              "proving. Both require trusted setup and are not quantum-safe. " +
+              "Groth16's improvement is purely in proof size (2.7x smaller) " +
+              "and verification speed (2.3x faster). Groth16 achieves the " +
+              "theoretical minimum: Groth proved no pairing-based SNARK can " +
+              "have fewer than 2 group elements."
+          }
+        ]
       },
       {
         name: "ZK-STARKs",
@@ -2040,7 +2345,92 @@ window.DAY1_GUIDE = {
           "Groth16, meaning higher gas costs on Sui. Your migration " +
           "strategy could use STARKs for high-value transactions " +
           "(where quantum safety matters more) and keep Groth16 for " +
-          "low-value payments."
+          "low-value payments.",
+        history: {
+          inventor: "Eli Ben-Sasson, Iddo Bentov, Yinon Horesh, Michael Riabzev (Technion / StarkWare)",
+          year: 2018,
+          context:
+            "Ben-Sasson et al. published 'Scalable, transparent, and " +
+            "post-quantum secure computational integrity' (ePrint 2018/046), " +
+            "introducing STARKs. The key innovation was using FRI (Fast " +
+            "Reed-Solomon Interactive Oracle Proofs of Proximity) as a " +
+            "polynomial commitment scheme based only on hash functions. " +
+            "STARKs build on the IOP (Interactive Oracle Proof) model " +
+            "formalized by Ben-Sasson, Chiesa, and Spooner (2016). " +
+            "StarkWare (founded 2018 by Ben-Sasson, Goldberg, and others) " +
+            "commercialized STARKs for Ethereum scaling via StarkEx " +
+            "(2020) and StarkNet (2021). The AIR (Algebraic Intermediate " +
+            "Representation) arithmetization format was co-developed " +
+            "with the STARK framework.",
+          funFact:
+            "The name STARK stands for 'Scalable Transparent ARgument of " +
+            "Knowledge,' a deliberate contrast with SNARKs (Succinct " +
+            "Non-interactive ARgument of Knowledge). The 'T' for " +
+            "Transparent emphasizes no trusted setup, and the 'S' for " +
+            "Scalable refers to quasi-linear prover time."
+        },
+        limitations: [
+          "Proof size is 50-200KB (vs 192 bytes for Groth16), making " +
+          "on-chain verification storage-expensive. Posting a STARK proof " +
+          "on Ethereum costs ~500K-1M gas for calldata alone, compared to " +
+          "~300K total for Groth16 verification.",
+          "Verification time is O(log^2 n) with large constants. For a " +
+          "circuit of size 2^20, STARK verification takes ~50-100ms " +
+          "(compared to ~5ms for Groth16). This makes STARKs impractical " +
+          "for Sui's per-transaction verification model.",
+          "STARKs require a specific arithmetization (AIR) that is less " +
+          "expressive than R1CS for some computations. Converting existing " +
+          "R1CS circuits to AIR format requires non-trivial rewriting, and " +
+          "the STARK ecosystem has fewer developer tools than SNARKs " +
+          "(no equivalent to Circom's large library ecosystem)."
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "Explain the FRI protocol at a high level. How does it prove " +
+              "that a committed polynomial has low degree, and why is this " +
+              "useful for STARKs?",
+            hint:
+              "FRI recursively halves the polynomial's degree by folding, " +
+              "and the verifier checks random evaluations at each step.",
+            answer:
+              "FRI proves that a function f committed via Merkle tree is " +
+              "'close to' a polynomial of degree < d. Process: (1) Commit " +
+              "to evaluations of f on a domain D. (2) Verifier sends random " +
+              "alpha. (3) Prover folds: f'(x) = (f(x) + f(-x))/2 + " +
+              "alpha*(f(x) - f(-x))/(2x), reducing degree by half. " +
+              "(4) Repeat until the polynomial is constant. (5) Verifier " +
+              "checks random positions across layers for consistency. " +
+              "This is useful because STARK soundness reduces to proving " +
+              "that the execution trace satisfies polynomial constraints " +
+              "of bounded degree. FRI provides the 'polynomial commitment' " +
+              "using only hash functions (Merkle trees), avoiding pairings."
+          },
+          {
+            type: "comparison",
+            question:
+              "A credential system must choose between Groth16 and STARKs " +
+              "for on-chain verification on Sui. Create a decision matrix " +
+              "comparing: proof size, verification time, setup trust, " +
+              "quantum safety, and proving time.",
+            hint:
+              "Consider that Sui has native Groth16 support but no native " +
+              "STARK verifier.",
+            answer:
+              "Proof size: Groth16 = 192B (excellent for on-chain), STARK = " +
+              "50-200KB (expensive on-chain storage). Verification: Groth16 = " +
+              "~5ms / 3 pairings (Sui native), STARK = ~100ms / log^2(n) " +
+              "hash operations (no Sui native support, must be in Move). " +
+              "Setup: Groth16 = trusted ceremony (per circuit), STARK = " +
+              "transparent (no trust). Quantum safety: Groth16 = broken by " +
+              "quantum (pairing-based), STARK = safe (hash-based). Proving: " +
+              "Groth16 = ~10s for 1M constraints, STARK = ~15s for equivalent " +
+              "(quasi-linear). For the thesis TODAY, Groth16 wins on all " +
+              "practical metrics except quantum safety. For 10-year " +
+              "credential longevity, STARKs may be necessary."
+          }
+        ]
       },
       {
         name: "PLONK",
@@ -2108,7 +2498,115 @@ window.DAY1_GUIDE = {
           "efficiently implement the 'country ∈ EU' set membership " +
           "check inside the circuit. PLONK proofs are ~400B (vs " +
           "Groth16's 288B) with ~5ms verification — a reasonable " +
-          "tradeoff for development flexibility."
+          "tradeoff for development flexibility.",
+        history: {
+          inventor: "Ariel Gabizon, Zachary Williamson, Oana Ciobotaru (Aztec Network / Protocol Labs)",
+          year: 2019,
+          context:
+            "Gabizon, Williamson, and Ciobotaru published 'PLONK: " +
+            "Permutations over Lagrange-bases for Oecumenical Noninteractive " +
+            "arguments of Knowledge' (ePrint 2019/953). PLONK solved the " +
+            "universal setup problem: unlike Groth16 (per-circuit setup), " +
+            "PLONK's SRS works for any circuit up to a maximum size. It " +
+            "built on Kate-Zaverucha-Goldberg (KZG) polynomial commitments " +
+            "(2010) and Sonic (Maller, Bowe, Kohlweiss, Meiklejohn, 2019). " +
+            "Halo (Bowe, Grigg, Hopwood, 2019) later achieved recursive " +
+            "proof composition without trusted setup. PLONK variants " +
+            "proliferated: TurboPLONK (custom gates), UltraPLONK (plookup " +
+            "tables), Halo2 (Zcash, recursive), and Noir (Aztec DSL).",
+          funFact:
+            "The name PLONK is a backronym: 'Permutations over " +
+            "Lagrange-bases for Oecumenical Noninteractive arguments of " +
+            "Knowledge.' The 'O' stands for 'Oecumenical' (meaning " +
+            "universal), chosen to make the acronym spell a word meaning " +
+            "'cheap wine' in British slang."
+        },
+        limitations: [
+          "PLONK proofs are ~400-700 bytes (vs 192 for Groth16) and require " +
+          "~15-25ms verification (vs ~5ms for Groth16). While still practical, " +
+          "this 3-5x overhead accumulates in high-throughput blockchain " +
+          "settings where every millisecond of verification affects TPS.",
+          "The universal SRS still requires a trusted setup ceremony (powers " +
+          "of tau). While the SRS is reusable across circuits and updatable " +
+          "(anyone can add randomness), the initial ceremony must be " +
+          "conducted honestly. If compromised, all circuits using that SRS " +
+          "are insecure.",
+          "KZG polynomial commitments (used in PLONK) are not quantum-safe " +
+          "(based on discrete log). Replacing KZG with FRI (hash-based) " +
+          "gives Plonky2/Plonky3, which are quantum-safe but with larger " +
+          "proofs (~100KB) and slower verification."
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "What is the 'permutation argument' in PLONK, and why is it " +
+              "needed? What problem does it solve that R1CS handles " +
+              "differently?",
+            hint:
+              "In a circuit, the output wire of one gate connects to the " +
+              "input wire of another. The permutation argument enforces " +
+              "these 'copy constraints.'",
+            answer:
+              "In PLONK's flat table representation, each row is a gate " +
+              "with columns (a, b, c) for left input, right input, and " +
+              "output. When gate 1's output must equal gate 2's input, " +
+              "this is a 'copy constraint': c_1 = a_2. The permutation " +
+              "argument proves that values at specified positions are " +
+              "equal by showing that a permutation mapping those positions " +
+              "preserves all values. Technically, it uses a grand product " +
+              "check: prod((f(i) + beta*i + gamma) / (f(i) + beta*sigma(i) + " +
+              "gamma)) = 1, where sigma is the permutation. In R1CS, copy " +
+              "constraints are implicit in the constraint matrices A, B, C " +
+              "(the same variable index appears in multiple constraints)."
+          },
+          {
+            type: "comparison",
+            question:
+              "Compare Groth16, PLONK, and Halo2 as candidates for the " +
+              "thesis credential circuit. Consider: setup requirements, " +
+              "proof size, verification time, ability to upgrade the circuit, " +
+              "and ecosystem maturity.",
+            hint:
+              "Halo2 is used in Zcash Orchard and supports recursive proofs. " +
+              "PLONK and Halo2 share the PLONKish arithmetization.",
+            answer:
+              "Groth16: per-circuit setup, 192B proof, ~5ms verify, cannot " +
+              "upgrade without new ceremony, mature ecosystem (circom, " +
+              "snarkjs, arkworks). PLONK: universal setup (reusable), ~500B " +
+              "proof, ~20ms verify, circuits upgradeable within SRS bounds, " +
+              "growing ecosystem (noir, plonky). Halo2: no trusted setup " +
+              "(IPA-based), ~5KB proof, ~100ms verify, recursive proofs " +
+              "enable proof aggregation, Zcash ecosystem. For the thesis: " +
+              "Groth16 for on-chain verification (Sui native support, " +
+              "smallest proof). PLONK as upgrade path if credential schemas " +
+              "change frequently. Halo2 if proof aggregation (batching " +
+              "multiple credential proofs into one) becomes needed."
+          },
+          {
+            type: "design",
+            question:
+              "The thesis credential circuit may need updates (new attribute " +
+              "types, new predicate functions). Design a strategy using " +
+              "PLONK's universal setup to handle circuit evolution without " +
+              "new ceremonies.",
+            hint:
+              "The universal SRS supports any circuit up to a maximum size N. " +
+              "Only the circuit-specific preprocessing needs to change.",
+            answer:
+              "Strategy: (1) Conduct one powers-of-tau ceremony with N = " +
+              "2^22 (~4 million constraints), large enough for any foreseeable " +
+              "credential circuit. (2) Define the credential verification " +
+              "circuit as a versioned template: v1 supports 10 attributes + " +
+              "range proofs + Merkle membership. (3) When v2 adds new " +
+              "attribute types or predicates, recompile the circuit against " +
+              "the same SRS. Only the preprocessed verification key changes " +
+              "(deployed as a new Sui Move module). (4) Both v1 and v2 " +
+              "proofs can coexist on-chain, verified by different modules " +
+              "sharing the same trusted SRS. This avoids re-running the " +
+              "ceremony for each credential schema update."
+          }
+        ]
       },
       {
         name: "Bulletproofs",
@@ -2182,7 +2680,117 @@ window.DAY1_GUIDE = {
           "ranges for multiple outputs in one proof. Monero's " +
           "adoption of Bulletproofs validates their practicality " +
           "for private payments — your system applies the same " +
-          "technique on Sui."
+          "technique on Sui.",
+        history: {
+          inventor: "Benedikt Bunz, Jonathan Bootle, Dan Boneh, Andrew Poelstra, Pieter Wuille, Greg Maxwell",
+          year: 2017,
+          context:
+            "Bunz et al. published 'Bulletproofs: Short Proofs for " +
+            "Confidential Transactions and More' (S&P 2018, ePrint " +
+            "2017/1066). The core technique builds on Bootle et al.'s " +
+            "efficient inner product argument (EUROCRYPT 2016) from UCL. " +
+            "Bulletproofs were designed specifically for range proofs in " +
+            "confidential transactions — proving a committed value is in " +
+            "[0, 2^n) without revealing it. Monero adopted Bulletproofs in " +
+            "October 2018 (hard fork v0.13), reducing transaction sizes by " +
+            "~80%. Bulletproofs+ (Chung, Han, Ju, Kim, 2020) further " +
+            "reduced proof size by ~15%.",
+          funFact:
+            "Before Bulletproofs, Monero's range proofs used Borromean ring " +
+            "signatures, producing ~13KB per output. Bulletproofs compressed " +
+            "this to ~0.7KB (single output), saving Monero ~$100M per year " +
+            "in transaction fees at 2018 volumes."
+        },
+        limitations: [
+          "Verification time is O(n) where n is the number of generators " +
+          "(bit length of the range). Verifying a 64-bit range proof " +
+          "requires ~64 multi-scalar exponentiations, taking ~3-5ms. " +
+          "Batch verification amortizes this (128 proofs in ~50ms) but " +
+          "single-proof verification is 5-10x slower than Groth16.",
+          "Not quantum-safe: Bulletproofs rely on the discrete log " +
+          "assumption (same as Pedersen commitments). Shor's algorithm " +
+          "breaks the binding of the underlying commitment and the " +
+          "soundness of the inner product argument.",
+          "Proving time is O(n) with significant constants due to " +
+          "multi-scalar multiplication at each round. A 64-bit range proof " +
+          "takes ~20-50ms to generate, compared to ~500ms for an equivalent " +
+          "Groth16 range circuit. However, Groth16's proof is constant-size " +
+          "while Bulletproofs grow logarithmically."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "A Bulletproof for a 64-bit range proof produces " +
+              "2*ceil(log2(64)) = 2*6 = 12 group elements plus 5 scalars " +
+              "and a few additional elements. If each group element is " +
+              "32 bytes and each scalar is 32 bytes, estimate the proof " +
+              "size. Compare with Groth16's 192 bytes.",
+            hint:
+              "The Bulletproof inner product argument produces 2*log2(n) " +
+              "group elements (L_i, R_i pairs) plus 2 scalars (a, b) " +
+              "and 3 additional elements (A, S, T1, T2, tau_x, mu, t_hat).",
+            answer:
+              "Inner product argument: 2*6 = 12 group elements (L, R pairs) " +
+              "= 384 bytes. Final scalars: a, b = 64 bytes. Protocol " +
+              "elements: A (commitment to aL, aR), S (commitment to sL, sR), " +
+              "T1, T2 (polynomial commitments) = 4 group elements = 128 bytes. " +
+              "Scalars: tau_x, mu, t_hat = 3 scalars = 96 bytes. " +
+              "Total: 384 + 64 + 128 + 96 = 672 bytes. Compare: Groth16 = " +
+              "192 bytes (3.5x smaller). But Bulletproofs need NO trusted " +
+              "setup, which for range proofs in a payment system is a " +
+              "significant advantage."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain the inner product argument at a high level. Why does " +
+              "it produce a logarithmic-size proof for a linear-size " +
+              "statement?",
+            hint:
+              "The prover recursively halves the vectors, sending 2 group " +
+              "elements per round. After log2(n) rounds, the vectors are " +
+              "size 1 and can be checked directly.",
+            answer:
+              "The prover wants to convince the verifier that <a, b> = c " +
+              "for vectors a, b of length n. Round 1: split a = (a_L, a_R) " +
+              "and b = (b_L, b_R). Send L = <a_L, b_R> and R = <a_R, b_L> " +
+              "as group element commitments. Verifier sends random x. " +
+              "Prover folds: a' = a_L*x + a_R*x^(-1), b' = b_R*x + " +
+              "b_L*x^(-1). Now a', b' have length n/2. Repeat for log2(n) " +
+              "rounds until a', b' are single elements, then send them. " +
+              "Total: 2*log2(n) group elements (L_i, R_i) + 2 field elements " +
+              "(final a', b'). Verification: O(n) because the verifier must " +
+              "compute the final commitment from all the L_i, R_i values."
+          },
+          {
+            type: "design",
+            question:
+              "The thesis payment layer needs range proofs for transaction " +
+              "amounts. Compare two approaches: (a) Bulletproofs directly " +
+              "on-chain, (b) Bulletproof range proof wrapped inside a " +
+              "Groth16 proof. Which should the thesis use and why?",
+            hint:
+              "Consider on-chain verification cost, trusted setup burden, " +
+              "and proof aggregation. Sui has native Groth16 but not native " +
+              "Bulletproof verification.",
+            answer:
+              "Approach (a) Bulletproofs on-chain: no trusted setup, ~672B " +
+              "proof, but verification is O(n) requiring ~5ms for 64-bit " +
+              "range AND requires a custom Move verifier (no Sui native " +
+              "support). Approach (b) Bulletproof inside Groth16: the ZK " +
+              "circuit takes the Bulletproof components as private inputs " +
+              "and verifies the range proof inside the circuit. Output: " +
+              "Groth16 proof (192B, ~5ms native verification). Cost: the " +
+              "Bulletproof verification adds ~50K constraints to the Groth16 " +
+              "circuit. Recommendation for the thesis: approach (b) because " +
+              "Sui has native Groth16 verification, and the credential " +
+              "circuit already uses Groth16. Alternatively, encode range " +
+              "proofs directly as R1CS constraints (bit decomposition, " +
+              "~64 constraints per 64-bit range) which is simpler than " +
+              "wrapping Bulletproofs."
+          }
+        ]
       }
     ]
   }
