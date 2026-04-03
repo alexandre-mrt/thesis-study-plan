@@ -433,7 +433,7 @@ function buildExercisesSection(exercises) {
 
     const badge = document.createElement('span');
     badge.className = 'exercise-type-badge';
-    badge.style.setProperty('--exercise-type-color', typeColor);
+    badge.style.color = typeColor;
     badge.textContent = exercise.type || 'exercise';
     card.appendChild(badge);
 
