@@ -931,19 +931,13 @@ window.DAY1_GUIDE = {
               "z = k + e*x mod (order of g). The order of 5 in Z_23* is 22. " +
               "Verification checks g^z = a * pk^e mod 23.",
             answer:
-              "a = 5^3 mod 23 = 125 mod 23 = 10. z = 3 + 4*7 = 31 mod 22 = 9. " +
-              "Verification: g^z = 5^9 mod 23. 5^9 = 5^8 * 5 = (5^4)^2 * 5 " +
-              "= (625 mod 23)^2 * 5 = 3^2 * 5 = 45 mod 23 = 22. " +
-              "a * pk^e = 10 * 17^4 mod 23. 17^2 = 289 mod 23 = 14. " +
-              "17^4 = 14^2 = 196 mod 23 = 12. So 10 * 12 = 120 mod 23 = 5. " +
-              "Wait, let me recheck: 5^9 mod 23. 5^1=5, 5^2=2, 5^3=10, " +
-              "5^4=4, 5^5=20, 5^6=8, 5^7=17, 5^8=16, 5^9=80 mod 23=11. " +
-              "a*pk^e = 10*12=120 mod 23=120-5*23=120-115=5. These differ, " +
-              "meaning I need to recompute. Actually 5^2=25 mod 23=2, " +
-              "5^4=4, 5^8=16, 5^9=5^8*5=80 mod 23=80-3*23=80-69=11. " +
-              "pk^e = 17^4 mod 23: 17^2=289 mod 23=289-12*23=289-276=13, " +
-              "17^4=13^2=169 mod 23=169-7*23=169-161=8. " +
-              "a*pk^e=10*8=80 mod 23=11. g^z=5^9=11. They match! Proof valid."
+              "a = 5^3 mod 23 = 125 mod 23 = 10. z = (3 + 4*7) mod 22 = " +
+              "31 mod 22 = 9. Verification LHS: g^z = 5^9 mod 23. Computing " +
+              "step by step: 5^2 = 2, 5^4 = 4, 5^8 = 16, 5^9 = 16*5 = " +
+              "80 mod 23 = 11. Verification RHS: a * pk^e = 10 * 17^4 mod " +
+              "23. Computing: 17^2 = 289 mod 23 = 13, 17^4 = 13^2 = 169 " +
+              "mod 23 = 8. So 10 * 8 = 80 mod 23 = 11. LHS = RHS = 11. " +
+              "Proof valid."
           },
           {
             type: "conceptual",
