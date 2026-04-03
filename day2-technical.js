@@ -82,6 +82,44 @@ window.DAY2_TECHNICAL = {
             formula: "\\[ \\Pr[\\text{Forge}] \\leq \\text{negl}(\\lambda) \\]",
           },
         ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "Explain why the unlinkability property of anonymous credentials is essential for privacy. " +
+              "Describe the formal anonymity game (challenger picks b, adversary guesses b') and explain what " +
+              "would go wrong if presentations were linkable — give a concrete surveillance scenario.",
+            hint:
+              "Think about a user presenting the same credential to multiple verifiers. " +
+              "If presentations are linkable, verifiers can collude to build a profile. " +
+              "The anonymity game formalizes this: the adversary sees two presentations and must determine if they come from the same credential.",
+            answer:
+              "Unlinkability ensures that two presentations from the same credential are computationally indistinguishable " +
+              "from presentations of two different credentials. In the anonymity game, the challenger picks b in {0,1}, " +
+              "generates presentations for user b, and the adversary guesses b'. Advantage |Pr[b'=b] - 1/2| must be negligible. " +
+              "Without unlinkability, a verifier at a pharmacy and a verifier at an employer could correlate presentations " +
+              "to the same credential, tracking the user across contexts — defeating the purpose of selective disclosure.",
+          },
+          {
+            type: "design",
+            question:
+              "Design the high-level flow of an anonymous credential system for age verification at a bar. " +
+              "Specify: (1) what attributes are in the credential, (2) which are disclosed vs hidden during the Show protocol, " +
+              "(3) what predicate proof is needed, and (4) how the verifier checks validity without learning the user's identity.",
+            hint:
+              "The credential should contain: name, date_of_birth, nationality, photo_hash, credential_id. " +
+              "For age verification, the bar only needs to know the user is >= 18. " +
+              "Use a predicate proof on date_of_birth rather than disclosing it.",
+            answer:
+              "Attributes: (name, date_of_birth, nationality, photo_hash, credential_id). " +
+              "Disclosed set D = {} (nothing disclosed). " +
+              "Predicate proof: prove date_of_birth <= (today - 18 years) without revealing the exact date. " +
+              "The Show protocol produces a ZK proof pi that: (1) the user holds a valid signature from the issuer, " +
+              "(2) the date_of_birth attribute satisfies the age predicate. " +
+              "The verifier runs Verify(ipk, {}, pi) checking the issuer's public key and the predicate. " +
+              "The verifier learns only that the holder is >= 18 — not their name, exact age, or any other attribute.",
+          },
+        ],
       },
       {
         name: "CL Signatures (Camenisch-Lysyanskaya)",
@@ -171,6 +209,49 @@ window.DAY2_TECHNICAL = {
           {
             name: "RSA Accumulator",
             formula: "\\[ \\text{acc} = g^{\\prod_{i \\in V} (x_i + s)} \\bmod n, \\quad w_i = g^{\\prod_{j \\neq i} (x_j + s)} \\bmod n \\]",
+          },
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Given the CL signature equation A^e = Z * S^v * R_1^{m_1} (mod n), suppose the holder has signature (A, e, v) " +
+              "and picks randomness r' = 42. Write the randomized signature (A', e, v') in terms of A, S, e, v, and r'. " +
+              "Then verify algebraically that (A')^e still satisfies the CL equation with v' substituted for v.",
+            hint:
+              "Randomization: A' = A * S^{r'}, v' = v - e*r'. " +
+              "Expand (A')^e = (A * S^{r'})^e = A^e * S^{e*r'}. " +
+              "Substitute the original CL equation for A^e.",
+            answer:
+              "A' = A * S^{42}, v' = v - 42e. " +
+              "Check: (A')^e = A^e * S^{42e} = (Z * S^v * R_1^{m_1}) * S^{42e} = Z * S^{v + 42e} * R_1^{m_1}. " +
+              "But v' = v - 42e, so v + 42e = v' + 42e + 42e? No: v = v' + 42e, so v + 42e = v' + 84e. " +
+              "Correction: (A')^e = Z * S^v * R_1^{m_1} * S^{42e} = Z * S^{v+42e} * R_1^{m_1}. " +
+              "Since v' = v - 42e, we have v = v' + 42e, so v + 42e = v' + 84e. This is wrong. " +
+              "The correct verification: (A')^e = A^e * S^{e*r'} = Z * S^v * R_1^{m_1} * S^{e*r'} = Z * S^{v + e*r'} * R_1^{m_1}. " +
+              "Define v' = v + e*r' (not v - e*r'). Then (A')^e = Z * S^{v'} * R_1^{m_1}. " +
+              "Note: the sign convention depends on the formulation. In the file's convention v' = v - e*r', " +
+              "the equation rearranges as A' = A * S^{r'} => (A')^e = Z * S^{v + er'} * prod(R_i^{m_i}) = Z * S^{v'} * prod(R_i^{m_i}) where v' = v + er'. " +
+              "The key insight: the randomized triple (A', e, v') is a valid CL signature on the same messages, unlinkable to (A, e, v).",
+          },
+          {
+            type: "conceptual",
+            question:
+              "Why does CL signature security rely on the Strong RSA assumption rather than the standard RSA assumption? " +
+              "Explain the difference between the two assumptions, and why computing e-th roots mod n for adversary-chosen e " +
+              "is the critical operation in CL forgery.",
+            hint:
+              "Standard RSA: given (n, e, y), find x such that x^e = y mod n (e is fixed). " +
+              "Strong RSA: given (n, z), find ANY (u, e) with e > 1 such that u^e = z mod n (adversary chooses e). " +
+              "In CL, the forger can choose the prime e in the signature.",
+            answer:
+              "Standard RSA fixes e and asks to invert the RSA function. Strong RSA lets the adversary choose e freely. " +
+              "CL signatures require the adversary to produce (A*, e*, v*) where e* is a prime chosen by the adversary. " +
+              "A forger who finds a new valid triple effectively computes an e*-th root of a known value modulo n, " +
+              "for an e* of their choosing. This is exactly the Strong RSA problem. " +
+              "The standard RSA assumption is insufficient because CL does not fix e — different signatures use different primes. " +
+              "The reduction uses the forking lemma: rewinding the forger with different challenges yields two valid signatures " +
+              "with different e values, from which an e-th root can be extracted, contradicting Strong RSA.",
           },
         ],
       },
@@ -268,6 +349,47 @@ window.DAY2_TECHNICAL = {
             formula: "\\[ A' = A^{r_1}, \\quad \\bar{A} = A'^{-e} \\cdot B^{r_1}, \\quad e(A', \\tilde{X}) = e(\\bar{A}, \\tilde{g}_2) \\]",
           },
         ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In BBS+ signing, the signer computes B = g_1 * h_0^s * h_1^{m_1} * h_2^{m_2} and A = B^{1/(x+e)}. " +
+              "The verification pairing equation is e(A, X_tilde * g_tilde_2^e) = e(B, g_tilde_2). " +
+              "Prove algebraically why this equation holds, starting from A = B^{1/(x+e)} and X_tilde = g_tilde_2^x. " +
+              "Which property of bilinear pairings do you use?",
+            hint:
+              "Start with the left side: e(A, X_tilde * g_tilde_2^e) = e(B^{1/(x+e)}, g_tilde_2^x * g_tilde_2^e). " +
+              "Simplify g_tilde_2^x * g_tilde_2^e = g_tilde_2^{x+e}. " +
+              "Use bilinearity: e(g^a, h^b) = e(g, h)^{ab}.",
+            answer:
+              "LHS = e(B^{1/(x+e)}, g_tilde_2^{x+e}). " +
+              "By bilinearity: e(B^{1/(x+e)}, g_tilde_2^{x+e}) = e(B, g_tilde_2)^{(1/(x+e)) * (x+e)} = e(B, g_tilde_2)^1 = e(B, g_tilde_2) = RHS. " +
+              "The critical property used is bilinearity of the Type-3 pairing: e(g^a, h^b) = e(g, h)^{ab}. " +
+              "This is why BBS+ requires pairing-friendly curves (BLS12-381) — the pairing enables verification " +
+              "without knowing the secret key x or the signing randomness e.",
+          },
+          {
+            type: "conceptual",
+            question:
+              "BBS+ achieves information-theoretic unlinkability through randomization A' = A^{r_1}. " +
+              "Explain why choosing r_1 uniformly at random in Z_p* makes A' uniformly distributed over G_1 \\ {O}, " +
+              "regardless of A. Why does this give perfect (not just computational) unlinkability? " +
+              "Compare this to CL signature randomization.",
+            hint:
+              "In a cyclic group of prime order p, if A is a generator, then A^{r_1} for uniform r_1 in Z_p* " +
+              "produces every non-identity element with equal probability 1/(p-1). " +
+              "For CL, randomization is A' = A * S^{r'}, which is statistical (not perfect) ZK.",
+            answer:
+              "Since G_1 has prime order p, any non-identity element A is a generator. " +
+              "The map r_1 -> A^{r_1} is a bijection from Z_p* to G_1 \\ {O}. " +
+              "So for uniform r_1, A' is uniformly distributed over G_1 \\ {O}, independent of which A was used. " +
+              "Two presentations (A'_1, A'_2) are identically distributed regardless of whether they derive from " +
+              "the same A or different A values — this is information-theoretic (perfect) unlinkability, not relying " +
+              "on any computational assumption. " +
+              "CL randomization A' = A * S^{r'} is only statistically hiding because the RSA group has unknown order, " +
+              "and the range of r' must be super-polynomially larger than the group order to achieve statistical ZK.",
+          },
+        ],
       },
       {
         name: "Selective Disclosure",
@@ -351,6 +473,49 @@ window.DAY2_TECHNICAL = {
             formula: "\\[ \\text{PK}\\{ (\\alpha) : C_1 = h_i^{\\alpha} \\; \\wedge \\; C_2 = h_j'^{\\alpha} \\} \\]",
           },
         ],
+        exercises: [
+          {
+            type: "design",
+            question:
+              "A verifier wants to check that a user is (1) over 18 and (2) a citizen of an EU country, " +
+              "without learning the exact age or which EU country. The user holds a BBS+ credential with attributes " +
+              "(name, date_of_birth, nationality, address, credential_id). " +
+              "Design the selective disclosure proof: specify D (disclosed set), the predicate proofs needed, " +
+              "and the proof components the verifier receives.",
+            hint:
+              "D should be empty — nothing is disclosed in the clear. " +
+              "You need two predicate proofs: a range proof on date_of_birth and a set membership proof on nationality. " +
+              "The set membership proof proves nationality is in {DE, FR, IT, ES, ...} without revealing which.",
+            answer:
+              "Disclosed set D = {} (empty). " +
+              "Proof components: (1) BBS+ selective disclosure proof that the user holds a valid signature on 5 attributes, " +
+              "with all 5 hidden. (2) Range proof: date_of_birth <= (current_date - 18*365.25 days), realized via " +
+              "Bulletproof or bit-decomposition embedded in the Schnorr protocol. (3) Set membership proof: " +
+              "nationality in {DE, FR, IT, ES, NL, BE, ...all 27 EU codes}, realized via OR-composition of " +
+              "27 Schnorr proofs (for small set) or accumulator-based membership proof (for efficiency). " +
+              "The verifier receives: randomized BBS+ proof (A', A_bar, d), Schnorr responses for all 5 hidden attributes, " +
+              "the range proof (~672 bytes), and the set membership proof. The verifier checks all proofs against ipk.",
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain the difference between selective disclosure via SD-JWT and via BBS+ in terms of unlinkability. " +
+              "In SD-JWT, the holder reveals (salt_i, k_i, v_i) for disclosed claims. Why does this make " +
+              "SD-JWT presentations linkable? What specific cryptographic property does BBS+ have that SD-JWT lacks?",
+            hint:
+              "In SD-JWT, the JWT body (including all hashes H_1, ..., H_n and the issuer signature) is the same " +
+              "across all presentations. The verifier sees the full signed JWT each time. " +
+              "In BBS+, each presentation uses fresh randomness r_1 to produce a new A'.",
+            answer:
+              "SD-JWT reuses the same issuer signature (ECDSA/EdDSA over the JWT body) in every presentation. " +
+              "The JWT body contains all hashes H_1, ..., H_n, which are fixed. Any two verifiers receiving " +
+              "presentations can compare the JWT signature or the hash set to determine they come from the same credential. " +
+              "BBS+ achieves unlinkability because each presentation randomizes the signature: A' = A^{r_1} with fresh r_1. " +
+              "The randomized values (A', A_bar) are uniformly distributed and independent across presentations. " +
+              "The cryptographic property BBS+ has that SD-JWT lacks is re-randomizable signatures: " +
+              "the ability to transform a valid signature into a new, unlinkable valid signature on the same messages.",
+          },
+        ],
       },
       {
         name: "W3C Verifiable Credentials & DIDs",
@@ -432,6 +597,51 @@ window.DAY2_TECHNICAL = {
           {
             name: "VC-to-BBS+ Mapping",
             formula: "\\[ m_i = \\text{Hash}(k_i \\| v_i), \\quad \\sigma = \\text{BBS}^+.\\text{Sign}(sk, (m_1, \\ldots, m_L)) \\]",
+          },
+        ],
+        exercises: [
+          {
+            type: "comparison",
+            question:
+              "Compare three DID methods — did:web, did:key, and did:sui — along the following axes: " +
+              "(1) trust model (who do you trust?), (2) key rotation support, (3) offline resolution capability, " +
+              "and (4) suitability for anonymous credential presentations. " +
+              "Which method best fits a Sui-based anonymous credential system and why?",
+            hint:
+              "did:web trusts the web server operator and DNS/TLS infrastructure. " +
+              "did:key encodes the public key directly in the DID (no resolution needed, but no key rotation). " +
+              "did:sui trusts Sui consensus for the DID Document stored as an on-chain object.",
+            answer:
+              "did:web: trust = web PKI (CA + DNS); key rotation = yes (update hosted document); offline = no (needs HTTP); " +
+              "anonymous creds = poor (server logs who resolves the DID). " +
+              "did:key: trust = none (self-certifying); key rotation = no (key IS the identifier); offline = yes; " +
+              "anonymous creds = good for holders (no resolution needed) but no revocation/rotation. " +
+              "did:sui: trust = Sui consensus (BFT, 2/3 honest validators); key rotation = yes (update Sui object); " +
+              "offline = no (needs Sui RPC); anonymous creds = best fit because verification can happen on-chain " +
+              "via Move contracts, key rotation is decentralized, and the DID Document lifecycle maps to Sui object model. " +
+              "Best fit for Sui-based anonymous credentials: did:sui for issuers (on-chain key management), " +
+              "did:key for holders (minimal footprint, privacy-preserving).",
+          },
+          {
+            type: "design",
+            question:
+              "Design the issuance flow for a BBS+-based Verifiable Credential on Sui. " +
+              "The issuer has a did:sui DID. Specify: (1) how the issuer's BBS+ public key is published, " +
+              "(2) the credential issuance protocol steps, (3) how the VC is anchored on-chain, " +
+              "and (4) how a verifier resolves the issuer's key to check a presentation.",
+            hint:
+              "The issuer's BBS+ public key (h_0, h_1, ..., h_L, X_tilde) can be stored in the DID Document " +
+              "as a verification method. The credential itself is issued off-chain (signed by BBS+). " +
+              "On-chain anchoring uses a hash commitment, not the full credential.",
+            answer:
+              "Step 1: Issuer publishes BBS+ pk = (X_tilde, h_0, ..., h_L) in their did:sui DID Document, " +
+              "stored as a Sui object field under 'verificationMethod' with type 'Bls12381G2Key2020'. " +
+              "Step 2: Issuance — issuer receives holder's attribute commitments (blind issuance for holder-secret attributes), " +
+              "computes sigma = BBS+.Sign(sk, (m_1, ..., m_L)), returns sigma to holder off-chain. " +
+              "Step 3: Anchoring — issuer publishes H = SHA-256(VC_id || MRENCLAVE_credential || issuance_timestamp) " +
+              "as a Sui event or in a shared registry object. This proves issuance time without revealing VC contents. " +
+              "Step 4: Verification — verifier resolves did:sui:<object_id> via sui_getObject, extracts BBS+ pk " +
+              "from the DID Document, then verifies the BBS+ selective disclosure proof against that pk.",
           },
         ],
       },
@@ -525,6 +735,52 @@ window.DAY2_TECHNICAL = {
             formula: "\\[ \\text{acc}^a \\cdot d^{p_x} = g \\quad \\text{where } d = g^b, \\; a \\cdot p_x + b \\cdot \\textstyle\\prod_{j \\in V} p_j = 1 \\]",
           },
         ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Consider a toy RSA accumulator with n = 77 (p=7, q=11), g = 4, and valid credential primes V = {3, 5}. " +
+              "Compute: (1) the accumulator value acc = g^{3*5} mod 77, " +
+              "(2) the membership witness for credential with prime 3: w_3 = g^5 mod 77, " +
+              "(3) verify that w_3^3 = acc mod 77.",
+            hint:
+              "acc = 4^{15} mod 77. Compute 4^2 = 16, 4^4 = 256 mod 77, etc. by repeated squaring. " +
+              "w_3 = 4^5 mod 77. Then check w_3^3 mod 77 = acc.",
+            answer:
+              "acc = 4^{15} mod 77: 4^2 = 16, 4^4 = 256 mod 77 = 25, 4^8 = 625 mod 77 = 9, " +
+              "4^{15} = 4^8 * 4^4 * 4^2 * 4^1 = 9 * 25 * 16 * 4 = 9 * 25 = 225 mod 77 = 71, " +
+              "71 * 16 = 1136 mod 77 = 1136 - 14*77 = 1136 - 1078 = 58, " +
+              "58 * 4 = 232 mod 77 = 232 - 3*77 = 232 - 231 = 1. So acc = 1. " +
+              "w_3 = 4^5 mod 77: 4^4 = 25, 4^5 = 25*4 = 100 mod 77 = 23. So w_3 = 23. " +
+              "Verify: 23^3 mod 77 = 23^2 * 23 = 529 * 23. 529 mod 77 = 529 - 6*77 = 529 - 462 = 67. " +
+              "67 * 23 = 1541 mod 77 = 1541 - 20*77 = 1541 - 1540 = 1. " +
+              "w_3^3 = 1 = acc. Verification passes.",
+          },
+          {
+            type: "design",
+            question:
+              "Design a privacy-preserving revocation check for a Sui-based credential system. " +
+              "The issuer maintains a revocation list. The holder must prove non-revocation without revealing " +
+              "which credential they hold. Compare two approaches: (1) RSA accumulator with ZK non-membership proof, " +
+              "and (2) StatusList2021 with a SNARK proof. Recommend one for Sui and justify.",
+            hint:
+              "RSA accumulator: small on-chain state (~256B), holder maintains witness off-chain, " +
+              "witness update cost is O(|revoked|) exponentiations per epoch. " +
+              "StatusList + SNARK: bitstring on-chain, SNARK proves bit at secret index is 0, " +
+              "but proving cost is high (~100K constraints for Merkle path in Groth16).",
+            answer:
+              "Approach 1 (RSA accumulator): Store acc (256B) as a Sui shared object. Holder maintains witness w_x off-chain. " +
+              "On revocation, issuer updates acc' = acc^{1/p_r}. Holder updates witness via batch update. " +
+              "Proof: ZK proof of accumulator membership (~200B proof). Privacy: perfect (reveals nothing about which credential). " +
+              "Cost: witness update is expensive for holders (O(|revoked|) exponentiations). " +
+              "Approach 2 (StatusList + SNARK): Store compressed bitstring on-chain. Holder generates Groth16 proof " +
+              "that StatusList[idx] = 0 with idx as private input. Proof: ~128B (Groth16). " +
+              "Cost: ~100K constraints for Merkle path verification inside the SNARK, proving time ~2-5s. " +
+              "Recommendation for Sui: RSA accumulator. Sui's object model suits a single shared accumulator object, " +
+              "on-chain verification of accumulator proofs is cheaper than Groth16 verification (~50K gas vs ~300K gas), " +
+              "and the holder witness update can be batched into epoch boundaries matching Sui's epoch model.",
+          },
+        ],
       },
     ],
   },
@@ -607,6 +863,54 @@ window.DAY2_TECHNICAL = {
           {
             name: "Ideal Functionality",
             formula: "\\[ \\mathcal{F}_{\\text{att}}(\\text{prog}, \\text{input}) \\to (\\text{output}, \\sigma_{\\text{att}}) \\]",
+          },
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "The TEE ideal functionality F_att assumes the leakage function L is empty (no side-channel leakage). " +
+              "Explain why this assumption does not hold in practice for Intel SGX. " +
+              "List three specific micro-architectural leakage channels and for each, describe what information " +
+              "an OS-level adversary can extract from an enclave.",
+            hint:
+              "The OS controls page tables, cache eviction, and branch prediction. " +
+              "Think about: (1) page-fault side channel (OS sees which pages are accessed), " +
+              "(2) cache timing (Prime+Probe on shared L1/L2), (3) speculative execution (Spectre/Foreshadow).",
+            answer:
+              "(1) Page-fault channel: the OS controls page table mappings and can mark enclave pages as not-present. " +
+              "When the enclave accesses a page, a page fault reveals which 4KB page was accessed. " +
+              "Over time, this reveals memory access patterns at 4KB granularity — enough to extract AES keys from T-table implementations. " +
+              "(2) Cache timing (Prime+Probe): the adversary fills L1 cache sets with known data, lets the enclave execute, " +
+              "then measures access times. Slow access means the enclave evicted that cache line, revealing which " +
+              "64-byte cache lines the enclave touched. Resolution: 64B, enough to distinguish AES S-box lookups. " +
+              "(3) Spectre/Foreshadow: speculative execution within the enclave accesses memory based on secret values. " +
+              "Although speculatively accessed data is rolled back architecturally, it leaves L1 cache footprints. " +
+              "Foreshadow specifically reads arbitrary EPC data from L1 cache via terminal page faults, breaking confidentiality entirely.",
+          },
+          {
+            type: "comparison",
+            question:
+              "Compare the TEE implementations of Intel SGX, Intel TDX, and AMD SEV-SNP along three dimensions: " +
+              "(1) isolation granularity (process vs VM), (2) trusted computing base size, " +
+              "and (3) resistance to hypervisor-based attacks. Which is best suited for a cloud-deployed " +
+              "credential issuance service and why?",
+            hint:
+              "SGX isolates at process level (enclave), TDX and SEV-SNP isolate at VM level (Trust Domain / SEV VM). " +
+              "TCB: SGX = CPU only; TDX = CPU + TDX module; SEV-SNP = CPU + AMD Secure Processor. " +
+              "Hypervisor attacks: SGX enclaves are inside a process managed by untrusted OS; TDX/SEV protect the entire VM.",
+            answer:
+              "SGX: process-level isolation, smallest TCB (CPU microcode only), but vulnerable to OS-controlled " +
+              "side channels (page faults, cache). Deprecated on consumer CPUs, server-only (Xeon). " +
+              "TDX: VM-level isolation (Trust Domains), TCB includes CPU + Intel TDX module firmware. " +
+              "The hypervisor cannot read/modify TD memory (hardware enforced via SEPT). " +
+              "Larger protected surface than SGX (full VM), but larger TCB and attack surface (full guest OS inside TD). " +
+              "SEV-SNP: VM-level, TCB = CPU + AMD Secure Processor (PSP). Secure Nested Paging prevents " +
+              "hypervisor remapping attacks (each page has a Reverse Map Table entry binding it to a specific VM). " +
+              "Best for cloud credential issuance: TDX or SEV-SNP, because (1) VM-level isolation allows running " +
+              "standard Linux + application stack without EDL porting, (2) cloud providers (AWS Nitro, Azure CC) " +
+              "offer managed TDX/SEV instances, (3) the credential issuance service needs network I/O which is " +
+              "expensive with SGX OCALLs but native in a confidential VM.",
           },
         ],
       },
@@ -694,6 +998,57 @@ window.DAY2_TECHNICAL = {
           {
             name: "Sealing Encryption",
             formula: "\\[ \\text{ct} = \\text{AES-GCM}(K_{\\text{seal}}, \\text{data}) \\]",
+          },
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "An enclave developer seals a user's BBS+ private credential using MRENCLAVE policy. " +
+              "After discovering a bug, they release a patched enclave binary. " +
+              "Explain why the sealed credential becomes inaccessible, and describe how using MRSIGNER policy " +
+              "instead would solve this problem. What is the security tradeoff?",
+            hint:
+              "MRENCLAVE = SHA-256(code || data || layout || config). Any code change produces a different hash. " +
+              "The seal key K_seal = KDF(K_root, MRENCLAVE) changes, so the old ciphertext cannot be decrypted. " +
+              "MRSIGNER uses the developer's signing key hash instead of the code hash.",
+            answer:
+              "With MRENCLAVE policy, K_seal = KDF(K_root, MRENCLAVE). The patched binary has a different MRENCLAVE " +
+              "(even a one-byte change in code alters the SHA-256 measurement). The new enclave derives a different K_seal " +
+              "and cannot decrypt data sealed by the old version. The credential is permanently lost. " +
+              "MRSIGNER policy: K_seal = KDF(K_root, MRSIGNER || ProdID). Since both the old and new binaries are signed " +
+              "by the same developer key, MRSIGNER is identical. The new enclave can unseal the old data seamlessly. " +
+              "Security tradeoff: MRSIGNER allows ANY enclave signed by the same developer to access sealed data. " +
+              "A malicious or buggy version of the enclave (same developer signature) could unseal and exfiltrate secrets. " +
+              "MRENCLAVE is stricter: only the exact code that sealed the data can unseal it. " +
+              "Best practice: use MRSIGNER with SVN (Security Version Number) to allow upgrades but prevent rollback " +
+              "to older, vulnerable versions.",
+          },
+          {
+            type: "design",
+            question:
+              "Design the ECALL/OCALL interface for an SGX enclave that issues BBS+ anonymous credentials. " +
+              "The enclave holds the issuer's BBS+ secret key. Specify: (1) which operations happen inside the enclave (ECALLs), " +
+              "(2) which operations require outside calls (OCALLs), and (3) what input validation is needed " +
+              "to prevent Iago attacks on each OCALL return value.",
+            hint:
+              "Inside the enclave: key generation, BBS+ signing, seal/unseal of secret key. " +
+              "Outside: network I/O (receiving attribute requests, sending credentials), persistent storage. " +
+              "Iago attack: malicious OS returns crafted OCALL values to manipulate enclave logic.",
+            answer:
+              "ECALLs (inside enclave): " +
+              "(a) ecall_init(): generate or unseal BBS+ key pair (sk, pk), return pk to untrusted side. " +
+              "(b) ecall_issue_credential(attributes[], holder_commitment): validate attributes, compute " +
+              "sigma = BBS+.Sign(sk, attributes), return sigma. " +
+              "(c) ecall_seal_key(): seal sk using MRSIGNER policy with current SVN, return ciphertext via OCALL. " +
+              "OCALLs (outside enclave): " +
+              "(a) ocall_store_sealed_key(ciphertext): persist sealed key to disk. Return: success/failure. " +
+              "Validation: enclave does not trust the return value — it re-reads and unseals to verify integrity. " +
+              "(b) ocall_get_timestamp(): get current time for credential validity period. " +
+              "Validation: enclave maintains a monotonic counter; reject timestamps earlier than last seen " +
+              "(prevents OS from providing stale time to extend expired credentials). " +
+              "(c) ocall_log(message): audit logging. Validation: none needed (fire-and-forget, no enclave state change). " +
+              "Critical Iago defense: never use OCALL return values to index arrays or control secret-dependent branches.",
           },
         ],
       },
@@ -790,6 +1145,59 @@ window.DAY2_TECHNICAL = {
           {
             name: "Attestation Key Binding",
             formula: "\\[ \\text{REPORT\\_DATA} = \\text{SHA-256}(pk_{\\text{enclave}} \\| \\text{nonce}) \\]",
+          },
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "Trace the full DCAP remote attestation flow for a credential issuance enclave. " +
+              "A remote client wants to verify that the enclave is running the correct credential issuance code " +
+              "before sending sensitive attributes. List each step, the data exchanged, and the trust assumptions " +
+              "at each step. What happens if the Quoting Enclave is compromised?",
+            hint:
+              "DCAP flow: (1) app enclave generates REPORT, (2) QE verifies REPORT locally and signs with ECDSA, " +
+              "(3) client receives QUOTE + PCK certificate chain, (4) client verifies ECDSA signature up to Intel Root CA. " +
+              "The QE's key is certified by the PCE, which holds a key certified by Intel's PCK.",
+            answer:
+              "Step 1: Client sends nonce to the enclave. Enclave generates ephemeral key pair (sk_E, pk_E), " +
+              "sets REPORT_DATA = SHA-256(pk_E || nonce), calls EREPORT to generate a REPORT for the QE's target info. " +
+              "Trust: CPU hardware faithfully measures MRENCLAVE. " +
+              "Step 2: QE receives REPORT, verifies MAC using shared report key (local attestation), " +
+              "then signs: QUOTE = ECDSA_P256(sk_QE, REPORT). Trust: QE is an Intel-signed enclave running correct code. " +
+              "Step 3: Client receives (QUOTE, QE_cert, PCK_cert, Intel_Root_CA_cert). " +
+              "Client verifies: ECDSA signature on QUOTE using QE_cert public key, QE_cert signed by PCK, " +
+              "PCK signed by Intel Root CA (pinned). Trust: Intel CA is honest and did not mis-issue certificates. " +
+              "Step 4: Client checks MRENCLAVE in QUOTE matches expected hash of credential issuance code, " +
+              "extracts pk_E from REPORT_DATA, establishes TLS session using pk_E. " +
+              "If QE is compromised: attacker can forge QUOTEs for arbitrary MRENCLAVE values, " +
+              "completely breaking attestation. Mitigation: QE runs in its own enclave with Intel-controlled code, " +
+              "and its measurement is verified by the PCE during provisioning.",
+          },
+          {
+            type: "design",
+            question:
+              "Design an on-chain attestation verification system for Sui. A credential issuance enclave " +
+              "produces a DCAP QUOTE that must be verified by a Sui Move contract before the enclave is " +
+              "registered as an authorized issuer. Specify: (1) what data is submitted on-chain, " +
+              "(2) the Move contract verification logic, and (3) how to handle attestation freshness and key rotation.",
+            hint:
+              "On-chain: submit QUOTE (ECDSA signature + REPORT body) and PCK certificate chain. " +
+              "Move contract: verify ECDSA P-256 signature (Sui supports secp256r1), check MRENCLAVE, " +
+              "store authorized enclave identity. Freshness: include a Sui epoch number or timestamp in REPORT_DATA.",
+            answer:
+              "Data submitted on-chain: (quote_signature: vector<u8>, report_body: vector<u8>, " +
+              "pck_cert_chain: vector<vector<u8>>, enclave_pk: vector<u8>). " +
+              "Move contract logic: " +
+              "(a) Verify PCK cert chain up to a pinned Intel Root CA public key (stored as a module constant). " +
+              "(b) Extract QE public key from PCK cert, verify quote_signature using ecdsa_secp256r1::verify(). " +
+              "(c) Parse report_body: extract MRENCLAVE (bytes 112..144), REPORT_DATA (bytes 320..384). " +
+              "(d) Check MRENCLAVE matches a whitelist of approved enclave measurements (stored in a shared object). " +
+              "(e) Check REPORT_DATA == SHA-256(enclave_pk || current_epoch) for freshness. " +
+              "(f) Register enclave_pk as an authorized issuer in an AuthorizedIssuers table. " +
+              "Key rotation: enclave generates new key pair, produces new QUOTE with new pk in REPORT_DATA, " +
+              "submits on-chain. Old key is deregistered after a grace period (e.g., 1 epoch). " +
+              "Gas cost: ~200K-300K gas for ECDSA verification + SHA-256 + storage writes.",
           },
         ],
       },
@@ -890,6 +1298,59 @@ window.DAY2_TECHNICAL = {
           {
             name: "Path ORAM Overhead",
             formula: "\\[ O(\\log N) \\text{ accesses per operation, for } N \\text{ data blocks} \\]",
+          },
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "A BBS+ credential issuance enclave uses a lookup table for elliptic curve scalar multiplication " +
+              "(windowed method with precomputed points). Explain how a Prime+Probe cache attack on L1 " +
+              "can extract the issuer's secret key x. Describe the attack steps and what information each " +
+              "cache observation reveals. How many observations are needed to recover a 256-bit key?",
+            hint:
+              "Windowed scalar multiplication processes the key in w-bit windows, looking up precomputed points " +
+              "in a table indexed by each window value. If the table spans multiple cache lines, " +
+              "the accessed cache line reveals the w-bit window value. " +
+              "L1 cache line = 64 bytes, each G1 point = 96 bytes (uncompressed).",
+            answer:
+              "Attack: The windowed method processes x in w-bit chunks (e.g., w=4, so 4-bit windows). " +
+              "For each window, it accesses precomputed_table[window_value]. With 2^4 = 16 entries of 96 bytes each, " +
+              "the table spans 1536 bytes = 24 cache lines. Different window values access different cache lines. " +
+              "Prime phase: attacker fills all 24 relevant L1 cache sets with known data. " +
+              "Enclave executes one scalar multiplication step, accessing precomputed_table[window_i]. " +
+              "Probe phase: attacker measures access time to each cache set. The slow set reveals which table entry " +
+              "was accessed, leaking the 4-bit window value. " +
+              "For 256-bit key with 4-bit windows: 64 observations (one per window) recover the full key. " +
+              "In practice, noise requires ~100-200 observations with statistical analysis. " +
+              "Countermeasure: constant-time table lookup (access ALL entries, select the correct one via conditional moves), " +
+              "or use Montgomery ladder (no table lookups).",
+          },
+          {
+            type: "calculation",
+            question:
+              "The side-channel resistance criterion requires L(tau(x_1)) = L(tau(x_2)) for all secret inputs x_1, x_2. " +
+              "Consider a naive if-else branch: if (secret_bit) { A = table[0]; } else { A = table[8]; }. " +
+              "Show that this violates the criterion by describing L(tau(0)) and L(tau(1)). " +
+              "Then rewrite the code using a constant-time conditional select and prove it satisfies the criterion.",
+            hint:
+              "L(tau) includes branch outcomes and memory access patterns. " +
+              "For secret_bit=0: branch taken = else, memory access = table[8]. " +
+              "For secret_bit=1: branch taken = if, memory access = table[0]. " +
+              "Constant-time select: mask = -secret_bit (all 1s or all 0s), A = (table[0] & mask) | (table[8] & ~mask).",
+            answer:
+              "Naive version: " +
+              "L(tau(1)) = {branch: if-taken, mem_access: &table[0]}. " +
+              "L(tau(0)) = {branch: else-taken, mem_access: &table[8]}. " +
+              "L(tau(1)) != L(tau(0)) — both branch outcome and memory address differ. Criterion violated. " +
+              "Constant-time version: " +
+              "mask = -(int64_t)secret_bit; // 0xFFFF...F if bit=1, 0x0000...0 if bit=0 " +
+              "val0 = table[0]; val8 = table[8]; // always access BOTH entries " +
+              "A = (val0 & mask) | (val8 & ~mask); " +
+              "L(tau(1)) = {branch: none (no conditional), mem_access: {&table[0], &table[8]}}. " +
+              "L(tau(0)) = {branch: none, mem_access: {&table[0], &table[8]}}. " +
+              "L(tau(1)) == L(tau(0)) — same branches (none), same memory accesses (both entries loaded). " +
+              "Criterion satisfied. The bitwise select computes the correct value without leaking which was chosen.",
           },
         ],
       },
@@ -998,6 +1459,67 @@ window.DAY2_TECHNICAL = {
           {
             name: "Performance: TEE vs ZKP Proving",
             formula: "\\[ T_{\\text{TEE}} \\approx 1\\text{ms} \\quad \\text{vs} \\quad T_{\\text{ZKP}} \\approx 1\\text{-}5\\text{s} \\quad (\\sim\\!1000\\text{x difference}) \\]",
+          },
+        ],
+        exercises: [
+          {
+            type: "comparison",
+            question:
+              "The hybrid security model states: Secure_hybrid iff Secure_TEE OR Secure_ZKP. " +
+              "Analyze three failure scenarios: (1) TEE compromised via Foreshadow, ZKP intact; " +
+              "(2) ZKP broken by quantum computer (Shor's algorithm), TEE intact; " +
+              "(3) both compromised simultaneously. For each scenario, describe what security properties " +
+              "(confidentiality, integrity, unlinkability) survive.",
+            hint:
+              "When TEE is compromised: adversary can read enclave memory (learns witness/attributes) " +
+              "but ZKP soundness still prevents forging proofs for false statements. " +
+              "When ZKP is broken: adversary can forge proofs, but TEE prevents witness extraction. " +
+              "Both broken: no security remains.",
+            answer:
+              "Scenario 1 (TEE broken, ZKP intact): Adversary extracts the witness (credential attributes, user identity) " +
+              "from the enclave via Foreshadow. Confidentiality: LOST (adversary knows attributes). " +
+              "Integrity: PRESERVED (ZKP soundness means adversary cannot forge a proof for attributes they do not hold). " +
+              "Unlinkability: PRESERVED (BBS+ randomization is information-theoretic, independent of TEE). " +
+              "Practical impact: credential attributes leak, but the system remains unforgeable. " +
+              "Scenario 2 (ZKP broken, TEE intact): Shor's algorithm breaks DLP/q-SDH. Adversary can forge BBS+ signatures " +
+              "and proofs. Confidentiality: PRESERVED (TEE still encrypts computation, witness never leaves enclave). " +
+              "Integrity: LOST (adversary can forge credentials). Unlinkability: LOST (adversary can link presentations " +
+              "by solving DLP to recover randomness). Practical impact: credential forgery possible, but existing secrets safe. " +
+              "Scenario 3 (both broken): All properties lost. Adversary extracts secrets from TEE AND forges/links proofs. " +
+              "This requires both a hardware vulnerability AND a computational breakthrough — the disjunctive model " +
+              "ensures this is strictly harder than breaking either alone.",
+          },
+          {
+            type: "design",
+            question:
+              "Design a TEE-assisted ZKP proving architecture for anonymous credential presentation on Sui. " +
+              "The user's credential attributes are stored sealed in a cloud TEE. A Sui Move contract verifies " +
+              "the Groth16 proof. Specify: (1) what happens inside the TEE, (2) what is published on-chain, " +
+              "(3) the fallback path if the TEE is unavailable, and (4) why the system is secure even if the " +
+              "cloud TEE operator is malicious.",
+            hint:
+              "Inside TEE: unseal credential, compute Groth16 witness, run prover, output proof. " +
+              "On-chain: Groth16 proof + public inputs (disclosed attributes, issuer pk commitment). " +
+              "Fallback: user downloads sealed credential, runs Groth16 prover locally (~5s instead of ~500ms). " +
+              "Malicious operator: can read enclave memory IF TEE is broken, but cannot forge proofs (ZKP soundness).",
+            answer:
+              "Architecture: " +
+              "(1) Inside TEE: User authenticates via RA-TLS (remote attestation + TLS). Enclave unseals the BBS+ " +
+              "credential (sk_seal derived from MRSIGNER policy). Enclave constructs Groth16 witness: " +
+              "(private: all attributes, BBS+ signature, randomness; public: disclosed attributes, issuer pk, policy predicate). " +
+              "Enclave runs Groth16 prover with the preloaded proving key (~500ms with AES-NI acceleration). " +
+              "Outputs: (proof, public_inputs). Witness never leaves the enclave. " +
+              "(2) On-chain: User submits a Sui transaction containing (groth16_proof: vector<u8>, " +
+              "public_inputs: vector<u8>) to a Verifier Move contract. Contract calls sui::groth16::verify() " +
+              "with the pinned verification key. If valid, executes the authorized action (e.g., mint token, access gate). " +
+              "Cost: ~3 pairing operations, ~50K gas. " +
+              "(3) Fallback: User requests sealed credential export (encrypted blob). Runs Groth16 prover locally " +
+              "using a WASM or native prover (~3-5s on laptop). Same proof format — Move contract cannot distinguish " +
+              "TEE-generated vs locally-generated proofs. " +
+              "(4) Security against malicious operator: The cloud operator controls the OS but NOT the enclave. " +
+              "If TEE isolation holds: operator learns nothing (confidentiality). " +
+              "If TEE is broken: operator learns attributes but CANNOT forge Groth16 proofs for false statements " +
+              "(soundness depends on q-SDH, not TEE). The system degrades to ZKP-only security — still unforgeable.",
           },
         ],
       },
