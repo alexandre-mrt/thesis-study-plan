@@ -131,6 +131,26 @@ window.DAY3_TECHNICAL = {
               '\\( \\sum \\text{cv}_{\\text{in}} - \\sum \\text{cv}_{\\text{out}} = \\text{cv}_{\\text{fee}} \\)',
           },
         ],
+        exercises: [
+          {
+            type: 'design',
+            question:
+              'Trace the full lifecycle of a Zcash Sapling shielded transaction: Alice wants to send 5 ZEC to Bob. Describe each step from note creation to on-chain settlement, identifying which data is public, which is private, and what each zero-knowledge proof statement proves. Include the role of the Merkle tree, nullifier set, and value commitments.',
+            hint:
+              'Start with Alice owning an unspent note (commitment in the Merkle tree). She needs to: (1) prove she owns a valid note, (2) create a nullifier to prevent double-spend, (3) create a new note for Bob, (4) prove value balance via homomorphic commitments. Public data: nullifier, new commitment, value commitments, proof. Private data: note contents, Merkle path, spending key.',
+            answer:
+              'Step 1: Alice has note = (pk_d_Alice, 10, rho, rcm) with commitment cm_old in the Merkle tree at root rt. Step 2: Alice computes nullifier nf = PRF_nsk(rho) and creates two new notes: note_Bob = (pk_d_Bob, 5, rho_new1, rcm1) and note_change = (pk_d_Alice, 5, rho_new2, rcm2). Step 3: Alice computes value commitments cv_in = 10*V + rcv_in*R, cv_out1 = 5*V + rcv_out1*R, cv_out2 = 5*V + rcv_out2*R. Step 4: She generates a Groth16 spend proof proving: cm_old is in the tree (Merkle path to rt), nf is correctly derived, and v_old >= v_new. Step 5: She generates output proofs for both new notes. Step 6: On-chain: validators check nf is fresh, verify all proofs, check cv_in - cv_out1 - cv_out2 = 0 (homomorphic balance), insert cm_new1 and cm_new2 into the tree. Public: nf, cm_new1, cm_new2, cv values, proofs, rt. Private: note contents, Merkle path, keys, amounts.',
+          },
+          {
+            type: 'comparison',
+            question:
+              'Compare the Sapling and Orchard upgrade in Zcash across three dimensions: trusted setup requirements, proof system properties, and transaction structure. Why does the move from Groth16 to Halo 2 matter for long-term security?',
+            hint:
+              'Sapling uses Groth16 (trusted setup, BLS12-381 + Jubjub). Orchard uses Halo 2 (no trusted setup, Pallas/Vesta curve cycle). Think about the "toxic waste" problem and what happens if the ceremony is compromised.',
+            answer:
+              'Trusted setup: Sapling requires a multi-party computation ceremony (powers-of-tau) where at least one participant must be honest to prevent toxic waste exploitation. If compromised, an attacker can forge proofs and inflate the shielded supply undetectably. Orchard eliminates this entirely with Halo 2 recursive proofs. Proof system: Groth16 gives ~192 byte proofs and ~10ms verification but is non-universal (circuit-specific setup). Halo 2 has slightly larger proofs but supports recursive composition and is universal. Transaction structure: Sapling has separate Spend and Output descriptions (leaking the ratio of inputs to outputs). Orchard combines them into unified Actions where each Action contains one spend + one output, hiding whether a given Action is "real" or padding. This significantly improves privacy by making all transactions look structurally identical regardless of the actual number of inputs and outputs.',
+          },
+        ],
       },
 
       {
@@ -188,6 +208,26 @@ window.DAY3_TECHNICAL = {
               '\\( \\sum C_{\\text{in}} - \\sum C_{\\text{out}} = z \\cdot H \\)',
           },
         ],
+        exercises: [
+          {
+            type: 'conceptual',
+            question:
+              'Explain why Monero uses mandatory ring size 16 rather than allowing users to choose their own ring size. What would happen to the privacy of the network if some users chose ring size 1 (no decoys)?',
+            hint:
+              'Think about how a small ring size leaks information not just about the user who chose it, but about all other transactions that reference the same outputs as decoys.',
+            answer:
+              'If users could choose ring size 1, their transactions would reveal the true spent output. This has a cascading effect: other transactions using that same output as a decoy can now eliminate it from their anonymity sets, effectively reducing their ring size. In the worst case, this "chain reaction" can deanonymize transactions that chose larger ring sizes. Mandatory ring size 16 ensures a uniform anonymity guarantee: every transaction is indistinguishable among exactly 16 candidates, and no user can degrade the privacy of others. The tradeoff is increased transaction size (16 decoy references per input), but this is considered acceptable for network-wide privacy.',
+          },
+          {
+            type: 'calculation',
+            question:
+              'In Monero RingCT, a transaction has two inputs with Pedersen commitments C_in1 = 10G + 3H and C_in2 = 20G + 7H, and two outputs C_out1 = 25G + 5H and C_out2 = 5G + 4H. Compute the excess z*H and verify whether the transaction balances. What does z represent?',
+            hint:
+              'Compute sum(C_in) - sum(C_out) and separate the G and H components. For a valid transaction, the G component (value) must cancel to zero.',
+            answer:
+              'sum(C_in) = (10+20)G + (3+7)H = 30G + 10H. sum(C_out) = (25+5)G + (5+4)H = 30G + 9H. Excess = 30G + 10H - 30G - 9H = 0G + 1H = 1*H. The value components cancel (30 = 30), confirming no inflation. z = r_in_total - r_out_total = 10 - 9 = 1 is the difference in blinding factors. In a valid Monero transaction, the excess must be exactly z*H (no G component), proving the values balance. The blinding factor excess z is used to construct the transaction kernel, which serves as a signature proving the transaction creator knew the blinding factors.',
+          },
+        ],
       },
 
       {
@@ -235,6 +275,26 @@ window.DAY3_TECHNICAL = {
               '\\( \\exists \\, (s, n, \\text{path}) : H(s \\| n) \\in \\text{tree}(R) \\wedge \\text{nullifier} = H(n) \\)',
           },
         ],
+        exercises: [
+          {
+            type: 'design',
+            question:
+              'Walk through a complete Tornado Cash deposit-then-withdraw flow for 1 ETH. A user generates secret s and nullifier secret n, deposits 1 ETH, waits, then withdraws via a relayer. Trace the Merkle tree operations: what happens when the commitment is inserted as leaf index 42 in a depth-20 tree? How many hashes are computed on-chain during insertion?',
+            hint:
+              'An incremental Merkle tree only recomputes the path from the new leaf to the root. At each level, the new node is hashed with its sibling (which may be a pre-computed "zero" hash if no real leaf exists on that side). Depth 20 means 20 hash computations.',
+            answer:
+              'Deposit: User generates random s, n (248-bit each), computes cm = H(s || n), and sends 1 ETH + cm to the contract. The contract inserts cm at leaf index 42. On-chain Merkle insertion: starting from leaf level, compute hash(cm, sibling_0) at level 0, then hash(result, sibling_1) at level 1, and so on up to level 19, producing the new root R. This is exactly 20 hash operations (one per tree level). Siblings at unpopulated positions use precomputed zero hashes. The contract stores the new root R (and keeps up to 100 historical roots). Withdrawal: after waiting (to break timing correlation), the user computes nullifier = H(n), generates a Groth16 proof that (1) leaf = H(s || n), (2) MerklePath(leaf, path) = R for some stored root R, (3) nullifier = H(n). The user sends the proof + nullifier + recipient address to a relayer. The relayer submits the transaction, the contract verifies the proof, checks the nullifier is fresh, marks it as used, and sends 1 ETH minus relayer fee to the recipient.',
+          },
+          {
+            type: 'conceptual',
+            question:
+              'Tornado Cash uses fixed denominations (0.1, 1, 10, 100 ETH). Explain why variable-amount deposits would catastrophically weaken the anonymity set. Then analyze: if there are 5000 deposits in the 1 ETH pool and an adversary knows the withdrawal happened within 2 hours of a deposit, how does the effective anonymity set change?',
+            hint:
+              'With variable amounts, the adversary can match deposits to withdrawals by amount. With fixed amounts, the anonymity set is the full pool. For timing analysis, count how many deposits occurred in the 2-hour window.',
+            answer:
+              'Variable amounts break anonymity because each deposit-withdrawal pair can be correlated by matching the exact deposit amount. If Alice deposits 1.337 ETH and later someone withdraws 1.337 ETH, the linkage is trivial regardless of pool size. Fixed denominations ensure all deposits in a pool are indistinguishable by value. For the timing attack: if the 1 ETH pool has 5000 total deposits but only 50 occurred within the 2-hour window the adversary suspects, the effective anonymity set drops from 5000 to 50 (a 100x reduction). The anonymity entropy drops from log2(5000) = 12.3 bits to log2(50) = 5.6 bits. This is why Tornado Cash documentation recommends waiting long periods between deposit and withdrawal, and why depositing and withdrawing at high-traffic times maximizes privacy.',
+          },
+        ],
       },
 
       {
@@ -277,6 +337,26 @@ window.DAY3_TECHNICAL = {
             name: 'Object ownership',
             formula:
               '\\( \\text{owner}(\\text{obj}) \\in \\{\\text{address}, \\text{object\\_id}, \\text{shared}\\} \\)',
+          },
+        ],
+        exercises: [
+          {
+            type: 'design',
+            question:
+              'Design a privacy-preserving credential storage scheme using Sui owned objects. An encrypted BBS+ credential is stored as an owned Sui object. Explain how the object model properties (single-writer, fast-path, resource linearity) map to privacy requirements. What are the privacy gaps that remain even with per-object encryption?',
+            hint:
+              'Owned objects skip consensus (200ms fast path) and have single-writer access. Resource linearity prevents duplication. But consider: object metadata (ID, version, owner address) is still public. Transaction patterns (frequency, gas, called functions) are visible.',
+            answer:
+              'Design: The credential is stored as struct EncryptedCredential { id: UID, ciphertext: vector<u8>, issuer_id: address } owned by the user. Privacy benefits from the object model: (1) Single-writer means no other user or validator needs to read the credential contents during normal operations, (2) Fast-path (200ms) avoids consensus exposure for credential read/update, (3) Resource linearity ensures the credential cannot be duplicated (prevents credential sharing attacks) and cannot be silently dropped (auditability). Privacy gaps that remain: (1) The owner address is public, so an observer knows which address holds a credential, (2) The object ID and version number are public, revealing when the credential was last updated, (3) Any transaction touching the object is visible (function calls, gas usage), (4) The ciphertext size may leak the number of attributes, (5) Cross-referencing credential creation timestamps with issuer transactions can link users to issuers.',
+          },
+          {
+            type: 'comparison',
+            question:
+              'Compare how a private payment would work on Sui (object-centric, Move VM) versus Ethereum (account-centric, EVM). Focus on: where the note commitment tree lives, how the nullifier set is managed, and why Sui owned objects vs. shared objects matter for payment privacy throughput.',
+            hint:
+              'On Ethereum, the commitment tree and nullifier set are contract storage (global state). On Sui, they could be shared objects (requiring consensus) or owned objects (fast path). Think about contention and parallelism.',
+            answer:
+              'Ethereum: The note commitment tree and nullifier set live in a single smart contract storage. Every deposit/withdrawal is a state-modifying call to the same contract, processed sequentially. Throughput is limited by block gas limits and sequential execution. Sui: The commitment tree and nullifier set must be shared objects (multiple writers insert commitments and nullifiers), requiring Mysticeti consensus (~390ms). However, the credential verification and proof generation can use owned objects (fast path, ~200ms, no consensus). Key difference: Sui can parallelize independent payments that do not share objects. If the nullifier set is sharded across multiple shared objects (e.g., by hash prefix), concurrent payments to different shards execute in parallel. On Ethereum, all payments serialize through the same contract. Sui advantage: the owned object for credential storage never contends with other users, enabling parallel credential checks. Sui disadvantage: shared object mutations (tree + nullifier) still require consensus, creating a bottleneck similar to Ethereum but with higher base throughput (100K+ TPS vs. ~15 TPS).',
           },
         ],
       },
@@ -337,6 +417,26 @@ window.DAY3_TECHNICAL = {
               '\\( \\text{Dec}(\\text{vk}, \\text{encrypted\\_memo}) \\rightarrow (\\text{sender}, \\text{receiver}, v) \\)',
           },
         ],
+        exercises: [
+          {
+            type: 'design',
+            question:
+              'Design a compliance-friendly private payment system that satisfies all four privacy properties (sender, receiver, amount, graph) while still allowing a designated auditor to decrypt transaction details. Specify the cryptographic primitives for each property and explain how viewing keys enable selective auditability without degrading privacy for non-targeted users.',
+            hint:
+              'Use ring signatures or ZK Merkle membership for sender privacy, stealth addresses for receiver privacy, Pedersen commitments for amount privacy, and fixed denominations + relayers for graph privacy. Viewing keys use asymmetric encryption (ECIES) so only the auditor can decrypt.',
+            answer:
+              'Sender privacy: ZK proof of Merkle membership (Zcash-style), anonymity set = full commitment tree. Receiver privacy: stealth addresses derived from recipient public key, one-time address per payment. Amount privacy: Pedersen commitments C = vG + rH with Bulletproofs range proofs for v in [0, 2^64). Graph privacy: fixed denomination pools + time delays + relayer network for gas payment unlinkability. Compliance layer: each transaction includes an encrypted memo = Enc(auditor_pk, (sender_id, receiver_id, v, timestamp)) using ECIES (ephemeral DH key + AES-GCM). Only the auditor with the corresponding private key can decrypt. Privacy preservation: the ECIES ciphertext is IND-CCA2 secure, so non-auditors learn nothing from the memo. The auditor key can use threshold encryption (t-of-n) to prevent unilateral surveillance. For volume reporting, users generate ZK proofs over committed values proving sum(v_i) < threshold without revealing individual transactions.',
+          },
+          {
+            type: 'conceptual',
+            question:
+              'A private payment system uses a fixed denomination of 1 ETH with an anonymity set of 10,000 deposits. An adversary performs a timing attack combined with amount analysis (the user deposits 3 ETH across three separate 1 ETH deposits within 10 minutes). How does this multi-deposit pattern reduce the effective anonymity? What countermeasures would you recommend?',
+            hint:
+              'Three deposits in quick succession from potentially linked addresses (gas funding) creates a correlation. The adversary looks for sets of 3 deposits close in time and later 3 withdrawals close in time.',
+            answer:
+              'The adversary searches for clusters of 3 deposits within a 10-minute window. If there are N such 3-deposit clusters in the pool, the anonymity set drops from 10,000 individual deposits to N deposit clusters. If deposits are sparse (say 50 deposits per hour), only ~8 deposits fall in any 10-minute window, giving C(8,3) = 56 possible 3-deposit combinations. This is dramatically worse than the 10,000 individual anonymity set. On withdrawal, if the user also withdraws 3 times in quick succession, the adversary cross-correlates deposit and withdrawal clusters. Countermeasures: (1) Randomize deposit timing over hours or days rather than minutes, (2) Use different source addresses for each deposit (funded independently), (3) Vary the denomination across deposits (use 1 ETH and 10 ETH pools), (4) Withdraw at different times with long random delays between each, (5) Use a mixing service or CoinJoin before depositing to break the funding trail.',
+          },
+        ],
       },
     ],
   },
@@ -395,6 +495,26 @@ window.DAY3_TECHNICAL = {
               '\\( \\text{REAL}_{\\Pi, \\mathcal{A}} \\approx_c \\text{IDEAL}_{\\mathcal{F}, \\mathcal{S}} \\)',
           },
         ],
+        exercises: [
+          {
+            type: 'calculation',
+            question:
+              'A credential verification circuit has 100,000 R1CS constraints. The ZKP proving time is O(N log N) dominated by MSM operations. On mobile, one constraint takes ~5 microseconds to prove. Calculate the proving time for (a) pure ZKP, (b) hybrid with TEE reducing the circuit to 10,000 constraints (TEE pre-computes the witness in 5ms). What is the speedup factor?',
+            hint:
+              'T_prove = N * log2(N) * cost_per_constraint_operation. For (b), add the TEE overhead to the reduced ZKP proving time.',
+            answer:
+              'Pure ZKP: T = 100,000 * log2(100,000) * 5us = 100,000 * 16.6 * 5us = 8,300,000 us = 8.3 seconds. Hybrid: TEE witness generation = 5ms. Reduced ZKP: T = 10,000 * log2(10,000) * 5us = 10,000 * 13.3 * 5us = 665,000 us = 665ms. Total hybrid = 5ms + 665ms = 670ms. Speedup factor = 8,300ms / 670ms = 12.4x. This illustrates how TEE-assisted witness generation achieves 10-100x speedup by reducing the circuit size from 100K to 10K constraints, while the ZKP still provides trustless verification of the smaller circuit.',
+          },
+          {
+            type: 'conceptual',
+            question:
+              'Analyze the graceful degradation of a ZKP+TEE hybrid system under three failure scenarios: (1) TEE is compromised via side-channel attack but ZKP holds, (2) ZKP assumption is broken (e.g., trusted setup compromised for Groth16) but TEE is intact, (3) both are compromised. For each scenario, state which security properties survive and which are lost.',
+            hint:
+              'TEE provides confidentiality (data stays encrypted in the enclave). ZKP provides soundness (proofs cannot be forged). Think about what each component protects independently.',
+            answer:
+              'Scenario 1 (TEE broken, ZKP holds): The attacker can observe private inputs during TEE processing (witness values, credential contents, amounts). However, they cannot forge proofs because ZKP soundness is purely cryptographic. Properties lost: input confidentiality during computation, TEE attestation trustworthiness. Properties preserved: proof soundness (no fake credentials or inflated payments), on-chain verification integrity, double-spend prevention. Scenario 2 (ZKP broken, TEE intact): The attacker can forge proofs that the verifier accepts (counterfeit credentials, inflated payments). However, data inside the TEE remains confidential. Properties lost: soundness (fake proofs accepted), integrity of on-chain state. Properties preserved: input confidentiality (TEE encryption still protects data), honest TEE attestation. Scenario 3 (both broken): All security properties are lost. The attacker can both observe private data and forge proofs. This is the catastrophic failure mode. The probability is Pr[TEE broken] * Pr[ZKP broken], which is negligible if either assumption holds independently with high probability.',
+          },
+        ],
       },
 
       {
@@ -442,6 +562,26 @@ window.DAY3_TECHNICAL = {
             name: 'Commitment bridge',
             formula:
               '\\( \\text{com} = \\text{Commit}(z, r), \\quad \\text{ZKP proves } g(z) = \\text{output} \\)',
+          },
+        ],
+        exercises: [
+          {
+            type: 'comparison',
+            question:
+              'Compare the three hybrid architecture patterns (TEE-Assisted Witness, TEE-Accelerated Proving, TEE Real-Time + ZKP Settlement) across four dimensions: trust model, latency, throughput, and suitability for credential verification at a physical point of sale. Which pattern would you choose for the thesis and why?',
+            hint:
+              'Pattern 1 has the strongest trust model (ZKP is trustless). Pattern 2 is fastest but trusts TEE for proof generation. Pattern 3 gives real-time latency (~1-5ms) with periodic batch settlement. A point-of-sale needs sub-second response.',
+            answer:
+              'Pattern 1 (TEE Witness): Trust = strongest (ZKP verification is trustless). Latency = ~500ms-2s (full ZKP proving after TEE witness). Throughput = limited by ZKP proving. POS suitability = marginal (too slow for tap-to-pay). Pattern 2 (TEE Proving): Trust = medium (TEE generates proof, but on-chain verification is still trustless). Latency = ~50-100ms (TEE runs prover with hardware acceleration). Throughput = high (enclave parallelism). POS suitability = good but requires server-side TEE. Pattern 3 (TEE Real-Time + ZKP Batch): Trust = time-bounded (TEE validates instantly, ZKP catches dishonesty within N transactions). Latency = ~1-5ms real-time check. Throughput = highest (TEE handles all real-time, ZKP is amortized). POS suitability = excellent. The thesis uses Pattern 1 for high-security credential issuance (where trust matters more than speed) and Pattern 3 for payment verification at point of sale (where sub-second latency is required). Pattern 3 amortizes proving cost over N=100 transactions, making it economically viable.',
+          },
+          {
+            type: 'design',
+            question:
+              'In Pattern 1 (TEE-Assisted Witness Generation), the TEE must securely pass the witness to the ZKP prover. Design the secure channel between TEE enclave and ZKP prover, considering: (a) the witness must not leak in transit, (b) the prover may run outside the enclave, (c) an attacker controlling the host OS can observe memory. What cryptographic mechanism ensures witness confidentiality?',
+            hint:
+              'SGX enclaves can "seal" data to the enclave identity (MRSIGNER or MRENCLAVE). For cross-enclave communication, use remote attestation + Diffie-Hellman key exchange to establish an encrypted channel.',
+            answer:
+              'Design: The TEE enclave computes witness w from encrypted inputs. To pass w to the ZKP prover: Option A (same machine, prover inside enclave): Use SGX sealing with MRENCLAVE policy. The witness is sealed to the enclave measurement, stored in untrusted memory, and can only be unsealed by the same enclave code. The ZKP prover runs inside the same enclave, so w never leaves protected memory. Drawback: proving is CPU-intensive inside the enclave. Option B (prover outside enclave): Establish a secure channel via local attestation (if same platform) or remote attestation (if different machine). The TEE generates an ephemeral ECDH key pair, the prover generates its own, and they perform a key exchange authenticated by the attestation report. The witness is encrypted with the shared key: enc_w = AES-GCM(shared_key, w). The prover decrypts in its own secure context. This protects against host OS snooping but requires the prover to also be in a trusted environment. Option C (sealed storage): The TEE seals the witness to disk with a platform-specific key. The prover (in the same enclave identity) unseals it later. This supports asynchronous witness generation and proving. Recommended: Option A for maximum security (witness never leaves enclave), Option C for practical deployment (asynchronous pipeline).',
           },
         ],
       },
@@ -500,6 +640,26 @@ window.DAY3_TECHNICAL = {
           {
             name: 'Scoped pseudonym',
             formula: '\\( \\text{nym} = \\text{PRF}(\\text{sk}, \\text{scope}) \\)',
+          },
+        ],
+        exercises: [
+          {
+            type: 'design',
+            question:
+              'A user holds a BBS+ credential with attributes [name, age, country, income_bracket, kyc_level]. They want to prove to a DeFi protocol on Sui that they are (1) over 18, (2) from an EU country, and (3) KYC level >= 2, WITHOUT revealing their name or income. Write the selective disclosure set D, the predicate constraints, and describe how the Groth16-wrapped BBS+ proof is verified on-chain in a Move contract.',
+            hint:
+              'D is the set of revealed attribute indices. Predicates are ZK conditions on hidden attributes (range proofs, set membership). The Move contract calls a Groth16 verifier with public inputs = [issuer_pk, revealed_attributes, predicate_outputs].',
+            answer:
+              'Attributes indexed as: a1=name, a2=age, a3=country, a4=income_bracket, a5=kyc_level. Disclosure set D = {} (no attributes revealed in the clear). Predicate constraints embedded in the ZK circuit: (1) a2 >= 18 (range check), (2) a3 in {DE, FR, IT, ES, NL, ...EU_SET} (set membership proof), (3) a5 >= 2 (range check). The BBS+ proof of knowledge proves: valid signature from issuer ipk on (a1,...,a5) AND the three predicates hold. This is wrapped in a Groth16 circuit (~100K constraints) that internally verifies the BBS+ proof. On-chain Move contract: (1) Receives serialized Groth16 proof pi (192 bytes) and public inputs [ipk, predicate_results = (true, true, true)], (2) Calls groth16::verify(vk, pi, public_inputs) which performs 3 pairing checks, (3) Returns boolean. The scoped pseudonym nym = PRF(sk, "defi_protocol_X") is included as a public input to enable Sybil resistance without revealing identity. Gas cost: ~50K units for on-chain verification.',
+          },
+          {
+            type: 'conceptual',
+            question:
+              'Explain the role of scoped pseudonyms in the anonymous credential system. A user presents credentials to ServiceA and ServiceB. Under what conditions can ServiceA and ServiceB collude to link the user across services? How does the PRF-based pseudonym construction prevent this?',
+            hint:
+              'The pseudonym is nym = PRF(sk, scope). If scope differs between services, the outputs are computationally independent. Think about what an adversary would need to link two pseudonyms.',
+            answer:
+              'Scoped pseudonyms: For ServiceA, the user computes nym_A = PRF(sk, "ServiceA"). For ServiceB, nym_B = PRF(sk, "ServiceB"). Since PRF is a pseudorandom function, nym_A and nym_B are computationally indistinguishable from random values even if the same secret key sk is used. Collusion resistance: Even if ServiceA and ServiceB share their databases, they cannot determine whether nym_A and nym_B belong to the same user. Linking would require inverting the PRF (computing sk from nym_A and the known scope "ServiceA"), which is infeasible under PRF security. Within the same service: nym_A = PRF(sk, "ServiceA") is deterministic, so the same user always produces the same pseudonym for ServiceA. This enables rate-limiting (e.g., one vote per user) and Sybil resistance without learning the user identity. The key insight is that unlinkability across scopes and linkability within a scope are both achieved by the same construction, just by varying the scope input.',
           },
         ],
       },
@@ -571,6 +731,26 @@ window.DAY3_TECHNICAL = {
               '\\( \\text{memo} = \\text{Enc}(\\text{vk}_{\\text{auditor}}, (\\text{sender}, \\text{receiver}, v)) \\)',
           },
         ],
+        exercises: [
+          {
+            type: 'design',
+            question:
+              'Trace the complete 7-step private payment flow for a 50 EUR payment from Alice to Bob on Sui. Alice holds a BBS+ credential (KYC level 2, EU citizen). The payment uses the low-value fast path (TEE verification instead of on-chain ZKP). Describe each step, identifying what happens in the TEE, what goes on-chain, and what the auditor can see.',
+            hint:
+              'Low-value fast path: TEE verifies the credential and payment locally (~5ms), issues a signed receipt. Batch ZKP settles periodically. On-chain: nullifier insertion + note commitment + encrypted memo. The auditor decrypts the memo with their viewing key.',
+            answer:
+              'Step 1 (Credential check in TEE): Alice sends her encrypted BBS+ credential to the TEE. The TEE decrypts it, verifies the BBS+ signature against the issuer public key, checks a2_country in EU and a5_kyc >= 2, and verifies non-revocation against the accumulator. Time: ~2ms. Step 2 (Amount commitment): Alice creates C_send = 50*G + r_s*H inside the TEE. Bob creates C_recv = 50*G + r_r*H. Step 3 (Balance + range check in TEE): The TEE verifies 50 = 50 (balance) and 0 <= 50 < 2^64 (range). Since this is low-value (<1000 EUR threshold), TEE verification suffices. Step 4 (Nullifier): TEE computes nf = PRF(sk_Alice, note_id) for the spent note. Step 5 (Encrypted memo): TEE encrypts memo = Enc(auditor_pk, (Alice_id, Bob_id, 50, timestamp)) using ECIES. Step 6 (TEE receipt): TEE produces a signed attestation covering all checks. Alice submits this to the Sui contract. Step 7 (On-chain settlement): Move contract verifies TEE attestation signature, checks nf is fresh, inserts new note commitment into Merkle tree (shared object), records nf in nullifier set (shared object), stores encrypted memo. Total latency: ~5ms TEE + ~390ms consensus = ~395ms. The auditor can decrypt the memo to see Alice paid Bob 50 EUR. Periodic batch ZKP (every 100 transactions) proves all TEE attestations were honest.',
+          },
+          {
+            type: 'calculation',
+            question:
+              'A combined Groth16 proof bundles credential verification (pi_1) and payment proof (pi_2) into a single proof. The credential circuit has 100K constraints, the payment circuit has 50K constraints, and the combined circuit has 140K constraints (shared sub-circuits reduce overhead). If on-chain gas cost is 1 gas per pairing check, and each separate Groth16 proof requires 3 pairings, how much gas is saved by combining? What is the proving time overhead of combining vs. separate proofs at 5 microseconds per constraint (O(N log N))?',
+            hint:
+              'Separate proofs: 2 * 3 = 6 pairings. Combined: 3 pairings. For proving time, compute N*log2(N)*5us for each case.',
+            answer:
+              'Gas savings: Separate proofs = 2 Groth16 verifications = 6 pairing checks = 6 gas. Combined proof = 1 Groth16 verification = 3 pairing checks = 3 gas. Savings = 50% gas reduction. Proving time comparison: Separate = T(100K) + T(50K) = 100K * log2(100K) * 5us + 50K * log2(50K) * 5us = 100K * 16.6 * 5us + 50K * 15.6 * 5us = 8,300ms + 3,900ms = 12,200ms. Combined = T(140K) = 140K * log2(140K) * 5us = 140K * 17.1 * 5us = 11,970ms. The combined circuit is actually slightly faster to prove (11,970ms vs 12,200ms) because the sub-linear scaling of O(N log N) means one large circuit is more efficient than two separate ones, plus the 10K constraint savings from shared sub-circuits. Overall: combining saves 50% gas on-chain and is slightly faster to prove.',
+          },
+        ],
       },
 
       {
@@ -627,6 +807,26 @@ window.DAY3_TECHNICAL = {
             name: 'Lether proof size comparison',
             formula:
               '\\( |\\pi_{\\text{Lether}}| \\approx 68\\text{KB} \\text{ vs. } |\\pi_{\\text{Groth16}}| \\approx 192\\text{B} \\)',
+          },
+        ],
+        exercises: [
+          {
+            type: 'comparison',
+            question:
+              'Compare the impact of a quantum computer on three cryptographic primitives used in the thesis: (1) BBS+ signatures (pairing-based, q-SDH assumption), (2) Groth16 proofs (pairing-based, BLS12-381), (3) Pedersen commitments (elliptic curve discrete log). For each, state whether it is broken by Shor or Grover, the post-quantum alternative, and the size/performance tradeoff of migrating.',
+            hint:
+              'Shor breaks discrete log and factoring in polynomial time. Grover gives quadratic speedup for search. All three primitives rely on elliptic curve discrete log or pairings, which Shor breaks.',
+            answer:
+              'BBS+ signatures: Broken by Shor (relies on q-SDH in pairing groups, which reduces to discrete log). PQ alternative: lattice-based anonymous credentials using Module-LWE commitments with relaxed proofs of knowledge. Tradeoff: signature size grows from ~100 bytes to ~10-50KB, and native selective disclosure is lost (requires general-purpose ZK proofs). Groth16 proofs: Broken by Shor (pairing-based, BLS12-381 discrete log). PQ alternative: STARK-based proofs (hash-based, no algebraic structure to attack). Tradeoff: proof size grows from 192 bytes to ~50-200KB, verification time increases, but no trusted setup is needed. Alternatively, lattice-based SNARKs are an active research area. Pedersen commitments: Broken by Shor (elliptic curve discrete log reveals the committed value given C, G, H). PQ alternative: Module-LWE commitments (Lether protocol). Tradeoff: commitment size grows from ~32 bytes to ~1-5KB, and homomorphic properties are preserved but with "relaxed" extraction (small norm leakage). Overall: migration increases on-chain data by 100-350x, making it impractical for high-frequency payments today but acceptable for long-lived credentials.',
+          },
+          {
+            type: 'conceptual',
+            question:
+              'Explain the "harvest now, decrypt later" attack and why it is particularly relevant for identity credentials with long lifetimes (10+ years). How does the thesis recommend defending against this threat during the transition period before large-scale quantum computers exist?',
+            hint:
+              'An adversary records encrypted credential data today and stores it. When quantum computers become available (estimated 2035-2040), they decrypt the stored data. Credentials issued today with 10+ year validity would still be active.',
+            answer:
+              'The harvest-now-decrypt-later attack: An adversary with large storage capacity records all encrypted on-chain data (credential ciphertexts, encrypted memos, commitment values) today. The data is encrypted under classical assumptions (ECIES with ECDH, AES with keys derived from elliptic curve operations). When a sufficiently powerful quantum computer becomes available, the adversary uses Shor algorithm to break the ECDH key exchange, recover AES keys, and decrypt all stored credentials and transaction memos. For identity credentials valid for 10+ years (passports, national IDs), a credential issued in 2027 and valid until 2037 is at risk if quantum computers arrive by 2035. The thesis defense strategy: (1) Immediate: use post-quantum key encapsulation (ML-KEM/Kyber) for credential encryption at rest, so stored ciphertexts resist quantum attack. (2) Hybrid issuance: sign credentials with both BBS+ (for efficient classical presentation) and Dilithium (for PQ signature longevity). (3) Credential rotation: design the system for periodic re-issuance so credentials can be migrated to fully PQ schemes as they mature. (4) Modular architecture: the protocol structure (Issue, Present, Verify, Revoke) is independent of the cryptographic primitives, enabling primitive swaps without protocol redesign.',
           },
         ],
       },
@@ -721,6 +921,26 @@ window.DAY3_TECHNICAL = {
             name: 'Full protocol specification',
             formula:
               '\\( \\Pi = (\\Pi_{\\text{cred}}, \\Pi_{\\text{pay}}, \\Pi_{\\text{TEE}}, \\Pi_{\\text{comply}}) \\)',
+          },
+        ],
+        exercises: [
+          {
+            type: 'design',
+            question:
+              'Map the full thesis architecture onto Sui Move contracts. For each of the four layers (Credential, Payment, TEE, Compliance), specify: which data structures are owned objects vs. shared objects, which operations require Mysticeti consensus vs. fast-path, and estimate the gas cost breakdown for a single credential-gated private payment.',
+            hint:
+              'Owned objects: user credential (single writer, no contention). Shared objects: note commitment tree, nullifier set, credential registry, revocation accumulator. Fast-path operations: credential decryption, proof generation (client-side). Consensus operations: any shared object mutation.',
+            answer:
+              'Layer 1 (Credential): Owned objects = EncryptedCredential per user (~1KB, fast-path read/update). Shared objects = IssuerRegistry (issuer public keys, rarely updated), RevocationAccumulator (updated on revocation, requires consensus). Fast-path: credential decryption and proof generation are client-side (no on-chain cost). Consensus: revocation updates (~50K gas). Layer 2 (Payment): Shared objects = NoteCommitmentTree (Poseidon Merkle tree, depth 32, updated every payment), NullifierSet (sparse Merkle tree, updated every payment). Both require Mysticeti consensus (~390ms). Gas: tree insertion ~100K gas, nullifier insertion ~80K gas. Layer 3 (TEE): No on-chain objects for real-time mode. For batch settlement: a BatchProof shared object stores the latest batch proof. Gas: Groth16 verification ~50K gas per batch. Layer 4 (Compliance): Shared objects = AuditorRegistry (auditor public keys), MemoStore (encrypted memos per transaction ~200 bytes each). Gas: memo storage ~20K gas. Total gas per payment: Groth16 verification (50K) + tree insertion (100K) + nullifier insertion (80K) + memo storage (20K) = ~250K gas units. At current Sui prices (~$0.01 per 250K gas), this is economically viable for production use.',
+          },
+          {
+            type: 'conceptual',
+            question:
+              'The thesis proposes a 4-phase progressive deployment strategy. Analyze the security properties available at each phase: Phase 1 (credentials only), Phase 2 (+ payments), Phase 3 (+ TEE), Phase 4 (+ compliance). For each phase, identify what attacks are possible that the next phase mitigates.',
+            hint:
+              'Phase 1 has credentials but no private payments (amounts and transfers are public). Phase 2 adds amount hiding but may have high latency. Phase 3 adds TEE for speed. Phase 4 adds auditability. Think about what an adversary can do at each stage.',
+            answer:
+              'Phase 1 (Credentials only): Available properties: anonymous credential presentation with selective disclosure, Sybil resistance via scoped pseudonyms, issuer-verified KYC. Attacks possible: all payment data is public (amounts, sender, receiver visible on-chain), credential holders can be tracked by payment patterns even though their identity attributes are hidden. Phase 2 (+ Payments): Adds: sender/receiver/amount privacy via Pedersen commitments and nullifiers, ZK proofs for balance and range. Mitigates: amount surveillance, payment graph analysis. Attacks remaining: proof generation is slow (~500ms-2s mobile), making real-time use cases impractical. A timing side-channel exists: slow proof generation creates observable latency patterns. Phase 3 (+ TEE): Adds: real-time credential verification (~1-5ms), batch proving for cost amortization, witness pre-computation for faster proofs. Mitigates: latency attacks, makes point-of-sale viable. Attacks remaining: no regulatory compliance mechanism, making the system unusable in regulated markets (exchanges, banks cannot use it without violating AML laws). Phase 4 (+ Compliance): Adds: viewing keys for designated auditors, threshold volume reporting, modular jurisdiction policies. Mitigates: regulatory non-compliance risk, enables institutional adoption. Remaining risk: the system assumes at least one of TEE/ZKP holds, and the post-quantum migration path is not yet deployed (addressed by the dual-stack strategy in the architecture).',
           },
         ],
       },
