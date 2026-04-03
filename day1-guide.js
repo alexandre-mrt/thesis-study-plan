@@ -1340,7 +1340,104 @@ window.DAY1_GUIDE = {
           "useless alone. Threshold reconstruction (e.g., 3-of-5) " +
           "ensures the system remains operational even if 2 TEE " +
           "instances fail, while keeping the full signing key safe " +
-          "from any single point of compromise."
+          "from any single point of compromise.",
+        history: {
+          inventor: "Adi Shamir (Weizmann Institute of Science)",
+          year: 1979,
+          context:
+            "Shamir published 'How to Share a Secret' in Communications of " +
+            "the ACM (November 1979). George Blakley independently proposed " +
+            "a different geometric scheme the same year at the AFIPS " +
+            "conference. Shamir's scheme uses polynomial interpolation: the " +
+            "secret is the y-intercept f(0) of a random degree-(t-1) " +
+            "polynomial, and each share is a point f(i). Before these " +
+            "schemes, distributing secrets required trusting a single " +
+            "custodian. Feldman (1987) added verifiability (VSS): " +
+            "shareholders can verify their shares are consistent without " +
+            "learning the secret.",
+          funFact:
+            "Adi Shamir is the 'S' in RSA (Rivest-Shamir-Adleman). He " +
+            "published both RSA and secret sharing within a year of each " +
+            "other (1978-1979), establishing two pillars of modern " +
+            "cryptography before age 27."
+        },
+        limitations: [
+          "Shamir's scheme requires synchronous communication for " +
+          "reconstruction: all t shareholders must be online simultaneously " +
+          "to contribute their shares. Asynchronous secret sharing (Cachin " +
+          "et al., 2002) exists but adds significant complexity.",
+          "Share refresh is necessary for long-lived secrets: if an adversary " +
+          "compromises shares over time (mobile adversary model), they might " +
+          "accumulate t shares from different epochs. Proactive secret sharing " +
+          "(Herzberg et al., 1995) addresses this but requires periodic " +
+          "resharing among all parties.",
+          "Linear secret sharing schemes (including Shamir) reveal the secret " +
+          "to the reconstructing party. Threshold computation (MPC over " +
+          "shares) is needed if the reconstructed secret should never exist " +
+          "in cleartext — adding MPC overhead on top of the sharing scheme."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Construct a (2,3) Shamir secret sharing of secret s=42 over " +
+              "Z_97. Choose random polynomial f(x) = 42 + 17x (mod 97). " +
+              "Compute shares f(1), f(2), f(3). Then reconstruct s from " +
+              "shares at x=1 and x=3 using Lagrange interpolation.",
+            hint:
+              "Lagrange basis: L_1(0) = (0-3)/(1-3) = 3/2 mod 97 and " +
+              "L_3(0) = (0-1)/(3-1) = -1/2 mod 97. Use modular inverse: " +
+              "2^(-1) mod 97 = 49 (since 2*49 = 98 = 1 mod 97).",
+            answer:
+              "Shares: f(1) = 42+17 = 59, f(2) = 42+34 = 76, f(3) = 42+51 " +
+              "= 93. Reconstruction from (1,59) and (3,93): L_1(0) = " +
+              "(0-3)/(1-3) = (-3)/(-2) = 3/2 = 3*49 = 147 mod 97 = 50. " +
+              "L_3(0) = (0-1)/(3-1) = (-1)/2 = -1*49 = -49 mod 97 = 48. " +
+              "s = 59*50 + 93*48 mod 97 = 2950 + 4464 mod 97 = 7414 mod 97 " +
+              "= 7414 - 76*97 = 7414 - 7372 = 42. Matches the original secret."
+          },
+          {
+            type: "conceptual",
+            question:
+              "What is the difference between Shamir's (t,n) threshold " +
+              "scheme and additive secret sharing? When would you use each?",
+            hint:
+              "Additive sharing: s = s_1 + s_2 + ... + s_n (all shares " +
+              "needed). Shamir: any t of n shares suffice.",
+            answer:
+              "Additive sharing splits s into n random shares where " +
+              "s = sum(s_i). ALL n shares are needed (threshold = n). It is " +
+              "simpler and faster (just random sampling + subtraction) but " +
+              "has no fault tolerance. Shamir (t,n) allows reconstruction " +
+              "from any t shares, providing fault tolerance (n-t parties " +
+              "can fail). Use additive sharing in 2-party MPC (simpler, no " +
+              "interpolation needed) or when all parties are always available. " +
+              "Use Shamir in threshold systems (t-of-n credential issuance, " +
+              "TEE key backup) where availability matters."
+          },
+          {
+            type: "design",
+            question:
+              "In the thesis, the issuer's BBS+ signing key is Shamir-shared " +
+              "among 5 TEE instances with threshold 3. Describe a proactive " +
+              "resharing protocol that defends against a mobile adversary " +
+              "who compromises different TEEs over time.",
+            hint:
+              "Each TEE generates a random (2,5) sharing of zero and adds " +
+              "it to their current share. The secret remains the same but " +
+              "all shares change.",
+            answer:
+              "Each TEE i generates a random degree-1 polynomial q_i(x) with " +
+              "q_i(0) = 0 (a sharing of zero). TEE i sends q_i(j) to each " +
+              "other TEE j. Each TEE j updates its share: s_j' = s_j + " +
+              "sum(q_i(j)) for all i. Since sum(q_i(0)) = 0, the secret " +
+              "is unchanged: f'(0) = f(0) = sk. But all shares s_j' are " +
+              "completely new, so old compromised shares are useless. This " +
+              "resharing should happen periodically (e.g., daily). An " +
+              "adversary must compromise 3 TEEs within a single epoch to " +
+              "recover sk."
+          }
+        ]
       },
       {
         name: "Garbled Circuits",
@@ -1409,7 +1506,85 @@ window.DAY1_GUIDE = {
           "it on their private credential attributes via OT, and " +
           "both learn only the boolean result. This keeps the full " +
           "policy logic private to the verifier and attributes " +
-          "private to the user."
+          "private to the user.",
+        history: {
+          inventor: "Andrew Yao (Stanford University)",
+          year: 1986,
+          context:
+            "Yao introduced garbled circuits in 'How to Generate and Exchange " +
+            "Secrets' at FOCS 1986, building on his 1982 work on secure " +
+            "2-party computation. The protocol was primarily theoretical " +
+            "until Malkhi, Nisan, Pinkas, and Sella (2004) built the first " +
+            "practical implementation (Fairplay). Kolesnikov and Schneider " +
+            "(2008) introduced Free XOR, eliminating the cost of XOR gates " +
+            "entirely. Zahur, Rosulek, and Evans (2015) introduced " +
+            "half-gates, reducing AND gates to 2 ciphertexts (from 4), " +
+            "which is provably optimal. Modern garbled circuit implementations " +
+            "(EMP-toolkit, ABY) process billions of gates per second.",
+          funFact:
+            "The term 'garbled circuit' was actually coined years after " +
+            "Yao's paper. Yao never used the word 'garbled' in his original " +
+            "publication. Beaver, Micali, and Rogaway (1990) introduced the " +
+            "term in their formalization of Yao's protocol."
+        },
+        limitations: [
+          "Garbled circuits are one-time use: each garbled circuit can only " +
+          "be evaluated once securely (reuse reveals wire label correlations). " +
+          "For repeated evaluations, new garbled circuits must be generated, " +
+          "making the amortized cost high.",
+          "Communication cost is O(|C| * kappa) where |C| is the circuit " +
+          "size and kappa is the security parameter (~128 bits). For a " +
+          "circuit with 1 million AND gates, this is ~32MB of garbled tables " +
+          "that must be transmitted.",
+          "Garbled circuits are 2-party only. Extending to n > 2 parties " +
+          "requires BMR (Beaver-Micali-Rogaway) protocol, which adds an " +
+          "O(n) factor to the garbled table size and requires interaction " +
+          "during garbling."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "A garbled AND gate with point-and-permute has 4 rows in the " +
+              "garbled table. With the half-gates optimization, it has 2 " +
+              "rows. If a circuit has 500,000 AND gates and 300,000 XOR " +
+              "gates (free), and each row is 128 bits (16 bytes), what is " +
+              "the total garbled circuit size with: (a) basic garbling, " +
+              "(b) half-gates?",
+            hint:
+              "XOR gates are free (0 rows). Only AND gates contribute " +
+              "to the garbled table size. Multiply gates * rows * bytes.",
+            answer:
+              "(a) Basic: 500,000 AND gates * 4 rows * 16 bytes = 32,000,000 " +
+              "bytes = 32 MB. XOR gates contribute 0 bytes (Free XOR). " +
+              "(b) Half-gates: 500,000 * 2 rows * 16 bytes = 16,000,000 " +
+              "bytes = 16 MB. The half-gates optimization cuts communication " +
+              "by exactly 50% for AND-heavy circuits. This is provably " +
+              "optimal (Zahur-Rosulek-Evans 2015): no garbling scheme can " +
+              "do better than 2 ciphertexts per AND gate under standard " +
+              "assumptions."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Why are garbled circuits 'one-time use' and what goes wrong " +
+              "if you reuse the same garbled circuit with different inputs?",
+            hint:
+              "Think about what the evaluator learns when they see two " +
+              "different sets of wire labels for the same garbled gate.",
+            answer:
+              "Each wire has two labels (0-label and 1-label). On first " +
+              "evaluation, the evaluator learns one label per wire (the one " +
+              "corresponding to their input). On a second evaluation with " +
+              "different inputs, they might learn the other label for some " +
+              "wires. With both labels for a wire, the evaluator can " +
+              "decrypt all rows of downstream garbled gates, recovering " +
+              "the circuit's truth table in plaintext. This reveals the " +
+              "garbler's private input. Solution: generate a fresh garbled " +
+              "circuit for each evaluation, or use reusable garbled circuits " +
+              "(Goldwasser-Kalai-Rothblum 2008, but impractical)."
+          }
+        ]
       },
       {
         name: "Fully Homomorphic Encryption (FHE)",
