@@ -1650,7 +1650,111 @@ window.DAY1_GUIDE = {
           "too slow (~10,000x overhead), but lattice-based FHE is " +
           "quantum-safe — if TEE trust assumptions weaken and FHE " +
           "performance improves, it could replace the TEE layer in " +
-          "your post-quantum migration strategy."
+          "your post-quantum migration strategy.",
+        history: {
+          inventor: "Craig Gentry (IBM Research / Stanford PhD)",
+          year: 2009,
+          context:
+            "Gentry constructed the first fully homomorphic encryption scheme " +
+            "in his 2009 Stanford PhD thesis, solving a 30-year open problem " +
+            "posed by Rivest, Adleman, and Dertouzos in 1978. Prior work " +
+            "achieved only partial homomorphism: RSA is multiplicatively " +
+            "homomorphic (Enc(a) * Enc(b) = Enc(a*b)), and Paillier (1999) " +
+            "is additively homomorphic. Gentry's breakthrough was " +
+            "bootstrapping: a technique to refresh noisy ciphertexts by " +
+            "homomorphically evaluating the decryption circuit. Brakerski " +
+            "and Vaikuntanathan (BV, 2011) and Brakerski-Gentry-Vaikuntanathan " +
+            "(BGV, 2012) made FHE practical by basing it on the Learning " +
+            "With Errors (LWE) problem. Cheon-Kim-Kim-Song (CKKS, 2017) " +
+            "enabled approximate arithmetic on encrypted real numbers.",
+          funFact:
+            "Gentry's PhD thesis was titled 'A Fully Homomorphic Encryption " +
+            "Scheme' and ran to 209 pages. His advisor was Dan Boneh. When " +
+            "he presented the result, the cryptography community was stunned " +
+            "because most researchers believed practical FHE was decades away."
+        },
+        limitations: [
+          "Performance overhead is still 10,000-1,000,000x compared to " +
+          "plaintext computation, depending on the operation. A single " +
+          "bootstrapping operation (noise refresh) takes 10-100ms on modern " +
+          "hardware. TFHE achieves ~13ms per gate-level bootstrap.",
+          "Ciphertext expansion: encrypting 1 bit produces ~4KB-32KB of " +
+          "ciphertext depending on the scheme and parameters. This makes " +
+          "FHE impractical for large datasets or bandwidth-constrained " +
+          "settings like on-chain storage.",
+          "FHE supports only computation (addition and multiplication). " +
+          "Branching on encrypted data (if-then-else) requires evaluating " +
+          "both branches and selecting the result homomorphically, doubling " +
+          "the cost for each conditional. Complex control flow becomes " +
+          "exponentially expensive."
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "Explain why 'bootstrapping' was Gentry's key insight for " +
+              "fully homomorphic encryption. What happens to a ciphertext " +
+              "without bootstrapping after many operations?",
+            hint:
+              "Lattice-based ciphertexts contain noise that grows with each " +
+              "operation. When noise exceeds a threshold, decryption fails.",
+            answer:
+              "In lattice-based FHE (LWE/RLWE), each ciphertext contains a " +
+              "noise term that grows with every homomorphic operation. " +
+              "Addition roughly adds noise, multiplication roughly squares " +
+              "it. After O(log(q/noise)) multiplications, the noise exceeds " +
+              "the decryption threshold and the ciphertext becomes garbage. " +
+              "Bootstrapping resets the noise by homomorphically evaluating " +
+              "the decryption circuit: Enc(m) with high noise becomes " +
+              "Enc(m) with low noise. This requires the scheme to evaluate " +
+              "its own decryption as a circuit, which Gentry achieved by " +
+              "squashing the decryption circuit to low enough depth."
+          },
+          {
+            type: "comparison",
+            question:
+              "Compare BFV, CKKS, and TFHE schemes. For each, state the " +
+              "data type it operates on, a typical use case, and the main " +
+              "tradeoff.",
+            hint:
+              "BFV works on integers, CKKS on approximate reals, and TFHE " +
+              "on individual bits with fast bootstrapping.",
+            answer:
+              "BFV (Brakerski-Fan-Vercauteren): operates on exact integers " +
+              "mod t, best for counting and integer arithmetic (e.g., " +
+              "encrypted database queries). Tradeoff: no native floating " +
+              "point. CKKS (Cheon-Kim-Kim-Song): operates on approximate " +
+              "real/complex numbers via SIMD-like batching, best for ML " +
+              "inference on encrypted data. Tradeoff: introduces rounding " +
+              "errors. TFHE (Torus FHE, Chillotti et al. 2016): operates " +
+              "on individual bits with ~13ms bootstrapping per gate, best " +
+              "for arbitrary boolean circuits. Tradeoff: bit-level operations " +
+              "are slow for arithmetic (8-bit addition needs ~100 gates)."
+          },
+          {
+            type: "design",
+            question:
+              "If FHE performance improves 1000x (reaching ~10x plaintext " +
+              "overhead), could it replace TEEs in the thesis architecture? " +
+              "What would the credential verification flow look like?",
+            hint:
+              "The verifier would encrypt the policy, the user evaluates " +
+              "it homomorphically on their credential, and the verifier " +
+              "decrypts the boolean result.",
+            answer:
+              "Flow: (1) User encrypts their credential attributes under " +
+              "their FHE key: Enc(age), Enc(nationality), etc. (2) Verifier " +
+              "sends the verification policy as a circuit: 'age >= 18 AND " +
+              "nationality in EU'. (3) User evaluates the circuit " +
+              "homomorphically on their encrypted attributes, producing " +
+              "Enc(result). (4) User decrypts and sends the result with a " +
+              "ZK proof that the computation was correct. Advantages over " +
+              "TEE: no hardware trust assumptions, quantum-resistant (LWE). " +
+              "Remaining issues: the ZK proof of correct FHE evaluation is " +
+              "itself expensive, and the user must be trusted to decrypt " +
+              "honestly (or use a verifiable decryption protocol)."
+          }
+        ]
       },
       {
         name: "Oblivious RAM (ORAM)",
