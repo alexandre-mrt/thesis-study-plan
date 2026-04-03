@@ -20,7 +20,7 @@ const TECHNICAL_DATA = {
   1: () => window.DAY1_TECHNICAL,
   2: () => window.DAY2_TECHNICAL,
   3: () => window.DAY3_TECHNICAL,
-  'ch22': () => null,
+  'ch22': () => window.CH22_TECHNICAL,
   'rust': () => window.RUST_TECHNICAL,
 };
 
