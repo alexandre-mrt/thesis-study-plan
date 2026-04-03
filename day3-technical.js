@@ -53,6 +53,26 @@ window.DAY3_TECHNICAL = {
             formula: '\\( \\max_i p_i \\leq 1/k \\)',
           },
         ],
+        exercises: [
+          {
+            type: 'calculation',
+            question:
+              'Given a transaction graph where address A sent 1 ETH to B, 2 ETH to C, and B sent 0.5 ETH to C, compute the anonymity entropy H(sender | observed) for the 0.5 ETH transfer from B to C, assuming an external observer assigns probabilities p(A) = 0.3, p(B) = 0.7 based on chain analysis heuristics. Is this k-anonymous for k = 2?',
+            hint:
+              'Use the entropy formula H = -sum(p_i * log2(p_i)). For k-anonymity, check whether max(p_i) <= 1/k.',
+            answer:
+              'H = -(0.3 * log2(0.3) + 0.7 * log2(0.7)) = -(0.3 * (-1.737) + 0.7 * (-0.515)) = 0.521 + 0.361 = 0.882 bits. Maximum entropy for k=2 is log2(2) = 1 bit. Since max(p_i) = 0.7 > 1/2 = 0.5, this is NOT 2-anonymous. The dominant probability exceeds the uniform threshold.',
+          },
+          {
+            type: 'conceptual',
+            question:
+              'Explain why the common-input heuristic breaks down for CoinJoin transactions. How does CoinJoin exploit the structure of the transaction graph to increase the anonymity set, and what residual metadata could still be used for deanonymization?',
+            hint:
+              'CoinJoin combines inputs from multiple independent users into a single transaction. Think about what the common-input heuristic assumes and how CoinJoin violates that assumption.',
+            answer:
+              'The common-input heuristic assumes all inputs in a transaction belong to the same entity. CoinJoin deliberately violates this by having multiple users co-sign a single transaction, so the heuristic incorrectly clusters unrelated addresses together. This increases the anonymity set to the number of CoinJoin participants. However, residual deanonymization vectors include: (1) amount correlation if outputs are not uniform denominations, (2) timing analysis of participants joining the mix, (3) change output detection via round-number analysis, and (4) network-level IP correlation if participants connect through the same coordinator.',
+          },
+        ],
       },
 
       {
