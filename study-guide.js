@@ -21,7 +21,7 @@ const TECHNICAL_DATA = {
   2: () => window.DAY2_TECHNICAL,
   3: () => window.DAY3_TECHNICAL,
   'ch22': () => null,
-  'rust': () => null,
+  'rust': () => window.RUST_TECHNICAL,
 };
 
 const BLOCK_KEY_MAP = { 1: 'block1', 2: 'block2' };

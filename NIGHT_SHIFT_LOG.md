@@ -1,21 +1,13 @@
-# Night Shift Log — 2026-03-30
+# Night Shift Log — 2026-04-03
 
 ## Objective
-Build an interactive study website for the master thesis 3-day deep work plan. Organizes 30+ resources (YouTube videos, papers, tutorials, docs) across 6 study blocks.
+Enrich ALL study guide content with exercises, history, limitations, and technical views. Make content grounded, specific, and educational. 48 intuitive concepts to enrich + 7 technical concepts to create.
 
-## Architecture
-- Single page: index.html + style.css + app.js
-- No framework, no build step
-- Dark academic design with glass-morphism cards
-- Day 1 (indigo) / Day 2 (cyan) / Day 3 (emerald) color scheme
-- localStorage for progress checkboxes
-- Pomodoro timer (25/5 cycle)
-- YouTube lite-embed (thumbnail → iframe on click)
+## Plan
+1. T1: Rendering infrastructure (study-guide.js + CSS) — blocks everything
+2. T2-T3: Create missing technical views (ch22, rust) — parallel after T1
+3. T4-T8: Enrich all 5 intuitive guide files — parallel after T1
+4. T9-T11: Enrich existing technical views — parallel after T1
 
-## Task Plan
-
-| # | Task | Agent | Depends | Status |
-|---|------|-------|---------|--------|
-| T1 | Build complete website | night-coder | — | pending |
-| T2 | Visual QA | night-qa | T1 | pending |
-| T3 | GitHub + Vercel | orchestrator | T2 | pending |
+## Decisions
+(logged during execution)

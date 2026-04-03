@@ -47,6 +47,21 @@ window.DAY2_GUIDE = {
           "Your thesis builds an anonymous credential system on Sui. Users receive credentials (e.g., KYC-verified, accredited investor) and prove properties without revealing identity, enabling private payments and compliant DeFi.",
         thesisExample:
           "In your thesis, anonymous credentials are the bridge between identity and privacy on Sui. A government issues a credential containing (name, age, nationality, KYC_level) signed with BBS+. When the user wants to make a private payment, they present a zero-knowledge proof that they hold a valid credential with KYC_level >= 2 — the Sui verifier learns only this fact, not the user's identity. The same credential works at different merchants without creating a traceable profile.",
+        history: {
+          inventor: "David Chaum (DigiCash)",
+          year: 1985,
+          context: "Chaum introduced blind signatures and anonymous credentials in his 1985 paper 'Security without Identification: Transaction Systems to Make Big Brother Obsolete.' Before Chaum, every digital identity transaction required revealing full identity. His eCash company (DigiCash, founded 1990) built the first privacy-preserving digital payment system.",
+          funFact: "DigiCash went bankrupt in 1998 — Chaum later said it was 'too early for the market.' The lineage runs Chaum 1985 → Brands 1993 (efficient blind signatures) → CL 2001 → BBS 2004 → BBS+ 2009 → SAAC 2025 (your thesis builds on this chain).",
+        },
+        limitations: [
+          "Revocation is fundamentally hard: revoking a credential without breaking unlinkability requires cryptographic accumulators, which add O(n) witness update cost for n credentials or require a trusted update server",
+          "Credential transfer prevention relies on the assumption that users will not share their secret key — there is no cryptographic mechanism to prevent a user from giving their full credential to someone else",
+          "Multi-show unlinkability means the issuer cannot detect abuse (e.g., one credential shared by 100 users) without adding linkability, creating a privacy-accountability tension",
+        ],
+        exercises: [
+          { type: "conceptual", question: "Explain why multi-show unlinkability is both a feature and a risk. How does your thesis address the credential-sharing problem?", hint: "Think about what happens if a user shares their secret key with 100 friends — how would the system detect this without breaking unlinkability?", answer: "Multi-show unlinkability means each presentation looks like a different user, so the issuer cannot track usage patterns. This is a feature for privacy but a risk because a single credential could be shared widely without detection. The thesis can mitigate this with rate-limiting at the TEE layer (TEE counts presentations per epoch) or with linkable presentations for high-value transactions where accountability outweighs privacy." },
+          { type: "design", question: "Design a credential issuance flow for your Sui system where a government issues a KYC credential. What attributes would you include, and which would be disclosed for a DeFi lending protocol?", hint: "Consider what a lending protocol legally needs (KYC level, accreditation status) vs. what it does not need (name, exact age, address).", answer: "Attributes: (name, date_of_birth, nationality, address, KYC_level, accreditation_status, credential_expiry). For a DeFi lending protocol, disclose only: KYC_level >= 2 (as a predicate, not the exact value) and accreditation_status = true. Everything else (name, DOB, nationality, address) stays hidden. The Groth16 circuit on Sui verifies the BBS+ signature is valid over all attributes while only checking the two predicates." },
+        ],
       },
       {
         name: "CL Signatures (Camenisch-Lysyanskaya)",
@@ -88,6 +103,22 @@ window.DAY2_GUIDE = {
           "CL signatures were the first practical anonymous credential scheme. Understanding CL helps you appreciate why BBS+ is preferred for Sui: CL keys are too large for on-chain storage and verification is expensive in circuits.",
         thesisExample:
           "CL signatures were the original anonymous credential scheme (IBM's Idemix). For your thesis comparison, CL uses RSA groups (~256B keys, slow modular exponentiation) while BBS+ uses pairings (~48B keys, faster operations). Your thesis argues for BBS+ over CL: BBS+ is 5x faster for selective disclosure, has smaller proofs, and aligns with BLS12-381 already used by Sui — making on-chain verification significantly cheaper.",
+        history: {
+          inventor: "Jan Camenisch and Anna Lysyanskaya (IBM Zurich / Brown University)",
+          year: 2001,
+          context: "Published 'An Efficient System for Non-transferable Anonymous Credentials with Optional Anonymity Revocation' at EUROCRYPT 2001, then the more practical 'A Signature Scheme with Efficient Protocols' at SCN 2002 (the version commonly called 'CL signatures'). Built on Chaum's 1985 foundations but made multi-message signing practical.",
+          funFact: "CL signatures became the core of IBM's Identity Mixer (Idemix) system, deployed in the Hyperledger Fabric blockchain. Lysyanskaya was only 25 when the first CL paper was published — she completed her PhD at MIT under Ron Rivest (the 'R' in RSA).",
+        },
+        limitations: [
+          "RSA-based: public keys are ~2048-4096 bits (256-512 bytes), compared to 48 bytes for BBS+ on BLS12-381 — prohibitively expensive for on-chain storage on Sui where storage costs ~76 MIST per byte",
+          "Modular exponentiation over RSA groups is ~10x slower than elliptic curve scalar multiplication, making CL proof generation take 200-500ms vs ~50ms for BBS+",
+          "CL requires a trusted RSA modulus generation ceremony (n = p*q where p,q must be secret) — if the factors leak, all credentials become forgeable",
+          "Not compatible with pairing-based SNARKs (Groth16): encoding RSA operations inside a BLS12-381 arithmetic circuit requires expensive non-native field arithmetic, inflating circuit size by 100x+",
+        ],
+        exercises: [
+          { type: "comparison", question: "Compare the key sizes and proof generation times of CL vs BBS+ signatures. Why does this make CL impractical for on-chain verification on Sui?", hint: "Consider Sui's storage pricing model and the gas cost of verifying modular exponentiation vs. pairing checks in a smart contract.", answer: "CL uses RSA groups with ~256B public keys and requires modular exponentiation (200-500ms proof generation). BBS+ uses BLS12-381 with ~48B keys and pairing-based operations (~50ms proof generation). On Sui, storing a CL public key costs ~5x more in storage fees. Worse, encoding RSA arithmetic inside a Groth16 circuit (which operates over BLS12-381's scalar field) requires non-native field emulation, inflating the circuit from ~10K constraints to 1M+, making on-chain verification infeasible." },
+          { type: "conceptual", question: "Why does the RSA trusted setup for CL signatures pose a different risk than the Groth16 trusted setup ceremony?", hint: "Think about what happens if the trapdoor leaks in each case — what can the attacker do?", answer: "If the RSA factors (p, q) leak, the attacker can forge arbitrary CL signatures — they can create credentials for any identity with any attributes. If the Groth16 toxic waste (tau) leaks, the attacker can forge proofs but cannot forge the underlying BBS+ signatures. The CL trapdoor compromises the credential system entirely, while the Groth16 trapdoor only compromises proof soundness (and can be mitigated with multi-party ceremonies like Powers of Tau)." },
+        ],
       },
       {
         name: "BBS+ Signatures",
@@ -132,6 +163,23 @@ window.DAY2_GUIDE = {
           "BBS+ is the primary candidate for your thesis credential system. It uses the same pairing-friendly curves as Groth16 (BLS12-381), making it efficient to verify BBS+ signature proofs inside SNARKs on Sui.",
         thesisExample:
           "BBS+ is THE signature scheme for your credential layer. The issuer signs attributes (a1,...,a10) with one BBS+ signature. During payment on Sui, the user randomizes the signature (A' = A^r) making each presentation unlinkable, then proves in zero-knowledge that specific attributes satisfy the verifier's policy. The pairing equation e(A', X~) = e(A_bar, g~_2) is what your Groth16 circuit encodes for on-chain verification.",
+        history: {
+          inventor: "Dan Boneh, Xavier Boyen, Hovav Shacham (Stanford University)",
+          year: 2004,
+          context: "BBS was published as 'Short Group Signatures' at CRYPTO 2004 — named after the authors' initials (Boneh-Boyen-Shacham). The '+' variant was introduced by Man Ho Au, Willy Susilo, and Yi Mu (University of Wollongong) in 2006, improving the scheme for efficient multi-message signing and proof of knowledge protocols.",
+          funFact: "BBS+ is now under IRTF standardization by the Crypto Forum Research Group (draft-irtf-cfrg-bbs-signatures). The W3C also adopted it for the VC Data Integrity BBS Cryptosuite (2023). Boneh went on to become one of the most cited cryptographers alive, co-authoring the BLS signature scheme used by Ethereum 2.0 and Sui.",
+        },
+        limitations: [
+          "Requires pairing-friendly curves (BLS12-381): scalar multiplication on BLS12-381 is 10-20x slower than on non-pairing curves like Curve25519, and pairing computation itself costs ~1ms per evaluation",
+          "Proof size grows linearly with the number of hidden attributes: each hidden message adds ~48 bytes (one G1 element) to the proof, so a credential with 20 hidden attributes produces a ~1KB proof",
+          "No post-quantum security: BBS+ relies on the hardness of the Discrete Logarithm Problem in pairing groups, which is broken by Shor's algorithm — a quantum computer with ~4000 logical qubits could forge signatures",
+          "The IRTF standardization is still in draft status (not finalized as of 2025), meaning the exact API and serialization format may change, creating integration risk for early adopters",
+        ],
+        exercises: [
+          { type: "calculation", question: "A BBS+ credential has 15 attributes. During a Sui DeFi interaction, the user discloses 3 attributes and hides 12. Estimate the proof size in bytes, knowing each hidden attribute adds ~48 bytes (one G1 point) and the base proof overhead is ~240 bytes.", hint: "Base proof = 240B (contains A', Abar, challenge, response for e and s). Each hidden attribute adds one scalar response (~32B) plus the commitment overhead.", answer: "Base proof overhead: ~240 bytes (A' in G1 = 48B, Abar in G1 = 48B, challenge = 32B, response_e = 32B, response_s = 32B, response_r = 48B). Hidden attributes: 12 * 32 bytes (scalar responses) = 384 bytes. Total: ~624 bytes. This fits comfortably in a single Sui transaction (max 128KB). In practice, the BBS+ proof is then wrapped inside a Groth16 SNARK, compressing it to a constant ~192 bytes regardless of hidden attributes." },
+          { type: "design", question: "Why does your thesis wrap BBS+ verification inside a Groth16 circuit instead of verifying BBS+ directly on-chain? What are the tradeoffs?", hint: "Think about gas costs: a BBS+ pairing check requires 2 pairings on-chain (~2M gas each), while Groth16 verification requires 3 pairings but proves arbitrary statements.", answer: "Direct BBS+ verification on Sui would require 2 pairing operations (~4M gas) and scale with the number of disclosed attributes. Wrapping BBS+ in Groth16 costs 3 pairings (~6M gas) but is CONSTANT regardless of credential complexity. The Groth16 approach also lets you combine BBS+ verification with range proofs, revocation checks, and policy predicates in a single proof — one on-chain verification covers everything. The tradeoff: Groth16 requires a trusted setup ceremony and proof generation takes ~2-5 seconds client-side (vs. ~50ms for raw BBS+ proof)." },
+          { type: "conceptual", question: "BBS+ has no post-quantum security. How would you future-proof your thesis credential system against quantum computers?", hint: "Consider hybrid approaches: what if the credential contains both a BBS+ signature and a lattice-based signature?", answer: "A hybrid approach: issue credentials with both a BBS+ signature (for current efficiency) and a lattice-based signature like Dilithium (for post-quantum security). During the transition period, verifiers accept either proof type. When quantum computers become practical, deprecate BBS+ and switch to lattice-based selective disclosure schemes (e.g., based on Module-LWE). The credential format stays the same — only the signature and proof mechanism change. This is the approach recommended by NIST's post-quantum migration guidelines." },
+        ],
       },
       {
         name: "Selective Disclosure",
@@ -172,6 +220,22 @@ window.DAY2_GUIDE = {
           "Selective disclosure is the key feature for your thesis use cases. A user can prove 'I am KYC-verified and accredited' to a DeFi protocol on Sui without revealing their name, nationality, or any other personal data.",
         thesisExample:
           "Selective disclosure is the UX differentiator of your system. A user with credential (name, age=25, country=CH, KYC=3) can prove 'age >= 18 AND country in EU/CH' to a Sui DeFi protocol without revealing their exact age (25), name, or KYC level. For payments below the threshold, they only prove 'valid credential exists.' This flexibility means one credential covers convenience stores, DeFi protocols, and regulated exchanges with different disclosure levels.",
+        history: {
+          inventor: "Stefan Brands (CWI Amsterdam / Credentica)",
+          year: 1993,
+          context: "While Chaum introduced the concept of anonymous credentials in 1985, Stefan Brands formalized practical selective disclosure in his 1993 PhD thesis 'Untraceable Off-line Cash in Wallets with Observers.' Brands showed how to reveal individual attributes from a signed credential without a full ZK proof. His scheme was later acquired by Microsoft (U-Prove, 2008).",
+          funFact: "Microsoft acquired Brands' company Credentica in 2008 and released U-Prove as an open specification, but it never achieved mainstream adoption. Meanwhile, the EU Digital Identity Wallet (eIDAS 2.0, mandated by 2026) chose the BBS+/SD-JWT approach for selective disclosure — validating the concept 30 years after Brands' original work.",
+        },
+        limitations: [
+          "Range proofs (e.g., age >= 18) are expensive: a Bulletproof range proof for a 64-bit value adds ~672 bytes and ~50ms verification time; encoding range checks in Groth16 adds ~10K constraints per predicate",
+          "Set membership proofs ('country in {CH, DE, FR, ...}') scale linearly with set size when done naively — a Merkle proof approach reduces this to O(log n) but adds tree management complexity",
+          "The verifier's disclosure policy must be fixed before proof generation — dynamic policies (where the verifier decides what to ask after seeing partial data) are not supported without interactive protocols",
+          "Correlation attacks: even with selective disclosure, if a user always discloses the same unusual combination of attributes (e.g., age=97 AND country=LI), the verifier can re-identify them statistically",
+        ],
+        exercises: [
+          { type: "design", question: "Design three disclosure policies for your Sui payment system: (1) a coffee shop, (2) a DeFi lending protocol, (3) a regulated exchange. What attributes does each verifier need?", hint: "Think about regulatory requirements at each tier: no KYC for small payments, basic KYC for DeFi, full KYC for exchanges. Map this to specific credential attributes.", answer: "(1) Coffee shop: disclose NOTHING — only prove 'I hold a valid, non-revoked credential' (existence proof). (2) DeFi lending: disclose KYC_level >= 2 (predicate) and accreditation_status = true (exact value) — hides name, age, nationality. (3) Regulated exchange: disclose name, nationality, date_of_birth (for sanctions screening), KYC_level >= 3 — this is the maximum disclosure level, approaching traditional KYC but still keeping address and other attributes private." },
+          { type: "conceptual", question: "How do correlation attacks threaten selective disclosure, and what countermeasures can your thesis system employ?", hint: "If only 3 people in Switzerland are exactly 97 years old, disclosing 'age >= 95 AND country = CH' effectively identifies you. How do you prevent this?", answer: "Correlation attacks exploit the uniqueness of attribute combinations. Countermeasures: (1) Use predicates instead of exact values (age >= 18 instead of age = 25). (2) Coarsen disclosed values (country_region = 'Western Europe' instead of country = CH). (3) The credential issuer can add k-anonymity guarantees: refuse to issue credentials with attribute combinations shared by fewer than k users. (4) The verifier policy should be audited to reject policies that could re-identify users with high probability." },
+        ],
       },
       {
         name: "W3C Verifiable Credentials & DIDs",
@@ -218,6 +282,22 @@ window.DAY2_GUIDE = {
           "Your thesis maps the VC/DID model onto Sui. DIDs could be Sui addresses, VCs are issued off-chain (or anchored on-chain), and VPs are ZK proofs verified by Sui smart contracts. This bridges W3C standards with blockchain verification.",
         thesisExample:
           "Your system implements W3C Verifiable Credentials on Sui. Each user has a DID (did:sui:<wallet_object_id>) resolved from a Sui object. Credentials follow the VC data model with BBS+ as the proof mechanism. The VP (Verifiable Presentation) sent to a Sui smart contract contains the selective disclosure proof. This standards compliance means your thesis system could interoperate with the EU Digital Identity Wallet (eIDAS 2.0) — a massive real-world adoption vector.",
+        history: {
+          inventor: "W3C Credentials Community Group (Manu Sporny, Dave Longley, et al.)",
+          year: 2019,
+          context: "The W3C Verifiable Credentials Data Model 1.0 became a W3C Recommendation in November 2019. DIDs (Decentralized Identifiers) reached W3C Recommendation status in July 2022. The work built on earlier efforts: Christopher Allen's 'Self-Sovereign Identity' principles (2016), the Rebooting the Web of Trust workshops (2015+), and the Sovrin Foundation's Hyperledger Indy (2017).",
+          funFact: "There are now 100+ registered DID methods (did:web, did:key, did:ion, did:ethr, etc.) but no dominant standard has emerged. The EU's eIDAS 2.0 regulation (2024) mandates that all EU member states offer digital identity wallets by 2026, using VC-compatible formats — this is the largest-scale deployment of verifiable credentials in history, targeting 450 million EU citizens.",
+        },
+        limitations: [
+          "The VC ecosystem is fragmented: JSON-LD credentials (used by W3C VC Data Integrity) and JWT credentials (used by OpenID4VC) have different serialization, proof formats, and tooling — interoperability between them requires translation layers",
+          "DID resolution depends on the DID method: did:web relies on DNS/HTTPS (centralized), did:key has no revocation, did:ethr requires an Ethereum node — no DID method satisfies all requirements (decentralized + resolvable + revocable + privacy-preserving)",
+          "The VC Data Model does not specify a standard for selective disclosure — this is left to proof suites (BBS+, SD-JWT), creating a 'proof format war' between competing approaches",
+          "Storing VCs on-chain (for availability) conflicts with GDPR's right to erasure: personal data committed to an immutable blockchain cannot be deleted, even if encrypted",
+        ],
+        exercises: [
+          { type: "design", question: "Design a did:sui DID method for your thesis. What would the DID document contain, how would it be resolved, and where would it be stored on Sui?", hint: "Think about Sui's object model: a DID document could be a Sui object owned by the user's address. Resolution = reading the object. What fields go in the DID document?", answer: "DID format: did:sui:<object_id>. The DID document is a Sui object containing: (1) public keys for authentication (Ed25519 for Sui transactions, BLS12-381 for BBS+ credential binding), (2) service endpoints (e.g., credential storage URL), (3) controller field (the Sui address that owns the object). Resolution: call sui_getObject with the object_id. Key rotation: the controller transfers the object or updates it via a Move function. Cost: ~0.01 SUI for creation, free for resolution (read-only RPC call)." },
+          { type: "comparison", question: "Compare how your thesis system handles VCs vs. how the EU Digital Identity Wallet (eIDAS 2.0) handles them. Where could they interoperate?", hint: "eIDAS 2.0 uses SD-JWT and mdoc formats. Your thesis uses BBS+. The interoperability point is at the credential issuance and attribute level.", answer: "eIDAS 2.0 wallets use SD-JWT (selective disclosure via hash-based redaction) and ISO 18013-5 mdoc format. Your thesis uses BBS+ for ZK-based selective disclosure. Interoperability: (1) At issuance: a government could issue the same attributes in both SD-JWT (for eIDAS compliance) and BBS+ (for Sui ZK proofs) formats. (2) At the attribute level: both systems encode the same claims (name, DOB, nationality) — a bridge service could re-sign eIDAS credentials with BBS+ for use on Sui. (3) The DID layer is already interoperable if did:sui follows the W3C DID spec." },
+        ],
       },
       {
         name: "Revocation Mechanisms",

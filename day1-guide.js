@@ -79,7 +79,95 @@ window.DAY1_GUIDE = {
           "payment verification, the ZK circuit proves membership in " +
           "this tree — Poseidon's ZK-friendly design keeps the circuit " +
           "under 1000 constraints per hash, making on-chain verification " +
-          "affordable."
+          "affordable.",
+        history: {
+          inventor: "Ralph Merkle (Stanford University)",
+          year: 1979,
+          context:
+            "Merkle proposed cryptographic hashing as part of his PhD thesis " +
+            "on public-key cryptosystems. Before dedicated hash functions, message " +
+            "authentication relied on block-cipher MACs (DES-CBC-MAC). Rivest's " +
+            "MD4 (1990) and MD5 (1992) dominated the 1990s until differential " +
+            "cryptanalysis revealed weaknesses. SHA-1 (NSA, 1995) became the " +
+            "standard until Xiaoyun Wang demonstrated practical collisions in " +
+            "2005 at CRYPTO. SHA-256 (SHA-2 family, 2001) and SHA-3/Keccak " +
+            "(Bertoni, Daemen, Peeters, Van Assche, 2012 NIST winner) are the " +
+            "current standards.",
+          funFact:
+            "Merkle's original hash tree patent (US 4,309,569) was filed in " +
+            "1979 but not granted until 1982. He was 27 years old and the " +
+            "concept was considered too abstract to be useful. Today Merkle " +
+            "trees secure every major blockchain."
+        },
+        limitations: [
+          "SHA-256 requires ~27,000 R1CS constraints in a Groth16 circuit " +
+          "because its bitwise operations (rotations, XOR, modular additions) " +
+          "are expensive over arithmetic fields. Poseidon needs only ~300 " +
+          "constraints for equivalent security, making it 90x more ZK-friendly.",
+          "Hash functions are one-way by construction but not hiding for small " +
+          "message spaces. H(m) for a known small domain can be brute-forced " +
+          "(e.g., hashing all 10^9 possible SSNs reveals the preimage in seconds).",
+          "Collision resistance degrades with output length via the birthday " +
+          "bound: a 256-bit hash provides only 128-bit collision resistance " +
+          "(2^128 evaluations), which is marginal for post-quantum security " +
+          "where Grover's algorithm halves the preimage resistance to 128 bits."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "If a hash function has a 256-bit output, how many evaluations " +
+              "are needed on average to find a collision (birthday attack)? " +
+              "Express as a power of 2.",
+            hint:
+              "The birthday bound for an n-bit hash is approximately 2^(n/2) " +
+              "evaluations.",
+            answer:
+              "2^128 evaluations. The birthday paradox says that with 2^128 " +
+              "random hashes, the probability of at least one collision exceeds " +
+              "50%. This is why 256-bit hashes provide 128-bit collision " +
+              "resistance, and why post-quantum security (where Grover halves " +
+              "preimage resistance) may require 384-bit or larger outputs."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Why does Sui use Poseidon hash inside ZK circuits (e.g., zkLogin) " +
+              "instead of SHA-256, even though SHA-256 is more widely studied?",
+            hint:
+              "Think about the cost of representing each hash operation as " +
+              "arithmetic constraints in an R1CS or PLONKish system.",
+            answer:
+              "SHA-256 requires ~27,000 R1CS constraints per invocation because " +
+              "its bitwise operations (rotations, XOR, additions mod 2^32) are " +
+              "expensive to express in arithmetic circuits over prime fields. " +
+              "Poseidon, designed specifically for ZK, uses field-native " +
+              "operations (additions, multiplications, exponentiations in F_p) " +
+              "and needs only ~300 constraints. In zkLogin, where the circuit " +
+              "must hash multiple values, this 90x reduction directly translates " +
+              "to faster proof generation and smaller proving keys."
+          },
+          {
+            type: "comparison",
+            question:
+              "Compare SHA-256, Poseidon, and Pedersen hash in terms of " +
+              "constraint cost, algebraic friendliness, and typical use cases " +
+              "in ZK systems.",
+            hint:
+              "Pedersen hash is based on elliptic curve scalar multiplication, " +
+              "Poseidon on S-box permutations over F_p, and SHA-256 on bitwise " +
+              "operations.",
+            answer:
+              "SHA-256: ~27,000 R1CS constraints, bitwise (not field-native), " +
+              "used for external compatibility (Merkle trees, TLS). Poseidon: " +
+              "~300 constraints, fully field-native (S-box = x^alpha in F_p), " +
+              "used inside ZK circuits for commitments and Merkle trees. " +
+              "Pedersen hash: ~750 constraints (EC scalar multiplication), " +
+              "additively homomorphic which enables algebraic composition, " +
+              "used in Zcash Sapling. Poseidon dominates new ZK designs " +
+              "because it minimizes proving time."
+          }
+        ]
       },
       {
         name: "Commitment Schemes",
@@ -144,7 +232,98 @@ window.DAY1_GUIDE = {
           "without revealing the exact value. In the payment layer, " +
           "Pedersen commitments hide transaction amounts while enabling " +
           "balance verification: sum of input commitments = sum of " +
-          "output commitments."
+          "output commitments.",
+        history: {
+          inventor: "Torben Pedersen (Aarhus University)",
+          year: 1991,
+          context:
+            "Pedersen published 'Non-Interactive and Information-Theoretic " +
+            "Secure Verifiable Secret Sharing' at CRYPTO 1991. Earlier " +
+            "commitment schemes by Blum (1981) and Brassard-Chaum-Crepeau " +
+            "(1988) existed but were less practical. Pedersen's C = g^m * h^r " +
+            "achieved information-theoretic hiding with computational binding " +
+            "from the discrete log assumption, in a single elegant equation. " +
+            "Hash-based commitments C = H(m || r) predated Pedersen but lack " +
+            "the homomorphic property essential for modern ZK systems.",
+          funFact:
+            "Pedersen commitments are so fundamental that they appear in the " +
+            "specifications of Monero (RingCT), Mimblewimble/Grin, Zcash, and " +
+            "nearly every confidential transaction scheme. The original paper " +
+            "has over 3,000 citations."
+        },
+        limitations: [
+          "Computationally binding only: if a quantum computer solves the " +
+          "discrete log problem, an adversary could open a Pedersen commitment " +
+          "to any value they choose, completely breaking binding.",
+          "Requires NOTHING-UP-MY-SLEEVE generation of generators g, h: if " +
+          "anyone knows the discrete log log_g(h), they can open any " +
+          "commitment to any value (breaking binding), since C = g^m * h^r = " +
+          "g^(m + r*log_g(h)) gives full freedom in choosing m' and r'.",
+          "Not compact for large attribute sets: a credential with L " +
+          "attributes requires L separate Pedersen commitments (one per " +
+          "attribute), each needing its own randomness, which increases " +
+          "storage and communication overhead linearly."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "On a toy group where operations are integers mod 11, with " +
+              "generators g=2 and h=7, compute the Pedersen commitment " +
+              "C = g^m * h^r (mod 11) for m=3 and r=4. Then compute a " +
+              "second commitment for m=5 and r=2, and verify that the " +
+              "product of the two commitments equals a commitment to m=8 " +
+              "and r=6.",
+            hint:
+              "Compute 2^3 mod 11 = 8, then 7^4 mod 11. Use Fermat's little " +
+              "theorem: a^10 = 1 (mod 11) for any a not divisible by 11.",
+            answer:
+              "C1 = 2^3 * 7^4 mod 11 = 8 * 2401 mod 11 = 8 * (2401 mod 11) " +
+              "= 8 * 3 = 24 mod 11 = 2. C2 = 2^5 * 7^2 mod 11 = 32 * 49 " +
+              "mod 11 = 10 * 5 = 50 mod 11 = 6. C1*C2 = 2*6 = 12 mod 11 " +
+              "= 1. Direct: 2^8 * 7^6 mod 11 = 256 * 117649 mod 11 = 3 * 4 " +
+              "= 12 mod 11 = 1. They match, confirming the homomorphic " +
+              "property: Commit(m1,r1) * Commit(m2,r2) = Commit(m1+m2, r1+r2)."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Why is randomness r essential for the hiding property of " +
+              "Pedersen commitments? What attack becomes possible if the " +
+              "committer uses r=0?",
+            hint:
+              "With r=0, the commitment becomes C = g^m, which is a " +
+              "deterministic function of m alone.",
+            answer:
+              "Without randomness, C = g^m is deterministic. An adversary who " +
+              "knows the message space (e.g., ages 0-150) can compute g^m for " +
+              "every possible m and compare with C. This is a dictionary " +
+              "attack analogous to rainbow tables. The randomness r ensures " +
+              "that identical messages produce different commitments (each " +
+              "with fresh r), making C information-theoretically hiding: " +
+              "every commitment value is equally likely for any message."
+          },
+          {
+            type: "design",
+            question:
+              "In the thesis credential system, how would you use Pedersen " +
+              "commitments to enable range proofs on an age attribute (prove " +
+              "age >= 18 without revealing exact age)? Outline the approach.",
+            hint:
+              "Think about decomposing age - 18 into bits and committing to " +
+              "each bit, then proving each bit is 0 or 1.",
+            answer:
+              "Commit to the age as C_age = g^age * h^r. To prove age >= 18, " +
+              "compute delta = age - 18 and prove delta >= 0 by decomposing " +
+              "delta into bits (b_0, ..., b_n). Commit to each bit " +
+              "C_i = g^b_i * h^r_i and prove each b_i is in {0,1} using " +
+              "Sigma protocols. The homomorphic property lets the verifier " +
+              "check that the product of bit commitments (weighted by powers " +
+              "of 2) equals the commitment to delta, without learning any " +
+              "bit values. This is essentially how Bulletproof range proofs " +
+              "work inside the thesis payment layer."
+          }
+        ]
       },
       {
         name: "Digital Signatures",
@@ -214,7 +393,103 @@ window.DAY1_GUIDE = {
           "ensures the issuer doesn't learn all attributes. The user " +
           "can later derive unlinkable proofs from this signature, " +
           "showing only selected attributes to different verifiers " +
-          "on Sui."
+          "on Sui.",
+        history: {
+          inventor: "Whitfield Diffie & Martin Hellman (Stanford); RSA by Rivest, Shamir, Adleman (MIT)",
+          year: 1976,
+          context:
+            "Diffie and Hellman introduced public-key cryptography in 'New " +
+            "Directions in Cryptography' (1976), but digital signatures were " +
+            "first formalized by Rivest, Shamir, and Adleman (RSA, 1978). " +
+            "David Chaum invented blind signatures in 1982 ('Blind Signatures " +
+            "for Untraceable Payments', CRYPTO 1982), enabling the signer to " +
+            "sign a message without seeing its content. Schnorr signatures " +
+            "(1989) and ECDSA (NIST, 1998) brought elliptic curve efficiency. " +
+            "BBS+ (Boneh-Boyen-Shacham, 2004; extended by Au-Susilo-Mu, 2006) " +
+            "added multi-message signing with selective disclosure.",
+          funFact:
+            "Chaum's blind signature patent expired before its commercial " +
+            "potential was realized. His company DigiCash (1990) went bankrupt " +
+            "in 1998, but the blind signature concept became foundational for " +
+            "anonymous credentials and privacy-preserving identity 25 years later."
+        },
+        limitations: [
+          "Standard ECDSA signatures are linkable: the same public key " +
+          "produces verifiable signatures that can be correlated across " +
+          "different contexts, destroying user privacy. BBS+ signatures solve " +
+          "this with unlinkable derived proofs.",
+          "Blind signatures require an interactive protocol between signer " +
+          "and user (at least 2 rounds), which adds latency and complexity " +
+          "to credential issuance. Threshold blind signing (t-of-n issuers) " +
+          "multiplies this to 2 rounds per signer.",
+          "BBS+ signatures are pairing-based (BLS12-381), making them ~10x " +
+          "slower to verify than ECDSA. A single BBS+ verification takes " +
+          "~5ms on a modern CPU due to pairing computations, vs ~0.5ms for " +
+          "Ed25519."
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "Explain the difference between a standard digital signature, a " +
+              "blind signature, and a BBS+ signature. When would you use each " +
+              "in an identity system?",
+            hint:
+              "Think about what the signer learns and what the verifier can " +
+              "link across presentations.",
+            answer:
+              "Standard signature (ECDSA/Ed25519): signer sees the message, " +
+              "verifier can link all uses of the same public key. Used for " +
+              "transaction signing (Sui transactions). Blind signature (Chaum): " +
+              "signer signs without seeing the message content; used for " +
+              "credential issuance where the issuer should not learn all " +
+              "attributes. BBS+ signature: signer signs a vector of messages " +
+              "(attributes), and the holder can later derive unlinkable proofs " +
+              "disclosing any subset; used for selective disclosure in " +
+              "anonymous credentials."
+          },
+          {
+            type: "comparison",
+            question:
+              "Compare the verification cost of Ed25519, ECDSA (secp256k1), " +
+              "and BBS+ (BLS12-381) in terms of operations and approximate " +
+              "wall-clock time. Why does Sui use Ed25519 for transactions " +
+              "but the thesis uses BBS+ for credentials?",
+            hint:
+              "Ed25519 and ECDSA require scalar multiplications. BBS+ requires " +
+              "bilinear pairings which are ~10x more expensive.",
+            answer:
+              "Ed25519: 1 scalar multiplication + 1 point addition, ~0.1ms. " +
+              "ECDSA: 2 scalar multiplications + modular inverse, ~0.3ms. " +
+              "BBS+: 2-3 pairings + multi-scalar multiplication, ~5ms. " +
+              "Sui uses Ed25519 for transaction authentication because speed " +
+              "is critical (thousands of TPS). The thesis uses BBS+ for " +
+              "credentials because selective disclosure and unlinkability " +
+              "require the algebraic structure of pairing-based signatures. " +
+              "The 10x cost is acceptable since credential presentation " +
+              "happens less frequently than transaction signing."
+          },
+          {
+            type: "design",
+            question:
+              "Design a blind issuance protocol for BBS+ credentials: how " +
+              "does the user get a BBS+ signature on their attributes without " +
+              "the issuer learning all attribute values?",
+            hint:
+              "The user can blind (randomize) some attributes by adding a " +
+              "Pedersen commitment, and the issuer signs over the blinded " +
+              "values plus the known attributes.",
+            answer:
+              "The user Pedersen-commits to private attributes (e.g., " +
+              "C_priv = g^attr * h^r) and sends C_priv along with public " +
+              "attributes (name, nationality) to the issuer. The issuer signs " +
+              "the combined vector [public_attrs, C_priv] with BBS+. The user " +
+              "unblinds by incorporating the randomness r into their credential " +
+              "representation. During presentation, the user proves knowledge " +
+              "of r and the private attributes via a ZK proof. The issuer " +
+              "never sees the private attribute values, only the commitment."
+          }
+        ]
       },
       {
         name: "Elliptic Curve Cryptography",
@@ -286,7 +561,79 @@ window.DAY1_GUIDE = {
           "verification. Groth16 proofs for on-chain verification " +
           "also use BLS12-381. This curve choice means credential " +
           "operations and ZK verification share the same algebraic " +
-          "foundation, simplifying your Sui Move verifier contract."
+          "foundation, simplifying your Sui Move verifier contract.",
+        history: {
+          inventor: "Neal Koblitz (University of Washington) and Victor Miller (IBM Research)",
+          year: 1985,
+          context:
+            "Koblitz and Miller independently proposed using elliptic curves " +
+            "for cryptography in 1985. Before ECC, RSA (1978) and Diffie-Hellman " +
+            "(1976) relied on integer factorization and discrete log in Z_p*, " +
+            "requiring 2048-bit keys for 112-bit security. ECC achieves the " +
+            "same security with 256-bit keys (16x smaller), enabling mobile " +
+            "and embedded cryptography. Pairing-based cryptography emerged " +
+            "from Boneh and Franklin's identity-based encryption (2001), using " +
+            "the Weil and Tate pairings on supersingular curves. BN254 (Barreto " +
+            "and Naehrig, 2005) and BLS12-381 (Bowe, 2017 for Zcash Sapling) " +
+            "are the dominant pairing-friendly curves today.",
+          funFact:
+            "When Koblitz first proposed ECC in 1985, the NSA was skeptical. " +
+            "By 2005, NSA endorsed Suite B with ECC as the preferred algorithm. " +
+            "By 2018, over 80% of TLS connections used ECDHE key exchange."
+        },
+        limitations: [
+          "Not quantum-safe: Shor's algorithm breaks ECDLP in polynomial time " +
+          "on a sufficiently large quantum computer. A 256-bit elliptic curve " +
+          "key would require ~2,300 logical qubits to break, which is expected " +
+          "within 10-20 years.",
+          "Pairing computation is expensive: a single e(P,Q) on BLS12-381 " +
+          "takes ~1.5ms, compared to ~0.05ms for a scalar multiplication. " +
+          "Groth16 verification (3 pairings) costs ~4.5ms, which sets the " +
+          "floor for on-chain verification time.",
+          "Curve choice creates ecosystem lock-in: BLS12-381 proofs cannot " +
+          "be verified in contracts designed for BN254 (different field " +
+          "arithmetic), and Sui's native groth16 module currently supports " +
+          "only BN254, BLS12-381, and BN254 alt_bn128."
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "On the tiny elliptic curve y^2 = x^3 + 7 over F_17 " +
+              "(secp256k1 equation, tiny field), the point G = (15, 13) " +
+              "has order 18. Compute 2G using the point doubling formula. " +
+              "The tangent slope is lambda = (3*x1^2 + a) / (2*y1) mod 17.",
+            hint:
+              "a = 0 for this curve. lambda = (3*15^2) / (2*13) mod 17 " +
+              "= (3*225) / 26 mod 17 = 675/26 mod 17. Use modular inverse: " +
+              "26 mod 17 = 9, and 9^(-1) mod 17 = 2 (since 9*2 = 18 = 1 mod 17).",
+            answer:
+              "lambda = 675 * 2 mod 17 = 1350 mod 17. 1350 / 17 = 79 remainder 7, " +
+              "so lambda = 7. x3 = lambda^2 - 2*x1 = 49 - 30 = 19 mod 17 = 2. " +
+              "y3 = lambda*(x1 - x3) - y1 = 7*(15-2) - 13 = 91 - 13 = 78 " +
+              "mod 17 = 10. So 2G = (2, 10). You can verify: 10^2 = 100 = " +
+              "15 mod 17, and 2^3 + 7 = 15 mod 17. Checks out."
+          },
+          {
+            type: "conceptual",
+            question:
+              "What is the bilinear property of pairings, and why is it " +
+              "essential for BBS+ signature verification?",
+            hint:
+              "The bilinear property states e(aP, bQ) = e(P,Q)^(ab). " +
+              "Think about how a verifier checks a signature without " +
+              "knowing the signer's secret key.",
+            answer:
+              "Bilinearity means e(aP, Q) = e(P, aQ) = e(P,Q)^a. In BBS+ " +
+              "verification, the verifier checks e(A, pk) = e(H, G2) where " +
+              "A is the signature element and pk = [sk]G2. Without knowing " +
+              "sk, the verifier uses the pairing to algebraically relate " +
+              "the signature to the public key. Bilinearity lets the " +
+              "verification equation hold without revealing sk: " +
+              "e(A, [sk]G2) = e([sk]A, G2) = e(H, G2) when A = [1/sk]H. " +
+              "This algebraic trick is impossible with non-pairing curves."
+          }
+        ]
       },
       {
         name: "Zero-Knowledge Proofs (Fundamentals)",
