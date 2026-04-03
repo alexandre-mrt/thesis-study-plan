@@ -1182,7 +1182,106 @@ window.DAY1_GUIDE = {
           "trust in your identity system. MPC-in-the-head could also " +
           "provide an alternative ZK proof system for credential " +
           "verification, avoiding the trusted setup of Groth16 at " +
-          "the cost of larger proofs."
+          "the cost of larger proofs.",
+        history: {
+          inventor: "Andrew Yao (Stanford University / Tsinghua University)",
+          year: 1982,
+          context:
+            "Yao introduced the 'Millionaires Problem' and garbled circuits " +
+            "for 2-party computation at FOCS 1982. Oded Goldreich, Silvio " +
+            "Micali, and Avi Wigderson (GMW, 1987) extended this to n-party " +
+            "computation using secret sharing. Ben-Or, Goldwasser, and " +
+            "Wigderson (BGW, 1988) showed information-theoretic MPC is " +
+            "possible when honest parties form a majority. Ivan Damgard, " +
+            "Valerio Pastro, Nigel Smart, and Sarah Zakarias introduced SPDZ " +
+            "(pronounced 'Speedz', 2012), the first practical maliciously " +
+            "secure MPC protocol using somewhat homomorphic encryption for " +
+            "preprocessing.",
+          funFact:
+            "Yao received the Turing Award in 2000 for his foundational " +
+            "contributions to computation theory, including MPC. The " +
+            "Millionaires Problem he posed in 1982 is still the most " +
+            "common way MPC is explained to newcomers, 44 years later."
+        },
+        limitations: [
+          "Communication complexity scales at least linearly with the number " +
+          "of parties (O(n^2) for naive protocols). A 10-party GMW protocol " +
+          "sends O(n^2 * |C|) field elements where |C| is the circuit size, " +
+          "making large computations with many parties impractical.",
+          "Malicious security is 3-20x more expensive than semi-honest " +
+          "security depending on the protocol. SPDZ achieves malicious " +
+          "security via MAC-based verification, adding ~3x overhead. " +
+          "Garbled circuits with cut-and-choose (Lindell 2013) add ~40x.",
+          "MPC assumes network availability and synchrony for liveness. If " +
+          "enough parties go offline (more than n-t for a t-threshold " +
+          "protocol), the computation halts. This is problematic for " +
+          "blockchain-based MPC where node availability is not guaranteed."
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "What is the difference between semi-honest and malicious " +
+              "security in MPC? Why does the thesis care about this " +
+              "distinction for threshold BBS+ issuance?",
+            hint:
+              "Semi-honest parties follow the protocol but try to learn " +
+              "from the transcript. Malicious parties can deviate arbitrarily.",
+            answer:
+              "Semi-honest (passive): parties follow the protocol correctly " +
+              "but try to infer others' inputs from the messages they see. " +
+              "Sufficient when parties are trusted institutions (e.g., " +
+              "government issuers). Malicious (active): parties can send " +
+              "arbitrary messages, abort, or collude. Required when parties " +
+              "are mutually distrusting (e.g., competing credential issuers). " +
+              "For the thesis, threshold BBS+ issuance with mutually " +
+              "distrusting issuers (e.g., different countries' identity " +
+              "authorities) requires malicious security, as a corrupt issuer " +
+              "could try to sign unauthorized credentials."
+          },
+          {
+            type: "comparison",
+            question:
+              "Compare garbled circuits (Yao) and secret sharing (GMW/BGW) " +
+              "for MPC. Which approach is better for 2-party computation, " +
+              "and which for 5-party computation? Why?",
+            hint:
+              "Think about round complexity: garbled circuits have constant " +
+              "rounds, secret sharing requires communication per gate.",
+            answer:
+              "Garbled circuits (Yao): constant rounds (2-3), 2-party only, " +
+              "communication = O(|C| * kappa) where kappa is the security " +
+              "parameter, good for high-latency networks. Secret sharing " +
+              "(GMW/BGW): O(depth(C)) rounds (one per multiplication depth), " +
+              "n-party, communication = O(n^2 * |C|), good for low-latency " +
+              "networks with many parties. For 2-party: garbled circuits win " +
+              "(fewer rounds, optimized with free-XOR and half-gates). For " +
+              "5-party: secret sharing wins (garbled circuits do not generalize " +
+              "efficiently beyond 2 parties, while BGW scales naturally to n)."
+          },
+          {
+            type: "design",
+            question:
+              "Design a threshold BBS+ signing protocol for 3-of-5 issuers. " +
+              "What does each issuer contribute, and how is the final " +
+              "signature assembled without any single issuer seeing the " +
+              "full signing key?",
+            hint:
+              "The BBS+ signing key sk is Shamir-shared among 5 issuers. " +
+              "Each issuer contributes a partial signature using their share.",
+            answer:
+              "Setup: Shamir-share the BBS+ signing key sk into 5 shares " +
+              "(sk_1, ..., sk_5) with threshold 3. Each issuer i holds sk_i. " +
+              "Signing: the user sends the attribute commitment to all 5 " +
+              "issuers. Any 3 issuers compute partial signatures " +
+              "sigma_i = H(attrs)^(lambda_i * sk_i) where lambda_i are " +
+              "Lagrange interpolation coefficients. The user (or a combiner) " +
+              "multiplies the partial signatures: sigma = prod(sigma_i) = " +
+              "H(attrs)^(sum(lambda_i * sk_i)) = H(attrs)^sk. The full " +
+              "signing key sk is never reconstructed. If 2 issuers are " +
+              "compromised, they cannot sign (need 3 shares)."
+          }
+        ]
       },
       {
         name: "Secret Sharing",
