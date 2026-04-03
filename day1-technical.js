@@ -3467,6 +3467,73 @@ window.DAY1_TECHNICAL = {
               "\\mathbf{a}_L \\circ (\\mathbf{a}_L - " +
               "\\mathbf{1}^n) = \\mathbf{0} \\]"
           }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Compute the proof size for a Bulletproof inner product " +
+              "argument on vectors of length \\( n = 256 \\), using " +
+              "Curve25519 (32-byte group elements, 32-byte scalars). " +
+              "Then compute the proof size for an aggregated range " +
+              "proof of \\( m = 8 \\) values in \\( [0, 2^{64}) \\).",
+            hint:
+              "Inner product proof: \\( 2 \\log_2 n \\) group elements " +
+              "+ 2 scalars. For aggregated range proof of \\( m \\) " +
+              "values with \\( n \\)-bit range, the vector length is " +
+              "\\( mn \\), so use \\( 2 \\log_2(mn) \\) group elements " +
+              "+ constant overhead (~5 additional group elements + " +
+              "5 scalars for the range proof wrapper).",
+            answer:
+              "Inner product (\\( n = 256 \\)): " +
+              "\\( 2 \\log_2(256) = 2 \\cdot 8 = 16 \\) group elements " +
+              "+ 2 scalars = \\( 16 \\times 32 + 2 \\times 32 = " +
+              "512 + 64 = 576 \\) bytes. " +
+              "Aggregated range proof (\\( m = 8, n = 64 \\)): " +
+              "vector length = \\( 8 \\times 64 = 512 \\). " +
+              "\\( 2 \\log_2(512) = 2 \\times 9 = 18 \\) group elements " +
+              "from the inner product argument. Adding ~5 group " +
+              "elements + 5 scalars for the range proof structure: " +
+              "\\( (18 + 5) \\times 32 + (2 + 5) \\times 32 = " +
+              "736 + 224 = 960 \\) bytes. " +
+              "Compare: 8 separate proofs would be " +
+              "\\( 8 \\times 672 = 5,376 \\) bytes. Aggregation " +
+              "saves \\( \\approx 82\\% \\) bandwidth."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain how Bulletproof range proofs encode the " +
+              "constraint '\\( v \\in [0, 2^n) \\)' as an inner " +
+              "product relation. Why does the bit constraint " +
+              "\\( b_i(b_i - 1) = 0 \\) get expressed as " +
+              "\\( \\mathbf{a}_L \\circ \\mathbf{a}_R = \\mathbf{0} \\) " +
+              "where \\( \\mathbf{a}_R = \\mathbf{a}_L - \\mathbf{1}^n \\)?",
+            hint:
+              "Write \\( v = \\sum b_i 2^i \\) and set " +
+              "\\( \\mathbf{a}_L = (b_0, \\ldots, b_{n-1}) \\). " +
+              "For each component, what does " +
+              "\\( a_{L,i} \\cdot a_{R,i} = 0 \\) imply about " +
+              "\\( a_{L,i} \\)?",
+            answer:
+              "Set \\( \\mathbf{a}_L = (b_0, \\ldots, b_{n-1}) \\) " +
+              "as the binary representation of \\( v \\). Then " +
+              "\\( \\langle \\mathbf{a}_L, \\mathbf{2}^n \\rangle = " +
+              "\\sum_i b_i 2^i = v \\) (binary decomposition). " +
+              "Set \\( \\mathbf{a}_R = \\mathbf{a}_L - \\mathbf{1}^n \\), " +
+              "so \\( a_{R,i} = b_i - 1 \\). " +
+              "The Hadamard product constraint: " +
+              "\\( (\\mathbf{a}_L \\circ \\mathbf{a}_R)_i = " +
+              "b_i(b_i - 1) = 0 \\). This forces \\( b_i \\in " +
+              "\\{0, 1\\} \\) for each \\( i \\), since over any " +
+              "field, \\( x(x-1) = 0 \\iff x = 0 \\) or \\( x = 1 \\). " +
+              "Combined: \\( v = \\sum b_i 2^i \\) with each " +
+              "\\( b_i \\in \\{0,1\\} \\) implies " +
+              "\\( 0 \\leq v < 2^n \\). These two constraints are " +
+              "then combined (using random challenge \\( y \\)) " +
+              "into a single inner product relation that can be " +
+              "proved using the logarithmic halving protocol."
+          }
         ]
       }
     ]
