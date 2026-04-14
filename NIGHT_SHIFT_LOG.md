@@ -1,48 +1,53 @@
-# Night Shift Log — 2026-04-03
+# Night Shift Log — 2026-04-14
 
 ## Objective
-Enrich ALL study guide content with exercises, history, limitations, and technical views.
+Add paper recap cards (intuitive + technical) for all ~44 papers from papers.md, integrated into each chapter tab with full search support.
 
-## Night Shift Summary — 2026-04-03
+## Architecture
 
-### Timing
-- Started: 2026-04-03T00:15:00+02:00
-- Finished: 2026-04-03T04:30:00+02:00
-- Duration: ~4h 15m
+```
+┌─────────────────────────────────────────────────────┐
+│  index.html                                         │
+│  ├── Ch 2.1 tab                                     │
+│  │   ├── [existing] study-guide concepts            │
+│  │   └── [NEW] paper recap section (16 papers)      │
+│  ├── Ch 2.2 tab                                     │
+│  │   ├── [existing] study-guide concepts            │
+│  │   └── [NEW] paper recap section (8 papers)       │
+│  ├── ... (same for Ch 2.3–2.6)                      │
+│  └── search bar → indexes concepts + papers         │
+│                                                     │
+│  New files:                                         │
+│  ├── paper-guide.js     (rendering engine)          │
+│  ├── paper-cards.css    (styles)                    │
+│  ├── ch2X-papers-guide.js × 6  (data)              │
+│  └── ch2X-papers-technical.js × 6 (data)           │
+└─────────────────────────────────────────────────────┘
+```
 
-### Completed
-- [x] T1: Rendering infrastructure — buildHistorySection(), buildLimitationsSection(), buildExercisesSection() + CSS
-- [x] T2: ch22-technical.js — 879 lines, 4 concepts (Pedersen, Bulletproofs, Mimblewimble, ElGamal) with KaTeX, security analysis, formal definitions
-- [x] T3: rust-technical.js — 549 lines, 3 concepts (fastcrypto, crypto patterns, codebases) with code examples
-- [x] T4: day1-guide.js — 17/17 concepts enriched (ZK Proof Systems)
-- [x] T5: day2-guide.js — 11/11 concepts enriched (Anonymous Credentials + TEE)
-- [x] T6: day3-guide.js — 12/12 concepts enriched (Private Payments + Integration)
-- [x] T7: ch22-guide.js — 4/4 concepts enriched (Confidential TX)
-- [x] T8: rust-guide.js — 3/3 concepts enriched (Production Rust)
+## Task Execution Plan
 
-### Not completed / Needs review
-- T9-T11: Technical guide exercises (day1/2/3-technical.js) — agents couldn't complete on large files within context windows. Low priority: intuitive guides already have full exercise coverage.
+### Wave A (parallel, no deps)
+- T1: paper-guide.js rendering module
+- T2: paper-cards.css styles
 
-### Decisions made
-- Enriched all intuitive guides first (highest learning value), technical exercises deprioritized
-- Used multiple agent iterations per file (17-concept files needed 4-5 passes)
-- day2 has 11 concepts (not 12 as initially estimated — "Trust Model" section was miscounted)
+### Wave B (parallel, no deps)
+- T3: Ch 2.1 paper data (16 papers)
+- T4: Ch 2.2 paper data (8 papers)
+- T5: Ch 2.3 paper data (10 papers)
+- T6: Ch 2.4+2.5+2.6 paper data (10 papers)
 
-### Issues encountered
-- Large JS files (day1-guide: 2791 lines) caused agents to hit context limits before finishing all concepts
-- Workaround: re-launched agents multiple times with "finish remaining N concepts" prompts
-- Technical files (day*-technical.js) even larger — agents couldn't complete T9-T11
+### Wave C (depends on A+B)
+- T7: index.html integration
+- T8: search.js extension
 
-### Final validation
-- Build: PASS (static site, no build step)
-- Tests: N/A (pure HTML/CSS/JS)
-- Lint: N/A
-- Visual: site loads, tabs switch, exercises render with collapsible hints/answers
+### Wave D (depends on C)
+- T9: QA testing
 
-### Stats
-- Iterations used: 6 ralph-loop iterations
-- Files created: 2 (ch22-technical.js, rust-technical.js)
-- Files modified: 7 (day1/2/3-guide.js, ch22-guide.js, rust-guide.js, study-guide.js, style.css)
-- Lines added: ~3,500+
-- Commits: 8
-- Concepts enriched: ~48 with history, limitations, and exercises
+### Wave E
+- T10: Cleanup + PR
+
+## Decisions
+- Paper rendering in separate paper-guide.js, not modifying study-guide.js
+- Ch 2.4+2.5+2.6 grouped in T6 (only 10 papers total)
+- No AI recap badge — user prefers uniform look
