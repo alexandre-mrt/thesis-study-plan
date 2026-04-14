@@ -4,31 +4,31 @@
     "project": "thesis-study-plan",
     "branch": "feat/night-shift-2026-04-14-papers",
     "started_at": "2026-04-14T09:30:00+02:00",
-    "iteration": 0,
+    "iteration": 2,
     "total_tasks": 10,
-    "completed_tasks": 0
+    "completed_tasks": 2
   },
   "tasks": [
     {
       "id": "T1",
       "title": "Create paper-guide.js rendering module",
       "description": "New module that renders paper recap cards in each chapter tab. Mirrors study-guide.js pattern: expandable cards, intuitive/technical toggle, status/relevance badges, localStorage checkboxes. Must expose renderPaperGuides() function called from app.js init.",
-      "status": "pending",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
       "files": ["paper-guide.js"],
-      "iterations_attempted": 0,
+      "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-14T09:45:00+02:00"
     },
     {
       "id": "T2",
       "title": "Create paper-cards.css styles",
       "description": "CSS for paper cards: status badges (read=green, skimmed=yellow, queued=gray), relevance badges (core=accent, related=muted, context=dim), card layout matching concept cards, responsive, dark theme. Chapter accent colors via CSS vars.",
-      "status": "pending",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
@@ -43,7 +43,7 @@
       "id": "T3",
       "title": "Create Ch 2.1 paper data (16 papers — Anonymous Credentials)",
       "description": "Create ch21-papers-guide.js (window.CH21_PAPERS) and ch21-papers-technical.js (window.CH21_PAPERS_TECH) with intuitive + technical recaps for all 16 anonymous credential papers. Follow exact data structure from NIGHT_SHIFT_ENRICHED_SPEC.md. Each paper needs: analogy, ASCII diagram, keyPoints, connections, thesisExample, formalDefinition, mathDetails with KaTeX.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 2,
       "depends_on": [],
       "parallel_group": "B",
@@ -58,7 +58,7 @@
       "id": "T4",
       "title": "Create Ch 2.2 paper data (8 papers — CT, Range Proofs & ZK)",
       "description": "Create ch22-papers-guide.js (window.CH22_PAPERS) and ch22-papers-technical.js (window.CH22_PAPERS_TECH) for all 8 papers. Same structure as T3.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 2,
       "depends_on": [],
       "parallel_group": "B",
@@ -73,7 +73,7 @@
       "id": "T5",
       "title": "Create Ch 2.3 paper data (10 papers — TEE)",
       "description": "Create ch23-papers-guide.js (window.CH23_PAPERS) and ch23-papers-technical.js (window.CH23_PAPERS_TECH) for all 10 TEE papers. Same structure as T3.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 2,
       "depends_on": [],
       "parallel_group": "B",
@@ -88,7 +88,7 @@
       "id": "T6",
       "title": "Create Ch 2.4 + 2.5 + 2.6 paper data (10 papers)",
       "description": "Create paper guide+technical JS files for Ch 2.4 (3 papers), Ch 2.5 (4 papers), Ch 2.6 (3 papers). 6 files total: ch24-papers-guide.js, ch24-papers-technical.js, ch25-papers-guide.js, ch25-papers-technical.js, ch26-papers-guide.js, ch26-papers-technical.js.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 2,
       "depends_on": [],
       "parallel_group": "B",
@@ -184,7 +184,16 @@
       "reason": "User explicitly asked not to modify existing concept guide files"
     }
   ],
-  "iteration_log": [],
+  "iteration_log": [
+    {
+      "iteration": 1,
+      "started_at": "2026-04-14T09:35:00+02:00",
+      "tasks_attempted": ["T1", "T2", "T3", "T4", "T5", "T6"],
+      "tasks_completed": ["T1", "T2"],
+      "tasks_failed": [],
+      "notes": "Wave A+B launched. T1+T2 completed and merged. T3-T6 still running (large data files)."
+    }
+  ],
   "doom_loop": {
     "file_edit_counts": {},
     "error_hash_counts": {},
