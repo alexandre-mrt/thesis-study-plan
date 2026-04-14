@@ -10,7 +10,7 @@ const STORAGE_KEYS = {
   ACTIVE_DAY: 'thesis-study-active-day',
 };
 
-const CHAPTER_KEYS = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'rust'];
+const CHAPTER_KEYS = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'ch26', 'rust'];
 
 const POMODORO = {
   WORK_SECONDS: 25 * 60,
@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProgress();
   restoreActiveDay();
   renderStudyGuides();
+  if (typeof renderPaperGuides === 'function') {
+    renderPaperGuides();
+  }
   if (typeof initConceptSearch === 'function') {
     initConceptSearch();
   }
