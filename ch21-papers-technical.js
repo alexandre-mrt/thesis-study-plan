@@ -4,7 +4,6 @@
  * Rendered with KaTeX: \\( ... \\) for inline, \\[ ... \\] for display.
  * Paper names MUST match ch21-papers-guide.js exactly.
  */
-
 window.CH21_PAPERS_TECH = {
   papers: [
     /* ───────── 1. Revisiting BBS Signatures ───────── */
@@ -64,18 +63,6 @@ window.CH21_PAPERS_TECH = {
             "without the lossy \\( q \\)-fold security loss in the standard model. " +
             "The shorter BBS variant \\( \\sigma = (A, e) \\) saves one \\( \\mathbb{G}_1 \\) " +
             "element (48 bytes on BLS12-381) per signature."
-        },
-        {
-          subtitle: "Proof of Knowledge of Signature",
-          content:
-            "To prove possession of \\( \\sigma = (A, e, s) \\) without revealing it, " +
-            "the holder randomizes: \\( A' = A^r \\) for random \\( r \\in \\mathbb{Z}_p \\), " +
-            "computes \\( \\bar{A} = A'^{-e} \\cdot B'^{1} \\) and runs a Sigma protocol " +
-            "proving knowledge of \\( (e, s, r, m_{i_1}, \\ldots) \\) such that the " +
-            "pairing equation holds:" +
-            "\\[ e(A', \\tilde{w}) \\cdot e(A', \\tilde{g})^e = e(B', \\tilde{g}) \\]" +
-            "Using Fiat-Shamir, this becomes a non-interactive proof \\( \\pi \\) sound " +
-            "under the discrete logarithm assumption and ROM."
         }
       ]
     },
@@ -298,7 +285,6 @@ window.CH21_PAPERS_TECH = {
         }
       ]
     },
-
     /* ───────── 6. Revocable TACO ───────── */
     {
       name: "Revocable Threshold Anonymous Credentials for Blockchains",
