@@ -46,7 +46,27 @@ const CHAPTER_LABELS = {
   'ch23': '2.3',
   'ch24': '2.4',
   'ch25': '2.5',
+  'ch26': '2.6',
   'rust': 'RS',
+};
+
+/* Paper data accessors */
+const PAPER_GUIDE_ACCESSORS = {
+  'ch21': () => window.CH21_PAPERS,
+  'ch22': () => window.CH22_PAPERS,
+  'ch23': () => window.CH23_PAPERS,
+  'ch24': () => window.CH24_PAPERS,
+  'ch25': () => window.CH25_PAPERS,
+  'ch26': () => window.CH26_PAPERS,
+};
+
+const PAPER_TECH_ACCESSORS = {
+  'ch21': () => window.CH21_PAPERS_TECH,
+  'ch22': () => window.CH22_PAPERS_TECH,
+  'ch23': () => window.CH23_PAPERS_TECH,
+  'ch24': () => window.CH24_PAPERS_TECH,
+  'ch25': () => window.CH25_PAPERS_TECH,
+  'ch26': () => window.CH26_PAPERS_TECH,
 };
 
 /* === State === */
@@ -110,6 +130,47 @@ function buildSearchIndex() {
     ddEntries.forEach((entry) => index.push(entry));
   }
 
+  /* Add paper entries to the search index */
+  const paperChapterKeys = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'ch26'];
+  paperChapterKeys.forEach((chKey) => {
+    const guideGetter = PAPER_GUIDE_ACCESSORS[chKey];
+    const techGetter = PAPER_TECH_ACCESSORS[chKey];
+    const guide = guideGetter ? guideGetter() : null;
+    const techGuide = techGetter ? techGetter() : null;
+
+    if (!guide || !guide.papers) return;
+
+    guide.papers.forEach((paper, paperIdx) => {
+      const techPaper = techGuide && techGuide.papers
+        ? techGuide.papers.find((tp) => tp.name === paper.name) || null
+        : null;
+
+      const searchParts = [
+        paper.name,
+        paper.authors || '',
+        paper.venue || '',
+        paper.keyTakeaway || '',
+        paper.analogy || '',
+        (paper.keyPoints || []).join(' '),
+        paper.connections || '',
+        paper.thesisExample || '',
+      ];
+      const searchText = searchParts.join(' ').toLowerCase();
+
+      index.push({
+        name: paper.name,
+        nameLower: paper.name.toLowerCase(),
+        isPaper: true,
+        chapterKey: chKey,
+        paperIdx: paperIdx,
+        blockTitle: 'Paper \u2014 Ch ' + (CHAPTER_LABELS[chKey] || chKey),
+        searchText: searchText,
+        guideData: paper,
+        techData: techPaper,
+      });
+    });
+  });
+
   return index;
 }
 
@@ -166,10 +227,11 @@ function renderSearchResults(results, query) {
 
     const dayBadge = document.createElement('span');
     dayBadge.className = 'search-result-day';
+    const isPaper = result.isPaper === true;
     const isDeepDive = result.isDeepDive === true;
-    const chapterKey = isDeepDive ? 'zk' : (DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || 'ch25');
+    const chapterKey = isPaper ? result.chapterKey : (isDeepDive ? 'zk' : (DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || 'ch25'));
     dayBadge.dataset.day = chapterKey;
-    dayBadge.textContent = isDeepDive ? 'ZK' : (CHAPTER_LABELS[chapterKey] || result.day);
+    dayBadge.textContent = isPaper ? ('\uD83D\uDCC4 ' + (CHAPTER_LABELS[chapterKey] || chapterKey)) : (isDeepDive ? 'ZK' : (CHAPTER_LABELS[chapterKey] || result.day));
 
     const name = document.createElement('span');
     name.className = 'search-result-name';
@@ -269,6 +331,12 @@ function handleSearchKeydown(e) {
 /* === Navigation to Concept === */
 
 function navigateToConcept(result) {
+  /* Handle paper results */
+  if (result.isPaper) {
+    navigateToPaper(result);
+    return;
+  }
+
   /* Handle ZK Deep Dive results */
   if (result.isDeepDive) {
     navigateToZKDeepdive(result);
@@ -341,6 +409,43 @@ function navigateToZKDeepdive(result) {
 
     setTimeout(() => {
       targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      targetCard.classList.add('highlighted');
+      setTimeout(() => {
+        targetCard.classList.remove('highlighted');
+      }, HIGHLIGHT_DURATION_MS);
+    }, SCROLL_DELAY_MS);
+  }, EXPAND_DELAY_MS);
+}
+
+/* === Navigate to Paper === */
+
+function navigateToPaper(result) {
+  /* 1. Switch to the correct chapter tab */
+  if (typeof switchDay === 'function') {
+    switchDay(result.chapterKey);
+  }
+
+  /* 2. Find the paper card and expand it */
+  setTimeout(() => {
+    const container = document.querySelector(
+      '.paper-guide-container[data-chapter="' + result.chapterKey + '"]'
+    );
+    if (!container) return;
+
+    const paperCards = container.querySelectorAll('.paper-card');
+    const targetCard = paperCards[result.paperIdx];
+    if (!targetCard) return;
+
+    /* Expand the paper card if not already open */
+    if (!targetCard.classList.contains('open')) {
+      const header = targetCard.querySelector('.paper-header');
+      if (header) header.click();
+    }
+
+    /* Scroll into view with highlight */
+    setTimeout(() => {
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       targetCard.classList.add('highlighted');
       setTimeout(() => {
