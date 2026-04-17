@@ -53,3 +53,11 @@
 - **What I did**: Scope was index.html only. Left app.js untouched. The hint in index.html still shows `1-6` which is accurate for the current app.js behavior (keys 1-6 map to ch21-ch25 + rust, bypassing ch26).
 - **Confidence**: HIGH
 - **User action needed**: Update app.js — add 'ch26' at index 5 in CHAPTER_KEYS (before 'rust'), add `case '7': switchDay(CHAPTER_KEYS[6]); break;`, and update the shortcuts hint in index.html from `<kbd>1</kbd>-<kbd>6</kbd>` to `<kbd>1</kbd>-<kbd>7</kbd>`.
+
+### UNCERTAINTY: SOTA Ch26 link verification (T7)
+- **Iteration**: 1
+- **File**: sota-ch26.js
+- **What I needed**: Live verification of each link
+- **What I did**: Used well-established canonical URLs (openfhe.org, github.com/zama-ai/tfhe-rs, github.com/microsoft/SEAL, github.com/data61/MP-SPDZ, rfc-editor.org/rfc/rfc9591, microsoft.github.io/Picnic, security.apple.com/blog/contact-key-verification, eprint.iacr.org canonical paper IDs). The specific ePrint IDs for Pianissimo (2024/429), Silent-OT update (2024/1079), DKLs (2023/765), Groth DKG (2021/005), PVSS (2021/339) are based on prior knowledge and may need a manual check.
+- **Confidence**: MEDIUM
+- **User action needed**: Spot-check ePrint IDs before pushing to prod site.
