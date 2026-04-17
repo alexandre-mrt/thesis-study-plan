@@ -17,6 +17,22 @@
   ch26-papers-guide.js (venue field currently "TBD") and ch26-papers-technical.js
   (formalDefinition and mathDetails for Sui Confidential Transactions paper).
 
+### ASSUMPTION: weekly-update.sh uses git top-level for project root resolution (T16)
+- **Iteration**: 1
+- **File**: scripts/weekly-update.sh
+- **What I needed**: Script to resolve project root when run from any location, including git worktrees
+- **What I did**: Used `git rev-parse --show-toplevel` which returns the correct root when the script is installed at `<project-root>/scripts/weekly-update.sh`. During development the script lived in a worktree, so git top-level was the worktree dir — this is a non-issue in production.
+- **Confidence**: HIGH
+- **User action needed**: None — script works correctly when installed at the actual project root.
+
+### ASSUMPTION: sota file closing bracket pattern varies (T16)
+- **Iteration**: 1
+- **File**: scripts/weekly-update.sh (Python insertion block)
+- **What I needed**: Consistent `items: [ ... ]` closing pattern across all sota files
+- **What I did**: Some files use `]` + `};` (ch24, ch25, ch26, rust) and others use `],` + `};` (ch22, ch23). The Python regex `\],?\s*\n?\s*\};` handles both. Tested against all 6 existing sota files.
+- **Confidence**: HIGH
+- **User action needed**: None — but if a new sota file uses a different structure, the insertion may fall back to "no changes made" with a warning.
+
 ### UNCERTAINTY: Canton "ZKPs Not a Privacy Panacea" blog post exact URL
 - **Iteration**: 1
 - **File**: ch25-papers-guide.js
