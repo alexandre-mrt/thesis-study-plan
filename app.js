@@ -22,6 +22,9 @@ const PHASE = {
   BREAK: 'Break',
 };
 
+/* === Plan state === */
+let planInitialized = false;
+
 /* === State === */
 let timerState = {
   seconds: POMODORO.WORK_SECONDS,
@@ -43,7 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initKeyboardShortcuts();
   initMobileMenu();
   updateProgress();
-  restoreActiveDay();
+
+  /* Handle ?session=<id> deep-link: switch to Plan tab (plan.js init handles modal) */
+  const sessionParam = new URLSearchParams(window.location.search).get('session');
+  if (sessionParam) {
+    switchPlan();
+  } else {
+    restoreActiveDay();
+  }
+
   renderStudyGuides();
   if (typeof renderPaperGuides === 'function') {
     renderPaperGuides();
@@ -143,7 +154,47 @@ function initDayTabs() {
   });
 }
 
+function switchPlan() {
+  const tabs = $$('.day-tab');
+  const sections = $$('.day-section');
+  const zkSection = $('#zk-deepdive');
+
+  tabs.forEach((tab) => {
+    const isActive = tab.dataset.day === 'plan';
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
+  });
+
+  sections.forEach((sec) => {
+    const isActive = sec.dataset.day === 'plan';
+    sec.classList.toggle('active', isActive);
+    sec.hidden = !isActive;
+  });
+
+  if (zkSection) {
+    zkSection.classList.remove('active');
+    zkSection.hidden = true;
+  }
+
+  try {
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, 'plan');
+  } catch {
+    /* non-critical */
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (!planInitialized && window.PLAN) {
+    planInitialized = true;
+    window.PLAN.init();
+  }
+}
+
 function switchDay(chapterKey) {
+  if (chapterKey === 'plan') {
+    switchPlan();
+    return;
+  }
   const tabs = $$('.day-tab');
   const sections = $$('.day-section');
   const zkSection = $('#zk-deepdive');
@@ -230,6 +281,8 @@ function restoreActiveDay() {
     if (saved) {
       if (saved === 'zk') {
         switchToZKDeepdive();
+      } else if (saved === 'plan') {
+        switchPlan();
       } else if (CHAPTER_KEYS.includes(saved)) {
         switchDay(saved);
       } else {
@@ -502,6 +555,16 @@ function initKeyboardShortcuts() {
       case 'z':
       case 'Z':
         switchToZKDeepdive();
+        break;
+      case 'p':
+      case 'P':
+        switchPlan();
+        break;
+      case 'n':
+      case 'N':
+        if (window.PLAN && typeof window.PLAN.openNextUncompleted === 'function') {
+          window.PLAN.openNextUncompleted();
+        }
         break;
       case ' ':
         e.preventDefault();

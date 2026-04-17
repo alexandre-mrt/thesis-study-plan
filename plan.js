@@ -510,4 +510,15 @@ async function init() {
   }
 }
 
-window.PLAN = { init, openSession, markComplete };
+function openNextUncompleted() {
+  const sessions = window.PLAN_SESSIONS;
+  if (!Array.isArray(sessions)) { console.error('[plan] PLAN_SESSIONS not loaded'); return; }
+  const next = sessions.find((s) => !loadComplete(s.id));
+  if (next) {
+    openSession(next.id);
+  } else {
+    console.info('[plan] All sessions completed — nothing to open');
+  }
+}
+
+window.PLAN = { init, openSession, markComplete, openNextUncompleted };
