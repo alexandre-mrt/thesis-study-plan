@@ -95,3 +95,9 @@ Group E (final):                    T18 (needs all above)
 - Branch `feat/night-shift-2026-04-17-plan-sota` created from `main`
 - State + error + problems + log files initialized
 - 18 tasks planned across 5 dependency groups
+
+### Iteration 7 — T20 diagram upgrade + T18 QA in flight (2026-04-17)
+- User clarified: rich diagrams belong in **work product**, not Claude instructions (reverts CLAUDE.md / skill Mermaid changes; memory file `feedback_ascii_diagrams.md` rewritten).
+- T20 (new, site work product): Mermaid 10.9 CDN added in `index.html`. `zk-deepdive.js` now detects `{ type: 'mermaid', src }` and renders SVG via `mermaid.render()`, with ASCII `<pre>` fallback on error. First section in `zk-deepdive-data.js` ("Traditional ID vs ZK Proof") converted to `flowchart LR` to showcase. Dark theme aligned with site palette.
+- T18 Puppeteer QA still running in background (agent `ae287cad`). Early findings: flashcard counter shows `0/0`, Got it/Retry buttons cut off at viewport bottom. Will address in a follow-up night-fixer pass after T18 report lands.
+- Commit: `bb336f3 feat(zk-deepdive): render Mermaid diagrams alongside ASCII fallback`.
