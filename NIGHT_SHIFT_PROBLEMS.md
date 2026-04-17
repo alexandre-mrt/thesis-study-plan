@@ -67,6 +67,22 @@ Categories: UNCERTAINTY · ASSUMPTION · BLOCKED · UNFIXED · TEST GAP · DEPEN
 - **Confidence**: MEDIUM on dates, HIGH on architecture/math/links
 - **User action needed**: Spot-check the 2-3 most recent dates before citing in thesis chapter
 
+### UNCERTAINTY: Flashproofs — no IACR ePrint version found (T3)
+- **Iteration**: 1 (Ch 2.2 SOTA task T3)
+- **File**: sota-ch22.js
+- **What I needed**: authoritative paper link for Flashproofs
+- **What I did**: Cited as "Flashproofs: Efficient Zero-Knowledge Arguments of Range and Polynomial Evaluation" by Nan Wang and Sid Chi-Kin Chau, IEEE S&P 2022. Used IEEE CSDL URL `https://www.computer.org/csdl/proceedings-article/sp/2022/131600b376/1CIO7rGr0nS` (HTTP 200) as link. Also tested IEEE DOI `https://doi.ieeecomputersociety.org/10.1109/SP46214.2022.9833723` which resolves. Could not find an IACR ePrint ID via fuzzy probing (2022/1154, 2022/1251, 2022/1268, 2022/1399, 2022/1593 all unrelated).
+- **Confidence**: MEDIUM (venue/authors from prior knowledge; URL resolves but IEEE CSDL is SPA so title not verifiable via curl)
+- **User action needed**: If you need strict provenance, manually open the CSDL link and confirm title/authors.
+
+### ASSUMPTION: Seraphis / Jamtis cited as community specs (T3)
+- **Iteration**: 1 (Ch 2.2 SOTA task T3)
+- **File**: sota-ch22.js
+- **What I needed**: stable academic URLs for Seraphis and Jamtis
+- **What I did**: Seraphis points to koe's GitHub repo `https://github.com/UkoeHB/Seraphis` (the canonical spec draft). Jamtis points to tevador's gist `https://gist.github.com/tevador/50160d160d24cfc6c52ae02eb3d17024` (canonical proposal). Both HTTP 200 verified. Neither has a formal paper venue — the community specs are the ground truth.
+- **Confidence**: HIGH (these ARE the reference documents)
+- **User action needed**: None — the spec docs are the citation.
+
 ### ASSUMPTION: ePrint IDs used as `paper_refs` slugs (T1 plan)
 - **Iteration**: 1 (T1 plan)
 - **File**: study-plan/sessions.json
