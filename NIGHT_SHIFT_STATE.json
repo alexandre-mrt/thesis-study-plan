@@ -4,9 +4,9 @@
     "project": "thesis-study-plan",
     "branch": "feat/night-shift-2026-04-17-plan-sota",
     "started_at": "2026-04-17T16:45:00+02:00",
-    "iteration": 1,
+    "iteration": 2,
     "total_tasks": 18,
-    "completed_tasks": 0,
+    "completed_tasks": 9,
     "mission": "Transform thesis-study-plan into full 15-week (75 sessions \u00d7 2h = 150h) thesis prep program with SOTA content, Plan tab, weekly research loop, morning briefing integration. See NIGHT_SHIFT_THESIS_PREP_SPEC.md.",
     "window": "2026-04-20 to 2026-08-01",
     "cadence": "weekdays, 10h/week, 2h/session"
@@ -16,7 +16,7 @@
       "id": "T1",
       "title": "Generate study-plan/sessions.json with 75 sessions",
       "description": "Create study-plan/sessions.json covering 2026-04-20 to 2026-08-01 (weekdays only). 75 session objects: {id, date, week, phase, chapter, title, objectives[], materials[], paper_refs[], exercises[], sota_note, duration_min: 120}. Follow phase breakdown from spec \u00a71. Each session has specific learning objectives tied to chapter content + 1 SOTA addendum.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
@@ -29,13 +29,13 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T2",
       "title": "SOTA content: Ch 2.1 Anonymous Credentials + BBS+/PS signatures",
       "description": "Create sota-ch21.js with 2024-2026 SOTA: BBS+ RFC draft, threshold BBS+, zk-creds, PrivacyPass, rerandomizable PS refinements. Each entry: title, authors, venue, year, link, 2-paragraph recap, math highlight (KaTeX), 'why-for-thesis' note. Use WebSearch + arxiv MCP for recent papers.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
@@ -46,7 +46,7 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T3",
@@ -69,7 +69,7 @@
       "id": "T4",
       "title": "SOTA content: Ch 2.3 TEE + attestation",
       "description": "Create sota-ch23.js: Intel TDX 2025 production, NVIDIA H100/H200 confidential compute, Nitro Enclaves v2, Mysten Seal architecture, recent side-channel CVEs (Downfall, Inception).",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
@@ -80,13 +80,13 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T5",
       "title": "SOTA content: Ch 2.4 Private Payments",
       "description": "Create sota-ch24.js: Penumbra mainnet 2024-2025, Aztec 3.0 + Noir client-side proving, Namada multichain, Silent Payments Bitcoin.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
@@ -97,13 +97,13 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T6",
       "title": "SOTA content: Ch 2.5 ZK Proof Systems (folding + Plonky3 + Binius)",
       "description": "Create sota-ch25.js: Nova/SuperNova/HyperNova/ProtoStar folding, Plonky3 release, Binius, Halo2/PSE divergence, Ligero/Brakedown 2025, GKR revival. Heavy on benchmarks.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
@@ -114,13 +114,13 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T7",
       "title": "SOTA content: Ch 2.6 Advanced (MPC/FHE/threshold)",
       "description": "Create sota-ch26.js: Threshold FHE (OpenFHE 2025, Zama Concrete), Silent MPC (Pianissimo), PSI (Apple 2024), threshold crypto advances.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 2,
       "depends_on": [],
       "parallel_group": "A",
@@ -131,13 +131,13 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T8",
       "title": "SOTA content: Rust track additions",
       "description": "Create sota-rust.js: arkworks 2025, halo2_proofs + plonky3 idioms, nova-snark/Sonobe integration, async crypto for Sui Move FFI.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 2,
       "depends_on": [],
       "parallel_group": "A",
@@ -148,7 +148,7 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T9",
@@ -173,7 +173,7 @@
       "id": "T10",
       "title": "Plan tab: plan.css grid + modal styles",
       "description": "Create plan.css: 15-col \u00d7 5-row grid, per-chapter accent colors matching existing palette, modal overlay, progress-bar styles, responsive (mobile stack). Dark theme consistent with style.css.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "B",
@@ -184,7 +184,7 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T11",
@@ -282,7 +282,7 @@
       "id": "T15",
       "title": "Research log infrastructure: dir + queue + today entry",
       "description": "Create research-log/ directory with README explaining the flow. Create research-log/TEMPLATE.md and today's entry research-log/2026-04-17.md (seeded with 4 topics). Create research-queue.md with prioritized SOTA topics not yet integrated (10-20 items).",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
@@ -296,7 +296,7 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:10:00+02:00"
     },
     {
       "id": "T16",
