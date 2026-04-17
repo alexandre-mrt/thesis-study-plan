@@ -54,6 +54,53 @@ const PAPER_TECH_DATA = {
 window.PAPER_GUIDE_DATA = PAPER_GUIDE_DATA;
 window.PAPER_TECH_DATA = PAPER_TECH_DATA;
 
+/* === Mermaid rendering (scoped to paper cards) === */
+
+let __paperMermaidConfigured = false;
+let __paperMermaidSeq = 0;
+
+function ensurePaperMermaidConfigured() {
+  if (__paperMermaidConfigured || typeof mermaid === 'undefined') return;
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'strict',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    themeVariables: {
+      primaryColor: '#1a1a1a',
+      primaryTextColor: '#e5e5e5',
+      primaryBorderColor: '#06B6D4',
+      lineColor: '#94a3b8',
+      secondaryColor: '#1f2937',
+      tertiaryColor: '#111827',
+      background: '#0f0f0f',
+      mainBkg: '#1a1a1a',
+      nodeBorder: '#06B6D4',
+      clusterBkg: '#111827',
+      clusterBorder: '#334155',
+    },
+  });
+  __paperMermaidConfigured = true;
+}
+
+function renderPaperMermaid(host, src) {
+  ensurePaperMermaidConfigured();
+  if (typeof mermaid === 'undefined') return;
+  const id = 'paper-mmd-' + (++__paperMermaidSeq);
+  mermaid
+    .render(id, src)
+    .then(({ svg }) => {
+      host.innerHTML = svg;
+    })
+    .catch((err) => {
+      console.error('[paper-guide] Mermaid render failed', err);
+      const fallback = document.createElement('pre');
+      fallback.className = 'concept-diagram';
+      fallback.textContent = src;
+      host.replaceWith(fallback);
+    });
+}
+
 /* === Slugify paper name/title for anchor IDs === */
 
 function slugifyPaperName(str) {
@@ -137,7 +184,13 @@ function buildPaperIntuitiveContent(paper) {
     container.appendChild(analogy);
   }
 
-  if (paper.diagram) {
+  if (paper.diagram_mermaid) {
+    const host = document.createElement('div');
+    host.className = 'concept-diagram-mermaid mermaid';
+    host.textContent = paper.diagram_mermaid;
+    container.appendChild(host);
+    renderPaperMermaid(host, paper.diagram_mermaid);
+  } else if (paper.diagram) {
     const diagram = document.createElement('pre');
     diagram.className = 'concept-diagram';
     diagram.textContent = paper.diagram;

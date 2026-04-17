@@ -644,6 +644,113 @@ body { padding-bottom: 56px; }
 
 .resource-link:hover { opacity: 0.8; text-decoration: underline; }
 
+/* === Chapter Sub-Navigation === */
+.chapter-subnav {
+  position: sticky;
+  top: calc(var(--nav-height) + var(--sub-header-height, 56px));
+  z-index: 60;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 0;
+  margin: 8px 0 0;
+  background: rgba(15, 15, 15, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.chapter-subnav-tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 36px;
+  white-space: nowrap;
+}
+.chapter-subnav-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+.chapter-subnav-tab.active {
+  background: var(--day-color, var(--color-ch21));
+  color: #0f0f0f;
+  border-color: var(--day-color, var(--color-ch21));
+  font-weight: 600;
+}
+.chapter-section { display: none; margin-top: 16px; }
+.chapter-section.active { display: block; }
+.chapter-section[data-subsection="guide"].active .study-guide {
+  max-height: none; opacity: 1; margin-top: 20px;
+}
+
+/* === Per-Chapter Flashcards === */
+.chapter-flashcards-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; font-size: 13px; color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+.chapter-flashcards-count {
+  padding: 4px 10px; border: 1px solid var(--day-color, var(--color-ch21));
+  border-radius: 999px; color: var(--day-color, var(--color-ch21));
+}
+.chapter-flashcards-hint { opacity: 0.7; }
+.chapter-flashcards-empty {
+  padding: 32px; text-align: center; color: var(--text-secondary);
+  font-family: var(--font-mono); font-size: 13px;
+}
+.chapter-flashcards-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px; margin-top: 8px;
+}
+.chapter-flashcard {
+  position: relative; min-height: 180px; padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--day-color, var(--color-ch21));
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  overflow: hidden;
+}
+.chapter-flashcard:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+.chapter-flashcard-tag {
+  position: absolute; top: 10px; right: 12px;
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--day-color, var(--color-ch21));
+  text-transform: uppercase; letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+.chapter-flashcard-face {
+  font-size: 14px; line-height: 1.6; padding-top: 20px;
+}
+.chapter-flashcard-front { font-weight: 500; color: var(--text-primary); }
+.chapter-flashcard-back { display: none; color: var(--text-secondary); }
+.chapter-flashcard.flipped .chapter-flashcard-front { display: none; }
+.chapter-flashcard.flipped .chapter-flashcard-back { display: block; }
+
+/* === Mermaid diagram (paper cards) === */
+.concept-diagram-mermaid {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  margin: 16px 0;
+  overflow-x: auto;
+  text-align: center;
+}
+.concept-diagram-mermaid svg { max-width: 100%; height: auto; }
+
 /* === Study Guide === */
 .study-guide-toggle {
   display: inline-flex;
