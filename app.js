@@ -10,7 +10,7 @@ const STORAGE_KEYS = {
   ACTIVE_DAY: 'thesis-study-active-day',
 };
 
-const CHAPTER_KEYS = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'ch26', 'rust', 'method'];
+const CHAPTER_KEYS = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'ch26', 'rust', 'method', 'flashcards'];
 
 const POMODORO = {
   WORK_SECONDS: 25 * 60,
@@ -151,6 +151,14 @@ function switchDay(chapterKey) {
     zkSection.hidden = true;
   }
 
+  /* Lazy-init flashcards on first visit */
+  if (chapterKey === 'flashcards') {
+    const fcContainer = document.getElementById('flashcards-section');
+    if (fcContainer && fcContainer.children.length === 0 && typeof window.FLASHCARDS_UI !== 'undefined') {
+      window.FLASHCARDS_UI.init();
+    }
+  }
+
   try {
     localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, chapterKey);
   } catch {
@@ -209,8 +217,11 @@ function restoreActiveDay() {
     if (saved) {
       if (saved === 'zk') {
         switchToZKDeepdive();
-      } else if (CHAPTER_KEYS.includes(saved)) {
+      } else if (CHAPTER_KEYS.includes(saved) && saved !== 'flashcards') {
+        /* Don't restore flashcards tab on page load — let user navigate there */
         switchDay(saved);
+      } else if (saved === 'flashcards') {
+        switchDay(CHAPTER_KEYS[0]);
       } else {
         /* Backward compat: old numeric day values map to first chapter */
         switchDay(CHAPTER_KEYS[0]);
@@ -505,6 +516,10 @@ function initKeyboardShortcuts() {
         if (typeof focusSearch === 'function') {
           focusSearch();
         }
+        break;
+      case 'f':
+      case 'F':
+        switchDay('flashcards');
         break;
     }
   });

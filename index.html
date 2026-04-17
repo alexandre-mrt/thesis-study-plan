@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="technical.css">
   <link rel="stylesheet" href="zk-deepdive.css">
   <link rel="stylesheet" href="paper-cards.css">
+  <link rel="stylesheet" href="flashcards.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
@@ -59,6 +60,10 @@
           <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
             <span class="day-tab-dot" style="background: #8B5CF6"></span>
             ZK Deep Dive
+          </button>
+          <button class="day-tab" data-day="flashcards" role="tab" aria-selected="false" aria-controls="flashcards">
+            <span class="day-tab-dot" style="background: #6366F1"></span>
+            &#x1F3B4; Flashcards
           </button>
         </div>
       </div>
@@ -1277,6 +1282,16 @@
       <div id="zk-deepdive-content"></div>
     </section>
 
+    <!-- FLASHCARDS -->
+    <section class="day-section" id="flashcards" data-day="flashcards" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: #6366F1">
+        <div class="day-label">Mobile Study</div>
+        <h1 class="day-title">Flashcards</h1>
+        <p class="day-date">Tap to flip &middot; Got it / Retry</p>
+      </div>
+      <div id="flashcards-section"></div>
+    </section>
+
   </main>
 
   <!-- Keyboard Shortcuts Help -->
@@ -1314,6 +1329,8 @@
   <script src="zk-deepdive.js"></script>
   <script src="study-guide.js"></script>
   <script src="search.js"></script>
+  <script src="flashcard-data.js"></script>
+  <script src="flashcards.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

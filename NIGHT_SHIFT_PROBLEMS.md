@@ -53,3 +53,22 @@
 - **What I did**: Scope was index.html only. Left app.js untouched. The hint in index.html still shows `1-6` which is accurate for the current app.js behavior (keys 1-6 map to ch21-ch25 + rust, bypassing ch26).
 - **Confidence**: HIGH
 - **User action needed**: Update app.js — add 'ch26' at index 5 in CHAPTER_KEYS (before 'rust'), add `case '7': switchDay(CHAPTER_KEYS[6]); break;`, and update the shortcuts hint in index.html from `<kbd>1</kbd>-<kbd>6</kbd>` to `<kbd>1</kbd>-<kbd>7</kbd>`.
+
+---
+
+## Problems — 2026-04-17 (T19 Flashcards)
+
+### ASSUMPTION: Flashcards tab not restored on page reload
+- **Iteration**: 1
+- **File**: app.js `restoreActiveDay()`
+- **What I needed**: Decision on whether to persist the flashcard tab across page reloads.
+- **What I did**: Intentionally do NOT restore 'flashcards' tab on page load — restores ch21 instead. Rationale: flashcards is a session tool, not a primary study view. User opens it via nav or `F` key.
+- **Confidence**: MEDIUM
+- **User action needed**: If you want flashcards to restore on reload, remove the `saved !== 'flashcards'` guard in `restoreActiveDay()` in app.js.
+
+### ASSUMPTION: No --color-ch26 CSS variable used in flashcards
+- **Iteration**: 1
+- **File**: flashcards.js (renderCard), flashcards.css
+- **What I needed**: ch26 color from CSS variable (undefined in style.css per prior agent note).
+- **What I did**: Used hardcoded `#8B5CF6` (purple) for ch26 accent in the `chapterColors` map, consistent with prior agent decision. Marked inline comment NIGHT-SHIFT-REVIEW in flashcards.js renderCard function.
+- **Confidence**: HIGH (same fallback color the prior agent chose)
