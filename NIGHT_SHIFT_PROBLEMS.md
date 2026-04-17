@@ -53,3 +53,17 @@
 - **What I did**: Scope was index.html only. Left app.js untouched. The hint in index.html still shows `1-6` which is accurate for the current app.js behavior (keys 1-6 map to ch21-ch25 + rust, bypassing ch26).
 - **Confidence**: HIGH
 - **User action needed**: Update app.js — add 'ch26' at index 5 in CHAPTER_KEYS (before 'rust'), add `case '7': switchDay(CHAPTER_KEYS[6]); break;`, and update the shortcuts hint in index.html from `<kbd>1</kbd>-<kbd>6</kbd>` to `<kbd>1</kbd>-<kbd>7</kbd>`.
+
+### BLOCKED: skill.md write outside worktree sandbox (T17)
+- **Iteration**: 1
+- **File**: `~/.claude/skills/morning-thesis-addon/skill.md`
+- **What I needed**: Write access to `~/.claude/skills/morning-thesis-addon/` (outside the git worktree)
+- **What I did**: The agent sandbox denies Write tool calls to paths outside the worktree root. The full skill.md content is included in the T17 task output — copy it manually.
+- **Confidence**: HIGH
+- **User action needed**: Run the following to install the skill:
+  ```
+  mkdir -p ~/.claude/skills/morning-thesis-addon
+  # Then paste the content from the T17 agent output into:
+  # ~/.claude/skills/morning-thesis-addon/skill.md
+  ```
+  The complete skill.md content is in the T17 night-shift agent final message.
