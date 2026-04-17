@@ -37,12 +37,7 @@
  * 2. Section container + page header
  * =========================================================== */
 #plan-section {
-  display: none;
   animation: fadeIn var(--transition-base) ease;
-}
-
-#plan-section.active {
-  display: block;
 }
 
 .plan-page-header {

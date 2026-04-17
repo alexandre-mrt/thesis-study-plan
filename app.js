@@ -694,25 +694,26 @@ function initMobileMenu() {
   const nav = $('#nav');
   if (!btn || !nav) return;
 
-  nav.classList.add('collapsed');
-
-  btn.addEventListener('click', () => {
-    const isExpanded = nav.classList.contains('expanded');
-    nav.classList.toggle('collapsed', !isExpanded);
-    nav.classList.toggle('expanded', isExpanded ? false : true);
-  });
-
-  const mediaQuery = window.matchMedia('(min-width: 769px)');
-  const handleResize = (mq) => {
-    if (mq.matches) {
-      nav.classList.remove('collapsed', 'expanded');
-    } else {
-      if (!nav.classList.contains('expanded')) {
-        nav.classList.add('collapsed');
-      }
-    }
+  const setExpanded = (expanded) => {
+    nav.classList.toggle('expanded', expanded);
+    btn.setAttribute('aria-expanded', String(expanded));
   };
 
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setExpanded(!nav.classList.contains('expanded'));
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!nav.contains(e.target) && nav.classList.contains('expanded')) {
+      setExpanded(false);
+    }
+  });
+
+  const mediaQuery = window.matchMedia('(min-width: 901px)');
+  const handleResize = (mq) => {
+    if (mq.matches) setExpanded(false);
+  };
   mediaQuery.addEventListener('change', handleResize);
   handleResize(mediaQuery);
 }
