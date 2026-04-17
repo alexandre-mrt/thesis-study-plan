@@ -263,7 +263,8 @@ function switchDay(chapterKey) {
   }
 
   /* Lazily render SOTA section on first activation of this chapter */
-  if (!sotaRendered[chapterKey] && typeof window.SOTA !== 'undefined') {
+  if (!sotaRendered[chapterKey] && typeof window.SOTA !== 'undefined'
+      && document.getElementById(chapterKey + '-sota-container')) {
     sotaRendered[chapterKey] = true;
     window.SOTA.renderChapter(chapterKey, '#' + chapterKey + '-sota-container');
   }

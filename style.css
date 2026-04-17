@@ -1301,6 +1301,8 @@ body {
   z-index: 2;
   pointer-events: none;
   text-transform: uppercase;
+}
+
 /* === T14: Search result chapter tag === */
 .result-chapter {
   font-size: 0.68rem;

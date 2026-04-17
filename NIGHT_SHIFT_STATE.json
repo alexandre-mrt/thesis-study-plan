@@ -4,7 +4,7 @@
     "project": "thesis-study-plan",
     "branch": "feat/night-shift-2026-04-17-plan-sota",
     "started_at": "2026-04-17T16:45:00+02:00",
-    "iteration": 6,
+    "iteration": 8,
     "total_tasks": 19,
     "completed_tasks": 18,
     "mission": "Transform thesis-study-plan into full 15-week (75 sessions \u00d7 2h = 150h) thesis prep program with SOTA content, Plan tab, weekly research loop, morning briefing integration. See NIGHT_SHIFT_THESIS_PREP_SPEC.md.",
@@ -419,6 +419,14 @@
     }
   ],
   "iteration_log": [
+    {
+      "iteration": 8,
+      "started_at": "2026-04-17T21:45:00+02:00",
+      "tasks_attempted": ["T18-followup"],
+      "tasks_completed": ["fix-flashcard-counter", "fix-style-css-missing-brace", "fix-plan-js-collision", "fix-katex-dollar-delimiters", "fix-sota-container-errors"],
+      "tasks_failed": [],
+      "notes": "T18 QA report landed: 4 critical/major bugs. Fixed all 4: (a) style.css:1303 missing } — added, restored 20 T14 rules (182->202). (b) flashcards.js: root cause was name collision with app.js updateProgress() at global scope — renamed to fcUpdateProgress. Counter now 0/20 -> 1/20, bar 0% -> 5%. (c) plan.js: CHAPTER_LABELS const collision with search.js silently halted plan.js from loading — renamed to PLAN_CHAPTER_LABELS, also moved plan.js after app.js and removed defer. window.PLAN now available at page load. (d) study-guide.js: added $ and $$ KaTeX delimiters — SOTA math now renders. Also guarded SOTA container lookup in app.js to silence method/flashcards console errors."
+    },
     {
       "iteration": 0,
       "started_at": "2026-04-17T16:45:00+02:00",

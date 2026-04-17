@@ -11,7 +11,7 @@ const PLAN_SESSIONS_URL = 'study-plan/sessions.json';
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const STORAGE_KEY_PREFIX = 'plan:session:';
 
-const CHAPTER_LABELS = {
+const PLAN_CHAPTER_LABELS = {
   ch21: 'Ch 2.1', ch22: 'Ch 2.2', ch23: 'Ch 2.3', ch24: 'Ch 2.4',
   ch25: 'Ch 2.5', ch26: 'Ch 2.6', rust: 'Rust', synthesis: 'Synth',
 };
@@ -208,7 +208,7 @@ function renderCell(session, today, phaseStarts) {
   if (loadComplete(session.id)) cell.classList.add('completed');
   if (phaseStarts.has(session.id)) cell.setAttribute('data-phase-start', 'true');
 
-  cell.appendChild(el('div', 'plan-cell-code', { textContent: CHAPTER_LABELS[session.chapter] || session.chapter }));
+  cell.appendChild(el('div', 'plan-cell-code', { textContent: PLAN_CHAPTER_LABELS[session.chapter] || session.chapter }));
   const short = session.title.length > 32 ? session.title.slice(0, 30) + '…' : session.title;
   cell.appendChild(el('div', 'plan-cell-title', { textContent: short }));
 
@@ -364,7 +364,7 @@ function populateModal(session) {
   const header = el('div', 'plan-modal-header');
   const eyebrow = el('div', 'plan-modal-eyebrow');
   eyebrow.append(
-    el('span', null, { textContent: `${CHAPTER_LABELS[session.chapter] || session.chapter} · ${session.id}` }),
+    el('span', null, { textContent: `${PLAN_CHAPTER_LABELS[session.chapter] || session.chapter} · ${session.id}` }),
     el('span', 'plan-modal-phase-tag', { textContent: session.phase }),
   );
   header.append(

@@ -93,7 +93,7 @@ function startSession() {
 
   saveDeckState();
   renderCard();
-  updateProgress();
+  fcUpdateProgress();
 }
 
 function filterCards(chapter) {
@@ -193,7 +193,7 @@ function advanceQueue() {
   fcState = { ...fcState, currentIdx: nextIdx };
   saveDeckState();
   renderCard();
-  updateProgress();
+  fcUpdateProgress();
 }
 
 function nextCard() {
@@ -244,6 +244,10 @@ function buildHTML() {
     return `<button class="fc-chip${active}" data-chapter="${ch}" aria-pressed="${ch === fcState.chapterFilter}">${FC_CHAPTER_LABELS[ch]}</button>`;
   }).join('');
 
+  const total = fcState.queue.length;
+  const done = fcState.currentIdx;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
   return `
     <div class="fc-wrapper">
       <div class="fc-top-bar">
@@ -252,12 +256,12 @@ function buildHTML() {
         </div>
         <div class="fc-top-actions">
           <button class="fc-btn-secondary" id="fc-shuffle-btn" title="New shuffled session">Shuffle</button>
-          <span class="fc-progress-label" id="fc-progress-label">0 / 0</span>
+          <span class="fc-progress-label" id="fc-progress-label">${done} / ${total}</span>
         </div>
       </div>
 
       <div class="fc-progress-bar-wrap">
-        <div class="fc-progress-bar" id="fc-progress-bar" style="width: 0%"></div>
+        <div class="fc-progress-bar" id="fc-progress-bar" style="width: ${pct}%"></div>
       </div>
 
       <div class="fc-scene" id="fc-scene">
@@ -448,7 +452,7 @@ function renderSessionEnd() {
   }
 }
 
-function updateProgress() {
+function fcUpdateProgress() {
   const total = fcState.queue.length;
   const done = fcState.currentIdx;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;

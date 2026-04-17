@@ -96,6 +96,14 @@ Group E (final):                    T18 (needs all above)
 - State + error + problems + log files initialized
 - 18 tasks planned across 5 dependency groups
 
+### Iteration 8 — T18 QA landed → 4 critical fixes (2026-04-17)
+- T18 full report: 2 critical + 2 major + 4 minor issues. Weighted verdict 3.0/5 → ITERATE.
+- **Fix #1** — `style.css:1303`: `.whats-new-badge` block missing `}`, silently consumed all rules below it (weekly-review-modal, result-chapter, pomodoro-preset-row). Rule count 182 → 202 after fix. Weekly review modal now styled.
+- **Fix #2** — `plan.js` never executed on fresh load: root cause was `const CHAPTER_LABELS` collision with `search.js` (not the `defer` timing as T18 hypothesized — defer or not, redeclaration `SyntaxError` killed the module). Renamed all occurrences to `PLAN_CHAPTER_LABELS`. Also removed `defer` and moved script tag after `app.js` as defense-in-depth. `window.PLAN` + `window.PLAN.init` now resolve at page load.
+- **Fix #3** — `flashcards.js` counter stuck at `0 / 0`: root cause was `function updateProgress()` name collision with `app.js` (both declared at global scope of classic scripts; `app.js` loads last and wins the binding). Internal calls inside flashcards.js to `updateProgress()` dispatched to app.js's resource-check progress function — silently failed to find `.resource-check` elements in the flashcards section, early-returned. Renamed to `fcUpdateProgress` inside flashcards.js. Verified via Puppeteer: `0 / 20` at session start, `1 / 20` after first "Got it", bar fills to 5%.
+- **Fix #4** — `study-guide.js` KaTeX: added `$...$` and `$$...$$` delimiters so SOTA math renders (SOTA card strings use `$` not `\(`).
+- **Also** — guarded SOTA container lookup in `app.js:266` to silence the "container not found" console errors when switching to method/flashcards tabs.
+
 ### Iteration 7 — T20 diagram upgrade + T18 QA in flight (2026-04-17)
 - User clarified: rich diagrams belong in **work product**, not Claude instructions (reverts CLAUDE.md / skill Mermaid changes; memory file `feedback_ascii_diagrams.md` rewritten).
 - T20 (new, site work product): Mermaid 10.9 CDN added in `index.html`. `zk-deepdive.js` now detects `{ type: 'mermaid', src }` and renders SVG via `mermaid.render()`, with ASCII `<pre>` fallback on error. First section in `zk-deepdive-data.js` ("Traditional ID vs ZK Proof") converted to `flowchart LR` to showcase. Dark theme aligned with site palette.
