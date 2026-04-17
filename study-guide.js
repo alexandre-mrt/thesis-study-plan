@@ -117,6 +117,8 @@ function buildPublicPrivateTable(entries) {
 const KATEX_DELIMITERS = [
   { left: '\\[', right: '\\]', display: true },
   { left: '\\(', right: '\\)', display: false },
+  { left: '$$', right: '$$', display: true },
+  { left: '$', right: '$', display: false },
 ];
 
 function renderMathIn(element) {

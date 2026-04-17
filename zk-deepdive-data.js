@@ -34,19 +34,21 @@ window.ZK_DEEPDIVE_SECTIONS_1 = [
       'or not. After many rounds, they are convinced the balls are different colors, but they ' +
       'never learn <em>which</em> is red and <em>which</em> is green.</li>' +
       '</ul>',
-    diagram:
-      '           TRADITIONAL ID                              ZERO-KNOWLEDGE PROOF\n' +
-      '  \n' +
-      '  You ----[ Full ID Card ]----> Bouncer         You ----[ ZK Proof ]----> Bouncer\n' +
-      '          |                     |                        |                 |\n' +
-      '          | Name: Alice         | Sees ALL               | Statement:     | Sees ONLY\n' +
-      '          | DOB:  2001-03-15    | your data              | "age >= 18"    | yes/no\n' +
-      '          | Addr: Zurich 8001   |                        |                 |\n' +
-      '          | Photo: [img]        |                        | Proof: 288B    |\n' +
-      '          | ID#: 12345678       |                        | (just math)    |\n' +
-      '  \n' +
-      '  Information leaked: 5+ fields             Information leaked: 0 fields\n' +
-      '  Privacy cost: HIGH                        Privacy cost: ZERO',
+    diagram: {
+      type: 'mermaid',
+      src:
+        'flowchart LR\n' +
+        '  subgraph TRAD["TRADITIONAL ID (leaks 5+ fields)"]\n' +
+        '    U1["You"] -- "Full ID Card<br/>Name, DOB, Addr,<br/>Photo, ID#" --> B1["Bouncer<br/>sees ALL"]\n' +
+        '  end\n' +
+        '  subgraph ZK["ZERO-KNOWLEDGE PROOF (0 fields)"]\n' +
+        '    U2["You"] -- "ZK Proof<br/>(288 bytes of math)<br/>Statement: age >= 18" --> B2["Bouncer<br/>sees ONLY yes/no"]\n' +
+        '  end\n' +
+        '  classDef trad fill:#1a1a1a,stroke:#F59E0B,color:#fca5a5;\n' +
+        '  classDef zk fill:#1a1a1a,stroke:#06B6D4,color:#86efac;\n' +
+        '  class U1,B1 trad\n' +
+        '  class U2,B2 zk\n',
+    },
     publicPrivate: [
       { item: 'Your name', status: 'public', holder: 'Bouncer', when: 'Traditional ID' },
       { item: 'Your name', status: 'private', holder: 'Only you', when: 'ZK proof' },

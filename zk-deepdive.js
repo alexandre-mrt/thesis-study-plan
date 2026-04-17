@@ -8,6 +8,52 @@
 /* === Constants === */
 const ZK_DEEPDIVE_STORAGE_KEY = 'zkDeepdiveState';
 
+/* === Mermaid integration === */
+let __mermaidConfigured = false;
+let __mermaidSeq = 0;
+
+function ensureMermaidConfigured() {
+  if (__mermaidConfigured || typeof mermaid === 'undefined') return;
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'strict',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    themeVariables: {
+      primaryColor: '#1a1a1a',
+      primaryTextColor: '#e5e5e5',
+      primaryBorderColor: '#06B6D4',
+      lineColor: '#94a3b8',
+      secondaryColor: '#1f2937',
+      tertiaryColor: '#111827',
+      background: '#0f0f0f',
+      mainBkg: '#1a1a1a',
+      nodeBorder: '#06B6D4',
+      clusterBkg: '#111827',
+      clusterBorder: '#334155',
+    },
+  });
+  __mermaidConfigured = true;
+}
+
+function renderMermaidWhenVisible(host, src) {
+  ensureMermaidConfigured();
+  if (typeof mermaid === 'undefined') return;
+  const id = 'zk-dd-mmd-' + (++__mermaidSeq);
+  mermaid
+    .render(id, src)
+    .then(({ svg }) => {
+      host.innerHTML = svg;
+    })
+    .catch((err) => {
+      console.error('[zk-deepdive] Mermaid render failed', err);
+      const fallback = document.createElement('pre');
+      fallback.className = 'zk-dd-diagram';
+      fallback.textContent = src;
+      host.replaceWith(fallback);
+    });
+}
+
 /* === State Persistence === */
 
 function loadDeepdiveState() {
@@ -125,7 +171,7 @@ function buildDeepdiveSectionCard(sectionData, index, savedState) {
   contentDiv.innerHTML = sectionData.content;
   body.appendChild(contentDiv);
 
-  /* ASCII diagram */
+  /* Diagram (ASCII fallback or Mermaid) */
   if (sectionData.diagram) {
     const diagramWrap = document.createElement('div');
     diagramWrap.className = 'zk-dd-diagram-wrap';
@@ -133,13 +179,24 @@ function buildDeepdiveSectionCard(sectionData, index, savedState) {
     const diagramLabel = document.createElement('span');
     diagramLabel.className = 'zk-dd-diagram-label';
     diagramLabel.textContent = 'Diagram';
-
-    const diagram = document.createElement('pre');
-    diagram.className = 'zk-dd-diagram';
-    diagram.textContent = sectionData.diagram;
-
     diagramWrap.appendChild(diagramLabel);
-    diagramWrap.appendChild(diagram);
+
+    const raw = sectionData.diagram;
+    const mermaidSrc = typeof raw === 'object' && raw.type === 'mermaid' ? raw.src : null;
+
+    if (mermaidSrc && typeof mermaid !== 'undefined') {
+      const host = document.createElement('div');
+      host.className = 'zk-dd-diagram-mermaid mermaid';
+      host.textContent = mermaidSrc;
+      diagramWrap.appendChild(host);
+      renderMermaidWhenVisible(host, mermaidSrc);
+    } else {
+      const diagram = document.createElement('pre');
+      diagram.className = 'zk-dd-diagram';
+      diagram.textContent = typeof raw === 'string' ? raw : (raw && raw.src) || '';
+      diagramWrap.appendChild(diagram);
+    }
+
     body.appendChild(diagramWrap);
   }
 

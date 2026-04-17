@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https://i.ytimg.com https://img.youtube.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; connect-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
   <title>Thesis Study Plan &mdash; By Chapter</title>
   <meta name="description" content="Interactive thesis study plan organized by chapter: Anonymous Credentials, Confidential TX, TEE, Private Payments, ZK Proof Systems, and Rust">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="print.css" media="print">
   <link rel="stylesheet" href="technical.css">
   <link rel="stylesheet" href="zk-deepdive.css">
   <link rel="stylesheet" href="paper-cards.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="plan.css">
+  <link rel="stylesheet" href="flashcards.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js" integrity="sha384-WmdflGW9aGfoBdHc4rRyWzYuAjEmDwMdGdiPNacbwfGKxBW/SO6guzuQ76qjnSlr" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -56,9 +61,17 @@
             <span class="day-tab-dot" style="background: #F43F5E"></span>
             Method
           </button>
+          <button class="day-tab" data-day="plan" role="tab" aria-selected="false" aria-controls="plan-section-wrap">
+            <span class="day-tab-dot" style="background: #6366F1"></span>
+            &#128197; Plan
+          </button>
           <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
             <span class="day-tab-dot" style="background: #8B5CF6"></span>
             ZK Deep Dive
+          </button>
+          <button class="day-tab" data-day="flashcards" role="tab" aria-selected="false" aria-controls="flashcards">
+            <span class="day-tab-dot" style="background: #6366F1"></span>
+            &#x1F3B4; Flashcards
           </button>
         </div>
       </div>
@@ -101,6 +114,11 @@
         <button class="pomo-btn" id="pomo-start">Start</button>
         <button class="pomo-btn" id="pomo-pause" disabled>Pause</button>
         <button class="pomo-btn pomo-btn-secondary" id="pomo-reset">Reset</button>
+      </div>
+      <!-- T14: Preset mode indicator -->
+      <div class="pomodoro-preset-row">
+        <span class="pomodoro-preset-label">Mode</span>
+        <span class="pomodoro-mode" id="pomodoro-mode">25/5</span>
       </div>
       <div class="pomodoro-hint">Press <kbd>Space</kbd> to toggle</div>
     </div>
@@ -239,6 +257,7 @@
         <button class="study-guide-toggle" style="--day-color: var(--color-ch21)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="2" data-block="1"></div>
         <div class="paper-guide-container" data-chapter="ch21"></div>
+        <div id="ch21-sota-container" class="sota-container"></div>
       </div>
     </section>
 
@@ -348,6 +367,7 @@
         <button class="study-guide-toggle" style="--day-color: var(--color-ch22)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="ch22" data-block="1"></div>
         <div class="paper-guide-container" data-chapter="ch22"></div>
+        <div id="ch22-sota-container" class="sota-container"></div>
       </div>
     </section>
 
@@ -480,6 +500,7 @@
         <button class="study-guide-toggle" style="--day-color: var(--color-ch23)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="2" data-block="2"></div>
         <div class="paper-guide-container" data-chapter="ch23"></div>
+        <div id="ch23-sota-container" class="sota-container"></div>
       </div>
     </section>
 
@@ -691,6 +712,7 @@
         <button class="study-guide-toggle" style="--day-color: var(--color-ch24)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="3" data-block="2"></div>
         <div class="paper-guide-container" data-chapter="ch24"></div>
+        <div id="ch24-sota-container" class="sota-container"></div>
       </div>
     </section>
 
@@ -850,6 +872,7 @@
         <button class="study-guide-toggle" style="--day-color: var(--color-ch25)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="1" data-block="2"></div>
         <div class="paper-guide-container" data-chapter="ch25"></div>
+        <div id="ch25-sota-container" class="sota-container"></div>
       </div>
     </section>
 
@@ -868,6 +891,7 @@
           <strong>Objectives:</strong> Understand Sui-specific privacy primitives: zkLogin (OIDC + ZKP authentication), ZK Authenticator (policy-private authorization), and the upcoming confidential transaction design.
         </div>
         <div class="paper-guide-container" data-chapter="ch26"></div>
+        <div id="ch26-sota-container" class="sota-container"></div>
       </div>
     </section>
 
@@ -947,6 +971,7 @@
         </div>
         <button class="study-guide-toggle" style="--day-color: var(--color-rust)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="rust" data-block="1"></div>
+        <div id="rust-sota-container" class="sota-container"></div>
       </div>
     </section>
 
@@ -1272,16 +1297,85 @@
 
     </section>
 
+    <!-- PLAN — 15-week session grid -->
+    <section class="day-section" id="plan-section-wrap" data-day="plan" role="tabpanel" hidden>
+      <div id="plan-section"></div>
+    </section>
+
     <!-- ZK DEEP DIVE -->
     <section id="zk-deepdive" role="tabpanel" hidden>
       <div id="zk-deepdive-content"></div>
+    </section>
+
+    <!-- FLASHCARDS -->
+    <section class="day-section" id="flashcards" data-day="flashcards" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: #6366F1">
+        <div class="day-label">Mobile Study</div>
+        <h1 class="day-title">Flashcards</h1>
+        <p class="day-date">Tap to flip &middot; Got it / Retry</p>
+      </div>
+      <div id="flashcards-section"></div>
     </section>
 
   </main>
 
   <!-- Keyboard Shortcuts Help -->
   <div class="shortcuts-hint" id="shortcuts-hint">
-    <kbd>1</kbd>-<kbd>6</kbd> Switch chapters &middot; <kbd>Z</kbd> ZK Deep Dive &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
+    <kbd>1</kbd>-<kbd>6</kbd> Switch chapters &middot; <kbd>Z</kbd> ZK Deep Dive &middot; <kbd>P</kbd> Plan &middot; <kbd>N</kbd> Next session &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
+  </div>
+
+  <!-- T14: Friday Weekly Review Modal -->
+  <div class="weekly-review-modal" id="weekly-review-modal" role="dialog" aria-modal="true" aria-labelledby="weekly-review-title" hidden>
+    <div class="weekly-review-card">
+      <h2 class="weekly-review-title" id="weekly-review-title">Friday review &mdash; 10 min</h2>
+      <div class="weekly-review-checklist">
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="deep-understanding">
+          <span>What did I understand deeply this week?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="still-fuzzy">
+          <span>What still feels fuzzy?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="reread-paper">
+          <span>Which paper would I re-read first?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="advisor-question">
+          <span>One open question for the advisor?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="plan-sessions">
+          <span>Did I finish this week&rsquo;s plan sessions?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="research-queue">
+          <span>Any research-queue item promoted to P0?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="lexicon-entry">
+          <span>Lexicon entry to add?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="sota-update">
+          <span>SOTA update to schedule?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="rust-exercise">
+          <span>Rust exercise that compiled first try?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="energy-reading">
+          <span>Emotion / energy reading this week?</span>
+        </label>
+      </div>
+      <textarea class="weekly-review-notes" id="weekly-review-notes" placeholder="Notes (optional)..." rows="3"></textarea>
+      <div class="weekly-review-actions">
+        <button class="weekly-review-btn weekly-review-btn-primary" id="weekly-review-save">Save notes</button>
+        <button class="weekly-review-btn weekly-review-btn-secondary" id="weekly-review-skip">Skip today</button>
+      </div>
+    </div>
   </div>
 
   <script src="lexicon.js"></script>
@@ -1309,11 +1403,23 @@
   <script src="ch26-papers-guide.js"></script>
   <script src="ch26-papers-technical.js"></script>
   <script src="paper-guide.js"></script>
+  <!-- SOTA data files -->
+  <script src="sota-ch21.js"></script>
+  <script src="sota-ch22.js"></script>
+  <script src="sota-ch23.js"></script>
+  <script src="sota-ch24.js"></script>
+  <script src="sota-ch25.js"></script>
+  <script src="sota-ch26.js"></script>
+  <script src="sota-rust.js"></script>
+  <script src="sota-renderer.js"></script>
   <script src="zk-deepdive-data.js"></script>
   <script src="zk-deepdive-data2.js"></script>
   <script src="zk-deepdive.js"></script>
   <script src="study-guide.js"></script>
   <script src="search.js"></script>
+  <script src="flashcard-data.js"></script>
+  <script src="flashcards.js"></script>
   <script src="app.js"></script>
+  <script src="plan.js"></script>
 </body>
 </html>

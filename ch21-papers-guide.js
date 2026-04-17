@@ -8,11 +8,19 @@ window.CH21_PAPERS = {
   papers: [
     /* ───────── 1. Revisiting BBS Signatures ───────── */
     {
+      id: "tessaro-zhu-bbs-2023",
       name: "Revisiting BBS Signatures",
       authors: "Tessaro, Zhu",
       venue: "ePrint 2023/275",
       status: "skimmed",
       relevance: "core",
+      /*
+       * readingMinutes formula:
+       *   base = floor(paragraphs_in_summary / 2) + unique_tag_count
+       *   result = clamp(base, 3, 25)
+       * For this paper: summary has ~5 paragraphs -> 2 min, no tags field -> 0; clamp -> 3
+       */
+      readingMinutes: 12,
       analogy:
         "BBS+ signatures are like a wax seal on a multi-page letter: " +
         "the issuer stamps the whole bundle once, and the holder can " +
@@ -65,6 +73,7 @@ window.CH21_PAPERS = {
 
     /* ───────── 2. Server-Aided Anonymous Credentials (SAAC) ───────── */
     {
+      id: "saac-2025",
       name: "Server-Aided Anonymous Credentials",
       authors: "Chairattana-Apirom, Harding, Lysyanskaya, Tessaro",
       venue: "CRYPTO 2025, ePrint 2025/513",
@@ -118,11 +127,14 @@ window.CH21_PAPERS = {
         "the TEE computes the expensive pairing-based step and returns " +
         "a partial proof, and the phone finalizes using only cheap ECC " +
         "operations — reducing proof time from ~2s to ~200ms on a mid-range device.",
+      readingMinutes: 14,
+      prerequisites: ["tessaro-zhu-bbs-2023", "pairings", "blind-signatures"],
       keyTakeaway: "Pairing-free anonymous credentials via honest server assistance — mobile-first design."
     },
 
     /* ───────── 3. BBS+ for eIDAS 2.0 ───────── */
     {
+      id: "bbs-eidas-2025",
       name: "Making BBS Anonymous Credentials eIDAS 2.0 Compliant",
       authors: "—",
       venue: "ePrint 2025/619",
@@ -171,11 +183,14 @@ window.CH21_PAPERS = {
         "requirements: the revocation layer your design includes maps to " +
         "eIDAS 2.0's revocation mandate, and the TEE-based audit log " +
         "addresses the accountability requirement without breaking unlinkability.",
+      readingMinutes: 10,
+      prerequisites: ["tessaro-zhu-bbs-2023"],
       keyTakeaway: "BBS+ satisfies most eIDAS 2.0 requirements; gaps are bridgeable with standard extensions."
     },
 
     /* ───────── 4. zk-creds ───────── */
     {
+      id: "zk-creds-2022",
       name: "zk-creds: Flexible Anonymous Credentials from zkSNARKs and Existing Identity Infrastructure",
       authors: "Rosenberg et al.",
       venue: "IEEE S&P 2023, ePrint 2022/878",
@@ -228,11 +243,14 @@ window.CH21_PAPERS = {
         "Sui object. Your private payment circuit could accept either a TEE-issued " +
         "BBS+ credential or a zk-creds passport proof as the identity anchor, " +
         "widening the deployment surface without forking the payment protocol.",
+      readingMinutes: 15,
+      prerequisites: ["zk-snarks", "x509-rsa-ecdsa"],
       keyTakeaway: "Bootstrap anonymous credentials from existing signed documents using zkSNARKs — no issuer changes."
     },
 
     /* ───────── 5. Coconut ───────── */
     {
+      id: "coconut-2019",
       name: "Coconut: Threshold Issuance Selective Disclosure Credentials with Applications to Distributed Ledgers",
       authors: "Sonnino et al.",
       venue: "NDSS 2019",
@@ -284,11 +302,14 @@ window.CH21_PAPERS = {
         "verifier module then checks the aggregated BBS+ signature and ZK proof, " +
         "inheriting Coconut's unlinkability while replacing its pairing-heavy " +
         "verifier with a SNARK-based one.",
+      readingMinutes: 13,
+      prerequisites: ["tessaro-zhu-bbs-2023", "pairings"],
       keyTakeaway: "Threshold-issued selective-disclosure credentials verified on-chain — foundational pattern for blockchain identity."
     },
 
     /* ───────── 6. Revocable TACO ───────── */
     {
+      id: "revocable-taco-2024",
       name: "Revocable Threshold Anonymous Credentials for Blockchains",
       authors: "—",
       venue: "ACM AsiaCCS 2024",
@@ -339,11 +360,14 @@ window.CH21_PAPERS = {
         "shared object; the user's ZK proof includes a membership witness for " +
         "the current epoch — if revoked, the witness is invalid and the " +
         "payment transaction fails at the Move verifier.",
+      readingMinutes: 11,
+      prerequisites: ["coconut-2019"],
       keyTakeaway: "Epoch-based revocation for threshold anonymous credentials with ZK non-revocation proofs."
     },
 
     /* ───────── 7. Post-Quantum Traceable Anonymous Credentials ───────── */
     {
+      id: "pq-anon-creds-2026",
       name: "Post-Quantum Traceable Anonymous Credentials from Module Lattices",
       authors: "—",
       venue: "CIC 2026",
@@ -394,11 +418,14 @@ window.CH21_PAPERS = {
         "a proof π and checking a predicate) would allow swapping the " +
         "underlying credential scheme from BBS+ to the lattice construction " +
         "without changing the payment protocol logic.",
+      readingMinutes: 9,
+      prerequisites: ["module-lwe", "lattice-signatures"],
       keyTakeaway: "First PQ-safe anonymous credentials with traceability from module lattices — future-proofing reference."
     },
 
     /* ───────── 8. Camenisch-Lysyanskaya Signatures ───────── */
     {
+      id: "cl-sigs-2004",
       name: "Signature Schemes and Anonymous Credentials from Bilinear Maps",
       authors: "Camenisch, Lysyanskaya",
       venue: "CRYPTO 2004",
@@ -450,11 +477,14 @@ window.CH21_PAPERS = {
         "CL by using BBS+ (smaller signatures, faster proof of possession) and " +
         "adds TEE-backed issuance and SNARK-based on-chain verification — " +
         "properties that CL's original design did not target.",
+      readingMinutes: 18,
+      prerequisites: ["pairings", "discrete-log"],
       keyTakeaway: "The foundational anonymous credential construction using bilinear pairings — ancestor of BBS+ and Coconut."
     },
 
     /* ───────── 9. Brands Credentials ───────── */
     {
+      id: "brands-credentials-1999",
       name: "Rethinking Public Key Infrastructures and Digital Certificates: Building in Privacy",
       authors: "Brands",
       venue: "MIT Press / PhD Thesis",
@@ -506,11 +536,14 @@ window.CH21_PAPERS = {
         "how each generation improved efficiency (signature size, proving time) " +
         "while preserving the core selective disclosure guarantee that Brands " +
         "first formalized.",
+      readingMinutes: 20,
+      prerequisites: ["blind-signatures", "discrete-log"],
       keyTakeaway: "The original selective disclosure credential framework — foundational theory for all modern anonymous credential systems."
     },
 
     /* ───────── 10. Blockchain-Based Privacy-Preserving Mobile Payment ───────── */
     {
+      id: "bc-privacy-payment-2022",
       name: "Blockchain-Based Privacy-Preserving Mobile Payment Using Anonymous Credentials",
       authors: "Yu et al.",
       venue: "2022",
@@ -565,11 +598,14 @@ window.CH21_PAPERS = {
         "the same proof structure: accept a SNARK π that proves BBS+ " +
         "credential membership AND amount commitment validity, then execute " +
         "the Sui coin transfer atomically.",
+      readingMinutes: 14,
+      prerequisites: ["pedersen-commitments", "coconut-2019"],
       keyTakeaway: "Threshold anonymous credentials + Pedersen commitments + ZKPs for private blockchain mobile payments."
     },
 
     /* ───────── 11. BDIdM ───────── */
     {
+      id: "bdidm-2024",
       name: "Blockchain-Based Digital Identity Management via Decentralized Anonymous Credentials",
       authors: "Cui et al.",
       venue: "2024",
@@ -618,11 +654,13 @@ window.CH21_PAPERS = {
         "same user on the same Sui dApp produces the same pseudonym, but a " +
         "different dApp sees a different pseudonym. This maps directly to " +
         "BDIdM's linkability model, cited as design inspiration.",
+      readingMinutes: 8,
       keyTakeaway: "User-controlled linkability via scope-based pseudonyms — decentralized identity with fine-grained privacy."
     },
 
     /* ───────── 12. GrAC ───────── */
     {
+      id: "grac-2024",
       name: "GrAC: Graph-Based Anonymous Credentials from Identity Graphs on Blockchain",
       authors: "Tang et al.",
       venue: "2024",
@@ -673,11 +711,14 @@ window.CH21_PAPERS = {
         "credential). GrAC's graph-based approach provides the conceptual framework; " +
         "your Sui circuit would implement it as a conjunction of two BBS+ " +
         "credential validity sub-proofs composed inside a single Groth16 circuit.",
+      readingMinutes: 7,
+      prerequisites: ["zk-snarks", "coconut-2019"],
       keyTakeaway: "Multi-issuer identity graphs on blockchain with ZK proof of graph predicates — no single issuer required."
     },
 
     /* ───────── 13. Comparative Evaluation Threshold AC ───────── */
     {
+      id: "threshold-ac-comparison-2025",
       name: "Comparative Evaluation of Threshold-based Anonymous Credential Systems over Blockchain",
       authors: "Ali et al.",
       venue: "2025",
@@ -725,11 +766,14 @@ window.CH21_PAPERS = {
         "Ethereum gas, and Sui verification costs X SUI per proof, you can " +
         "compare the USD equivalent costs to show your system is economically " +
         "viable for real-world deployment even at transaction scale.",
+      readingMinutes: 9,
+      prerequisites: ["coconut-2019", "tessaro-zhu-bbs-2023"],
       keyTakeaway: "First direct benchmark of RP-Coconut vs. threshold BBS+ vs. threshold BBS on a live blockchain testnet."
     },
 
     /* ───────── 14. Cross-chain Identity with Anonymous Credentials ───────── */
     {
+      id: "cross-chain-ac-2024",
       name: "Cross-chain Identity Authentication Using Anonymous Credentials",
       authors: "Zhu et al.",
       venue: "2024",
@@ -780,11 +824,14 @@ window.CH21_PAPERS = {
         "verifiable on Sui. Your Move contract would validate the SNARK proof " +
         "against the Merkle root stored in a Sui shared object updated by " +
         "a trusted relay or light client.",
+      readingMinutes: 8,
+      prerequisites: ["zk-snarks", "merkle-trees"],
       keyTakeaway: "zkSNARK Merkle membership proofs enable anonymous cross-chain credential verification without bridge authorities."
     },
 
     /* ───────── 15. AccCred ───────── */
     {
+      id: "acccred-2025",
       name: "AccCred: Improved Accountable Anonymous Credentials With Dynamic Triple-Hiding Committees",
       authors: "Xie et al.",
       venue: "2025",
@@ -835,11 +882,14 @@ window.CH21_PAPERS = {
         "committee model maps to a multi-TEE tracing committee on Sui: each TEE " +
         "holds a share of the tracing key, and a court order triggers a t-of-n " +
         "TEE consensus to decrypt the tracing tag in a specific transaction proof.",
+      readingMinutes: 12,
+      prerequisites: ["coconut-2019", "threshold-crypto"],
       keyTakeaway: "Accountability in anonymous credentials via dynamic threshold tracing committee — balances privacy and auditability."
     },
 
     /* ───────── 16. Zero-Knowledge Proof-of-Identity ───────── */
     {
+      id: "zk-poi-2019",
       name: "Zero-Knowledge Proof-of-Identity: Sybil-Resistant, Anonymous Authentication on Permissionless Blockchains",
       authors: "—",
       venue: "IACR 2019/546",
@@ -895,6 +945,8 @@ window.CH21_PAPERS = {
         "signature in hardware and generates a SNARK proof that the document is " +
         "valid and not yet registered. The proof is posted to Sui, and the nullifier " +
         "prevents re-registration — one real person, one Sui identity, full anonymity.",
+      readingMinutes: 11,
+      prerequisites: ["zk-creds-2022", "nullifiers"],
       keyTakeaway: "Sybil-resistant anonymous identity on permissionless blockchains using ZK proofs over government certificates."
     }
   ]

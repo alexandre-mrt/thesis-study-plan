@@ -713,6 +713,8 @@ body {
   color: var(--text-primary);
   font-size: 0.85rem;
   width: 220px;
+  max-width: 100%;
+  min-width: 0;
   transition: width 0.3s ease, border-color 0.2s;
   font-family: var(--font-body);
 }
@@ -720,7 +722,7 @@ body {
 .concept-search:focus {
   outline: none;
   border-color: var(--day-color, var(--color-day1));
-  width: 320px;
+  width: min(320px, 100%);
   background: rgba(255,255,255,0.08);
 }
 
@@ -1151,4 +1153,325 @@ body {
   .exercise-question { color: #111; }
   .exercise-toggle { display: none !important; }
   .exercise-hint, .exercise-answer { display: block !important; color: #333; background: #f5f5f5; border-left-color: #333; }
+}
+
+/* === SOTA Section Styles === */
+.sota-container {
+  margin-top: 2rem;
+}
+
+.sota-card__badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.sota-card__badge--new {
+  background: #10B981;
+  color: #000;
+}
+
+.sota-card__math {
+  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.sota-card__section-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.sota-card__recap-long {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+
+.sota-card__why-thesis {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--day-color, var(--color-day1));
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: 0.75rem;
+}
+
+.sota-card__link-row {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sota-card__updated {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+/* === Paper Card UX Additions (T13) === */
+
+/* Reading-time pill — appears in .paper-badges alongside status/relevance badges */
+.reading-time {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+/* Prerequisites block — shown inside the intuitive-content panel */
+.prereqs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+.prereqs-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.prereq-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.prereq-link:hover {
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.25);
+  text-decoration: underline;
+}
+
+/* "What's New" badge — absolute-positioned top-right of .paper-card */
+.paper-card {
+  position: relative;
+}
+
+.whats-new-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #10B981;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  z-index: 2;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+/* === T14: Search result chapter tag === */
+.result-chapter {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-align: right;
+  margin-left: auto;
+  padding-left: 0.5rem;
+  font-family: var(--font-mono);
+}
+
+/* === T14: Pomodoro preset mode indicator === */
+.pomodoro-preset-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.pomodoro-preset-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pomodoro-mode {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+/* === T14: Friday Weekly Review Modal === */
+.weekly-review-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 1rem;
+}
+
+.weekly-review-modal[hidden] {
+  display: none;
+}
+
+.weekly-review-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 28px 28px 24px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-card);
+}
+
+.weekly-review-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
+
+.weekly-review-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.weekly-review-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.weekly-review-item input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--color-ch25);
+  cursor: pointer;
+}
+
+.weekly-review-item:hover {
+  color: var(--text-primary);
+}
+
+.weekly-review-notes {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0.6rem 0.75rem;
+  resize: vertical;
+  outline: none;
+  margin-bottom: 1.25rem;
+}
+
+.weekly-review-notes:focus {
+  border-color: var(--color-ch25);
+}
+
+.weekly-review-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.weekly-review-btn {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.weekly-review-btn:hover {
+  opacity: 0.85;
+}
+
+.weekly-review-btn-primary {
+  background: var(--color-ch25);
+  color: #fff;
+}
+
+.weekly-review-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 540px) {
+  .weekly-review-card {
+    padding: 20px 16px 16px;
+  }
+  .weekly-review-actions {
+    flex-direction: column-reverse;
+  }
+  .weekly-review-btn {
+    width: 100%;
+    text-align: center;
+  }
 }

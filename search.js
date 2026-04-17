@@ -10,6 +10,11 @@ const HIGHLIGHT_DURATION_MS = 1500;
 const SCROLL_DELAY_MS = 150;
 const EXPAND_DELAY_MS = 100;
 
+// T14: Year boost thresholds (use current year at init time)
+const CURRENT_YEAR = new Date().getFullYear();
+const YEAR_BOOST_CURRENT = 10;
+const YEAR_BOOST_RECENT = 5; // current year - 1
+
 const MATCH_TYPE = {
   EXACT_NAME: 'exact',
   NAME_CONTAINS: 'name',
@@ -50,6 +55,17 @@ const CHAPTER_LABELS = {
   'rust': 'RS',
 };
 
+/* SOTA data accessors (matches SOTA_DATA_ACCESSORS in sota-renderer.js) */
+const SOTA_SEARCH_ACCESSORS = {
+  'ch21': () => window.SOTA_CH21,
+  'ch22': () => window.SOTA_CH22,
+  'ch23': () => window.SOTA_CH23,
+  'ch24': () => window.SOTA_CH24,
+  'ch25': () => window.SOTA_CH25,
+  'ch26': () => window.SOTA_CH26,
+  'rust': () => window.SOTA_RUST,
+};
+
 /* Paper data accessors */
 const PAPER_GUIDE_ACCESSORS = {
   'ch21': () => window.CH21_PAPERS,
@@ -69,9 +85,40 @@ const PAPER_TECH_ACCESSORS = {
   'ch26': () => window.CH26_PAPERS_TECH,
 };
 
+// T14: Map chapter keys to human-readable labels for result decoration
+const CHAPTER_DISPLAY_NAMES = {
+  'ch21': 'Ch 2.1 — Anon Credentials',
+  'ch22': 'Ch 2.2 — Confidential TX',
+  'ch23': 'Ch 2.3 — TEE',
+  'ch24': 'Ch 2.4 — Private Payments',
+  'ch25': 'Ch 2.5 — ZK Proof Systems',
+  'ch26': 'Ch 2.6 — Sui Primitives',
+  'rust': 'Rust',
+  'zk': 'ZK Deep Dive',
+};
+
 /* === State === */
 let searchIndex = [];
 let selectedResultIndex = -1;
+
+/* === Year Extraction === */
+
+// T14: Parse the most recent 4-digit year found in a venue string.
+// Examples: "CRYPTO 2025", "ePrint 2023/275", "2024", "NDSS 2019" → numeric year or null.
+function extractYearFromVenue(venue) {
+  if (!venue || typeof venue !== 'string') return null;
+  const matches = venue.match(/\b(20\d{2}|19\d{2})\b/g);
+  if (!matches || matches.length === 0) return null;
+  return Math.max(...matches.map(Number));
+}
+
+// T14: Compute relevance boost based on year.
+function yearBoost(year) {
+  if (year === null || year === undefined) return 0;
+  if (year >= CURRENT_YEAR) return YEAR_BOOST_CURRENT;
+  if (year >= CURRENT_YEAR - 1) return YEAR_BOOST_RECENT;
+  return 0;
+}
 
 /* === Index Building === */
 
@@ -108,6 +155,7 @@ function buildSearchIndex() {
         ];
         const searchText = searchParts.join(' ').toLowerCase();
 
+        // T14: concept entries have no year field; timestamp defaults to null (no boost)
         index.push({
           name: concept.name,
           nameLower: concept.name.toLowerCase(),
@@ -119,6 +167,7 @@ function buildSearchIndex() {
           searchText: searchText,
           guideData: concept,
           techData: techConcept,
+          timestamp: null,
         });
       });
     });
@@ -157,6 +206,8 @@ function buildSearchIndex() {
       ];
       const searchText = searchParts.join(' ').toLowerCase();
 
+      // T14: extract year from venue for recency boost
+      const paperYear = extractYearFromVenue(paper.venue);
       index.push({
         name: paper.name,
         nameLower: paper.name.toLowerCase(),
@@ -167,6 +218,41 @@ function buildSearchIndex() {
         searchText: searchText,
         guideData: paper,
         techData: techPaper,
+        timestamp: paperYear,
+      });
+    });
+  });
+
+  /* Add SOTA entries to the search index */
+  const sotaChapterKeys = Object.keys(SOTA_SEARCH_ACCESSORS);
+  sotaChapterKeys.forEach((chKey) => {
+    const getter = SOTA_SEARCH_ACCESSORS[chKey];
+    const data = getter ? getter() : null;
+    if (!data || !data.items) return;
+
+    data.items.forEach((item, itemIdx) => {
+      const searchParts = [
+        item.name || '',
+        item.authors || '',
+        item.venue || '',
+        item.recap_short || '',
+        item.recap_long || '',
+        item.why_for_thesis || '',
+        (item.tags || []).join(' '),
+      ];
+      const searchText = searchParts.join(' ').toLowerCase();
+
+      index.push({
+        name: item.name || '',
+        nameLower: (item.name || '').toLowerCase(),
+        isSota: true,
+        kind: 'sota',
+        chapterKey: chKey,
+        sotaIdx: itemIdx,
+        blockTitle: 'SOTA \u2014 Ch ' + (CHAPTER_LABELS[chKey] || chKey),
+        searchText: searchText,
+        link: item.link || '',
+        timestamp: item.year || null,
       });
     });
   });
@@ -175,6 +261,15 @@ function buildSearchIndex() {
 }
 
 /* === Search Function === */
+
+// T14: Base relevance score by match tier, then add year boost.
+// Higher score = higher relevance; we sort descending within each tier.
+function computeScore(entry, matchType) {
+  const tierBase = matchType === MATCH_TYPE.EXACT_NAME ? 100
+    : matchType === MATCH_TYPE.NAME_CONTAINS ? 50
+    : 10;
+  return tierBase + yearBoost(entry.timestamp);
+}
 
 function searchConcepts(query) {
   if (!query || query.trim().length === 0) return [];
@@ -194,10 +289,44 @@ function searchConcepts(query) {
     }
   });
 
+  // T14: Sort within each tier by score descending (year boost applies within tier)
+  const byScoreDesc = (a, b) =>
+    computeScore(b, b.matchType) - computeScore(a, a.matchType);
+
+  exactMatches.sort(byScoreDesc);
+  nameMatches.sort(byScoreDesc);
+  textMatches.sort(byScoreDesc);
+
   return [...exactMatches, ...nameMatches, ...textMatches].slice(0, SEARCH_MAX_RESULTS);
 }
 
 /* === UI Rendering === */
+
+// T14: Build the secondary chapter/phase label shown on each result row.
+// For papers: "Ch 2.1 — Anon Credentials"
+// For concepts: "Ch 2.5 — ZK Proof Systems" (derived from day/block)
+// For ZK Deep Dive entries: "ZK Deep Dive"
+// For Plan sessions: "Session S03 • W1 • Mon" (if the entry carries those fields)
+function buildResultChapterLabel(result) {
+  if (result.isPlan) {
+    const session = result.sessionId || '';
+    const week = result.weekId || '';
+    const day = result.weekDay || '';
+    return 'Session ' + session + ' \u2022 ' + week + ' \u2022 ' + day;
+  }
+  if (result.isDeepDive) {
+    return CHAPTER_DISPLAY_NAMES['zk'] || 'ZK Deep Dive';
+  }
+  if (result.isPaper) {
+    return CHAPTER_DISPLAY_NAMES[result.chapterKey] || ('Ch ' + (CHAPTER_LABELS[result.chapterKey] || result.chapterKey));
+  }
+  // Concept entry: map via DAY_BLOCK_TO_CHAPTER
+  const chKey = DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || null;
+  if (chKey) {
+    return CHAPTER_DISPLAY_NAMES[chKey] || ('Ch ' + (CHAPTER_LABELS[chKey] || chKey));
+  }
+  return result.blockTitle || '';
+}
 
 function renderSearchResults(results, query) {
   const container = document.getElementById('search-results');
@@ -228,10 +357,19 @@ function renderSearchResults(results, query) {
     const dayBadge = document.createElement('span');
     dayBadge.className = 'search-result-day';
     const isPaper = result.isPaper === true;
+    const isSota = result.isSota === true;
     const isDeepDive = result.isDeepDive === true;
-    const chapterKey = isPaper ? result.chapterKey : (isDeepDive ? 'zk' : (DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || 'ch25'));
+    const chapterKey = (isPaper || isSota) ? result.chapterKey : (isDeepDive ? 'zk' : (DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || 'ch25'));
     dayBadge.dataset.day = chapterKey;
-    dayBadge.textContent = isPaper ? ('\uD83D\uDCC4 ' + (CHAPTER_LABELS[chapterKey] || chapterKey)) : (isDeepDive ? 'ZK' : (CHAPTER_LABELS[chapterKey] || result.day));
+    if (isSota) {
+      dayBadge.textContent = '\u2728 ' + (CHAPTER_LABELS[chapterKey] || chapterKey);
+    } else if (isPaper) {
+      dayBadge.textContent = '\uD83D\uDCC4 ' + (CHAPTER_LABELS[chapterKey] || chapterKey);
+    } else if (isDeepDive) {
+      dayBadge.textContent = 'ZK';
+    } else {
+      dayBadge.textContent = CHAPTER_LABELS[chapterKey] || result.day;
+    }
 
     const name = document.createElement('span');
     name.className = 'search-result-name';
@@ -241,9 +379,25 @@ function renderSearchResults(results, query) {
     blockLabel.className = 'search-result-block';
     blockLabel.textContent = result.blockTitle;
 
+    /* Kind tag chip for SOTA results */
+    const kindChip = isSota ? (() => {
+      const chip = document.createElement('span');
+      chip.className = 'search-result-kind-chip';
+      chip.textContent = 'SOTA';
+      chip.style.cssText = 'font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:999px;background:#10B981;color:#000;margin-left:6px;vertical-align:middle;text-transform:uppercase;letter-spacing:0.04em;';
+      return chip;
+    })() : null;
+
+    // T14: Chapter/phase decoration tag
+    const chapterTag = document.createElement('span');
+    chapterTag.className = 'result-chapter';
+    chapterTag.textContent = buildResultChapterLabel(result);
+
     item.appendChild(dayBadge);
     item.appendChild(name);
+    if (kindChip) item.appendChild(kindChip);
     item.appendChild(blockLabel);
+    item.appendChild(chapterTag);
 
     item.addEventListener('click', () => {
       navigateToConcept(result);
@@ -331,6 +485,12 @@ function handleSearchKeydown(e) {
 /* === Navigation to Concept === */
 
 function navigateToConcept(result) {
+  /* Handle SOTA results */
+  if (result.isSota) {
+    navigateToSota(result);
+    return;
+  }
+
   /* Handle paper results */
   if (result.isPaper) {
     navigateToPaper(result);
@@ -410,6 +570,39 @@ function navigateToZKDeepdive(result) {
     setTimeout(() => {
       targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+      targetCard.classList.add('highlighted');
+      setTimeout(() => {
+        targetCard.classList.remove('highlighted');
+      }, HIGHLIGHT_DURATION_MS);
+    }, SCROLL_DELAY_MS);
+  }, EXPAND_DELAY_MS);
+}
+
+/* === Navigate to SOTA item === */
+
+function navigateToSota(result) {
+  /* 1. Switch to the correct chapter tab (triggers lazy SOTA render if needed) */
+  if (typeof switchDay === 'function') {
+    switchDay(result.chapterKey);
+  }
+
+  /* 2. Find the SOTA card by index and expand it */
+  setTimeout(() => {
+    const containerSelector = '#' + result.chapterKey + '-sota-container';
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    const sotaCards = container.querySelectorAll('.sota-card');
+    const targetCard = sotaCards[result.sotaIdx];
+    if (!targetCard) return;
+
+    if (!targetCard.classList.contains('open')) {
+      const header = targetCard.querySelector('.paper-header');
+      if (header) header.click();
+    }
+
+    setTimeout(() => {
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       targetCard.classList.add('highlighted');
       setTimeout(() => {
         targetCard.classList.remove('highlighted');
