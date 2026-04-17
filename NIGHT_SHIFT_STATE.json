@@ -4,10 +4,10 @@
     "project": "thesis-study-plan",
     "branch": "feat/night-shift-2026-04-17-plan-sota",
     "started_at": "2026-04-17T16:45:00+02:00",
-    "iteration": 0,
+    "iteration": 1,
     "total_tasks": 18,
     "completed_tasks": 0,
-    "mission": "Transform thesis-study-plan into full 15-week (75 sessions × 2h = 150h) thesis prep program with SOTA content, Plan tab, weekly research loop, morning briefing integration. See NIGHT_SHIFT_THESIS_PREP_SPEC.md.",
+    "mission": "Transform thesis-study-plan into full 15-week (75 sessions \u00d7 2h = 150h) thesis prep program with SOTA content, Plan tab, weekly research loop, morning briefing integration. See NIGHT_SHIFT_THESIS_PREP_SPEC.md.",
     "window": "2026-04-20 to 2026-08-01",
     "cadence": "weekdays, 10h/week, 2h/session"
   },
@@ -15,15 +15,19 @@
     {
       "id": "T1",
       "title": "Generate study-plan/sessions.json with 75 sessions",
-      "description": "Create study-plan/sessions.json covering 2026-04-20 to 2026-08-01 (weekdays only). 75 session objects: {id, date, week, phase, chapter, title, objectives[], materials[], paper_refs[], exercises[], sota_note, duration_min: 120}. Follow phase breakdown from spec §1. Each session has specific learning objectives tied to chapter content + 1 SOTA addendum.",
-      "status": "pending",
+      "description": "Create study-plan/sessions.json covering 2026-04-20 to 2026-08-01 (weekdays only). 75 session objects: {id, date, week, phase, chapter, title, objectives[], materials[], paper_refs[], exercises[], sota_note, duration_min: 120}. Follow phase breakdown from spec \u00a71. Each session has specific learning objectives tied to chapter content + 1 SOTA addendum.",
+      "status": "in_progress",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["study-plan/sessions.json", "study-plan/plan.md", "study-plan/README.md"],
-      "iterations_attempted": 0,
+      "files": [
+        "study-plan/sessions.json",
+        "study-plan/plan.md",
+        "study-plan/README.md"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -31,14 +35,16 @@
       "id": "T2",
       "title": "SOTA content: Ch 2.1 Anonymous Credentials + BBS+/PS signatures",
       "description": "Create sota-ch21.js with 2024-2026 SOTA: BBS+ RFC draft, threshold BBS+, zk-creds, PrivacyPass, rerandomizable PS refinements. Each entry: title, authors, venue, year, link, 2-paragraph recap, math highlight (KaTeX), 'why-for-thesis' note. Use WebSearch + arxiv MCP for recent papers.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["sota-ch21.js"],
-      "iterations_attempted": 0,
+      "files": [
+        "sota-ch21.js"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -46,14 +52,16 @@
       "id": "T3",
       "title": "SOTA content: Ch 2.2 Confidential TX + Bulletproofs++",
       "description": "Create sota-ch22.js: Bulletproofs++, Flashproofs refinements, Binius range proofs, ElGamal veiled TX (Aptos 2024). Same structure as T2.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["sota-ch22.js"],
-      "iterations_attempted": 0,
+      "files": [
+        "sota-ch22.js"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -61,14 +69,16 @@
       "id": "T4",
       "title": "SOTA content: Ch 2.3 TEE + attestation",
       "description": "Create sota-ch23.js: Intel TDX 2025 production, NVIDIA H100/H200 confidential compute, Nitro Enclaves v2, Mysten Seal architecture, recent side-channel CVEs (Downfall, Inception).",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["sota-ch23.js"],
-      "iterations_attempted": 0,
+      "files": [
+        "sota-ch23.js"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -76,14 +86,16 @@
       "id": "T5",
       "title": "SOTA content: Ch 2.4 Private Payments",
       "description": "Create sota-ch24.js: Penumbra mainnet 2024-2025, Aztec 3.0 + Noir client-side proving, Namada multichain, Silent Payments Bitcoin.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["sota-ch24.js"],
-      "iterations_attempted": 0,
+      "files": [
+        "sota-ch24.js"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -91,14 +103,16 @@
       "id": "T6",
       "title": "SOTA content: Ch 2.5 ZK Proof Systems (folding + Plonky3 + Binius)",
       "description": "Create sota-ch25.js: Nova/SuperNova/HyperNova/ProtoStar folding, Plonky3 release, Binius, Halo2/PSE divergence, Ligero/Brakedown 2025, GKR revival. Heavy on benchmarks.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["sota-ch25.js"],
-      "iterations_attempted": 0,
+      "files": [
+        "sota-ch25.js"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -106,14 +120,16 @@
       "id": "T7",
       "title": "SOTA content: Ch 2.6 Advanced (MPC/FHE/threshold)",
       "description": "Create sota-ch26.js: Threshold FHE (OpenFHE 2025, Zama Concrete), Silent MPC (Pianissimo), PSI (Apple 2024), threshold crypto advances.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 2,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["sota-ch26.js"],
-      "iterations_attempted": 0,
+      "files": [
+        "sota-ch26.js"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -121,28 +137,34 @@
       "id": "T8",
       "title": "SOTA content: Rust track additions",
       "description": "Create sota-rust.js: arkworks 2025, halo2_proofs + plonky3 idioms, nova-snark/Sonobe integration, async crypto for Sui Move FFI.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 2,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["sota-rust.js"],
-      "iterations_attempted": 0,
+      "files": [
+        "sota-rust.js"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
     {
       "id": "T9",
       "title": "Plan tab: plan.js renderer",
-      "description": "Create plan.js: loads sessions.json, renders 15-week × 5-day grid, color-coded cells by chapter, click → detail modal with objectives/materials/exercises, completion checkbox with localStorage key 'plan:session:<id>', progress bars (overall + this week), streak counter. Deep-link via ?session=<id>.",
+      "description": "Create plan.js: loads sessions.json, renders 15-week \u00d7 5-day grid, color-coded cells by chapter, click \u2192 detail modal with objectives/materials/exercises, completion checkbox with localStorage key 'plan:session:<id>', progress bars (overall + this week), streak counter. Deep-link via ?session=<id>.",
       "status": "pending",
       "priority": 1,
-      "depends_on": ["T1"],
+      "depends_on": [
+        "T1"
+      ],
       "parallel_group": "B",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["plan.js"],
+      "files": [
+        "plan.js"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
       "completed_at": null
@@ -150,15 +172,17 @@
     {
       "id": "T10",
       "title": "Plan tab: plan.css grid + modal styles",
-      "description": "Create plan.css: 15-col × 5-row grid, per-chapter accent colors matching existing palette, modal overlay, progress-bar styles, responsive (mobile stack). Dark theme consistent with style.css.",
-      "status": "pending",
+      "description": "Create plan.css: 15-col \u00d7 5-row grid, per-chapter accent colors matching existing palette, modal overlay, progress-bar styles, responsive (mobile stack). Dark theme consistent with style.css.",
+      "status": "in_progress",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "B",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["plan.css"],
-      "iterations_attempted": 0,
+      "files": [
+        "plan.css"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -168,11 +192,17 @@
       "description": "Edit index.html: add Plan nav button between Method and search, add plan-section. Edit app.js: handle Plan tab activation, P/N keyboard shortcuts (P opens Plan, N jumps to next uncompleted), initialize plan.js, session completion tracking. Load plan.js and plan.css.",
       "status": "pending",
       "priority": 1,
-      "depends_on": ["T9", "T10"],
+      "depends_on": [
+        "T9",
+        "T10"
+      ],
       "parallel_group": "C",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["index.html", "app.js"],
+      "files": [
+        "index.html",
+        "app.js"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
       "completed_at": null
@@ -183,11 +213,24 @@
       "description": "Edit index.html and chapter sections to include sota-ch21.js..sota-ch26.js and sota-rust.js. Add renderer hook in paper-guide.js or new sota-renderer.js to display SOTA cards within each chapter tab. Update search.js to index SOTA content.",
       "status": "pending",
       "priority": 2,
-      "depends_on": ["T2", "T3", "T4", "T5", "T6", "T7", "T8"],
+      "depends_on": [
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8"
+      ],
       "parallel_group": "C",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["index.html", "app.js", "search.js", "sota-renderer.js"],
+      "files": [
+        "index.html",
+        "app.js",
+        "search.js",
+        "sota-renderer.js"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
       "completed_at": null
@@ -198,11 +241,18 @@
       "description": "Add readingMinutes field across existing study cards (estimate from word count). Add 'prerequisites' field on paper cards with links to other concepts. Create print.css for ?print=session-<id> single-session A4 sheet. Add 'What's new' badge reading from research-log entries of last 7 days.",
       "status": "pending",
       "priority": 2,
-      "depends_on": ["T11"],
+      "depends_on": [
+        "T11"
+      ],
       "parallel_group": "D",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["style.css", "paper-guide.js", "app.js", "print.css"],
+      "files": [
+        "style.css",
+        "paper-guide.js",
+        "app.js",
+        "print.css"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
       "completed_at": null
@@ -213,11 +263,17 @@
       "description": "Update search.js: boost recent results (from research-log timestamps), show chapter+phase alongside. Add weekly-review modal auto-opening Fridays with 10-min checklist. Add 50/10 Pomodoro preset for Plan tab (keep existing 25/5 for chapters).",
       "status": "pending",
       "priority": 2,
-      "depends_on": ["T11"],
+      "depends_on": [
+        "T11"
+      ],
       "parallel_group": "D",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["search.js", "app.js", "index.html"],
+      "files": [
+        "search.js",
+        "app.js",
+        "index.html"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
       "completed_at": null
@@ -226,14 +282,19 @@
       "id": "T15",
       "title": "Research log infrastructure: dir + queue + today entry",
       "description": "Create research-log/ directory with README explaining the flow. Create research-log/TEMPLATE.md and today's entry research-log/2026-04-17.md (seeded with 4 topics). Create research-queue.md with prioritized SOTA topics not yet integrated (10-20 items).",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["research-log/README.md", "research-log/TEMPLATE.md", "research-log/2026-04-17.md", "research-queue.md"],
-      "iterations_attempted": 0,
+      "files": [
+        "research-log/README.md",
+        "research-log/TEMPLATE.md",
+        "research-log/2026-04-17.md",
+        "research-queue.md"
+      ],
+      "iterations_attempted": 1,
       "blocked_reason": null,
       "completed_at": null
     },
@@ -243,26 +304,36 @@
       "description": "Create scripts/weekly-update.sh (executable): reads research-log/ entries of last 7 days, extracts new findings into chapter data files, regenerates search index, commits with conventional message, pushes to main. Document invocation in README.md.",
       "status": "pending",
       "priority": 2,
-      "depends_on": ["T15"],
+      "depends_on": [
+        "T15"
+      ],
       "parallel_group": "D",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["scripts/weekly-update.sh", "README.md"],
+      "files": [
+        "scripts/weekly-update.sh",
+        "README.md"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
       "completed_at": null
     },
     {
       "id": "T17",
-      "title": "Morning briefing addon — thesis research digest",
+      "title": "Morning briefing addon \u2014 thesis research digest",
       "description": "Create ~/.claude/skills/morning-thesis-addon/skill.md that can be invoked by the existing morning briefing. It reads research-log/ last 7 days + study-plan/sessions.json for today's session + research-queue.md next SOTA topic. Document how to wire into existing briefing.",
       "status": "pending",
       "priority": 2,
-      "depends_on": ["T15"],
+      "depends_on": [
+        "T15"
+      ],
       "parallel_group": "D",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["~/.claude/skills/morning-thesis-addon/skill.md", "MORNING_BRIEFING_INTEGRATION.md"],
+      "files": [
+        "~/.claude/skills/morning-thesis-addon/skill.md",
+        "MORNING_BRIEFING_INTEGRATION.md"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
       "completed_at": null
@@ -273,7 +344,14 @@
       "description": "Run Puppeteer QA on locally served index.html: verify Plan tab renders grid, modals open, completion persists, keyboard shortcuts work, SOTA cards appear in chapters, no regression on existing tabs/search/Pomodoro. Screenshots for each major view. Then merge feat branch to main and confirm Vercel redeploy succeeds.",
       "status": "pending",
       "priority": 1,
-      "depends_on": ["T11", "T12", "T13", "T14", "T16", "T17"],
+      "depends_on": [
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T16",
+        "T17"
+      ],
       "parallel_group": "E",
       "agent_type": "night-qa",
       "isolation": "none",
@@ -300,7 +378,7 @@
   "decisions": [
     {
       "iteration": 0,
-      "decision": "10h/week × 15 weeks = 150h over 75 weekday sessions of 2h",
+      "decision": "10h/week \u00d7 15 weeks = 150h over 75 weekday sessions of 2h",
       "reason": "User chose this cadence via AskUserQuestion. Leaves weekends free, matches EPFL Master prep workload."
     },
     {
@@ -311,7 +389,7 @@
     {
       "iteration": 0,
       "decision": "Phase breakdown: P1 Ch21 (3w), P2 Ch22 (2w), P3 Ch23 (2w), P4 Ch24 (2w), P5 Ch25 (2w), P6 Ch26 (1w), P7 Rust (2w), P8 Synthesis (1w)",
-      "reason": "Anonymous Credentials is thesis core → most time. Rust implementation track as penultimate phase for maximal retention before September start."
+      "reason": "Anonymous Credentials is thesis core \u2192 most time. Rust implementation track as penultimate phase for maximal retention before September start."
     },
     {
       "iteration": 0,
@@ -327,6 +405,25 @@
       "tasks_completed": [],
       "tasks_failed": [],
       "notes": "Initialization iteration. Spec written, state initialized, branch created."
+    },
+    {
+      "iteration": 1,
+      "started_at": "2026-04-17T16:50:00+02:00",
+      "tasks_attempted": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T10",
+        "T15"
+      ],
+      "tasks_completed": [],
+      "tasks_failed": [],
+      "notes": "Wave A: 10 parallel agents launched (T1 sessions.json, T2-T7 SOTA chapters, T8 SOTA Rust, T10 plan.css, T15 research-log infra). All in separate worktrees with run_in_background=true. Waiting for completion notifications."
     }
   ],
   "doom_loop": {
