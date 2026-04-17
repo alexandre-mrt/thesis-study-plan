@@ -694,25 +694,21 @@ function initMobileMenu() {
   const nav = $('#nav');
   if (!btn || !nav) return;
 
-  nav.classList.add('collapsed');
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    nav.classList.toggle('expanded');
+  });
 
-  btn.addEventListener('click', () => {
-    const isExpanded = nav.classList.contains('expanded');
-    nav.classList.toggle('collapsed', !isExpanded);
-    nav.classList.toggle('expanded', isExpanded ? false : true);
+  document.addEventListener('click', (e) => {
+    if (!nav.contains(e.target) && nav.classList.contains('expanded')) {
+      nav.classList.remove('expanded');
+    }
   });
 
   const mediaQuery = window.matchMedia('(min-width: 769px)');
   const handleResize = (mq) => {
-    if (mq.matches) {
-      nav.classList.remove('collapsed', 'expanded');
-    } else {
-      if (!nav.classList.contains('expanded')) {
-        nav.classList.add('collapsed');
-      }
-    }
+    if (mq.matches) nav.classList.remove('expanded');
   };
-
   mediaQuery.addEventListener('change', handleResize);
   handleResize(mediaQuery);
 }
