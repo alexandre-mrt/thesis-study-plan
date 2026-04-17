@@ -46,6 +46,37 @@ window.CH24_PAPERS = {
         '│  2. Efficient anon accounts 5. Anon creds + payments       │\n' +
         '│  3. Privacy + auditability  6. Anon account-based systems  │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  T["SoK Privacy Taxonomy<br/>Baldimtsi et al."]\n' +
+        '  T --> L["Privacy Levels<br/>(weakest to strongest)"]\n' +
+        '  L --> L1["Confidentiality<br/><i>amounts hidden, parties known</i>"]\n' +
+        '  L --> L2["k-Anonymity<br/><i>sender in crowd of k users</i>"]\n' +
+        '  L --> L3["Full Anonymity<br/><i>sender/receiver fully hidden</i>"]\n' +
+        '  L --> L4["Sender-Receiver Unlinkability<br/><i>tx graph fully unlinkable</i>"]\n' +
+        '  T --> M["Ledger Models"]\n' +
+        '  M --> M1["UTxO<br/>Bitcoin-style"]\n' +
+        '  M --> M2["Account-based<br/>Ethereum-style"]\n' +
+        '  T --> C["Crypto Tools Compared"]\n' +
+        '  C --> C1["Homomorphic Encryption"]\n' +
+        '  C --> C2["ZKPs"]\n' +
+        '  C --> C3["Ring Signatures"]\n' +
+        '  C --> C4["MPC"]\n' +
+        '  T --> O["6 Open Problems<br/><b>Thesis targets #5 and #6</b>"]\n' +
+        '  O --> O1["#1 Stateless verification"]\n' +
+        '  O --> O2["#2 Efficient anon accounts"]\n' +
+        '  O --> O3["#3 Privacy + auditability"]\n' +
+        '  O --> O4["#4 Post-quantum privacy"]\n' +
+        '  O --> O5["#5 Anon creds + payments"]\n' +
+        '  O --> O6["#6 Anon account-based systems"]\n' +
+        '  classDef user fill:#111827,stroke:#EC4899,color:#fff\n' +
+        '  classDef onchain fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  classDef zkp fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class T,L user\n' +
+        '  class L1,L2,L3,L4,M,M1,M2 onchain\n' +
+        '  class C,C1,C2,C3,C4 zkp\n' +
+        '  class O,O1,O2,O3,O4,O5,O6 threat',
       keyPoints: [
         "First unified formal framework comparing privacy guarantees across all major " +
           "private payment systems (Zcash, Monero, Tornado Cash, UTT, Zether, etc.)",
@@ -112,6 +143,27 @@ window.CH24_PAPERS = {
         '│  • Scalability of ZK-based systems at CBDC scale           │\n' +
         '│  • Interoperability across payment rails                   │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  H["Hitchhiker\'s Guide<br/>Bank of Italy — Nardelli et al."]\n' +
+        '  H --> G["Privacy Goals<br/>(policy framing)"]\n' +
+        '  G --> G1["Payment Confidentiality<br/><i>amount hidden</i>"]\n' +
+        '  G --> G2["Sender Anonymity<br/><i>payer identity hidden</i>"]\n' +
+        '  G --> G3["Receiver Anonymity<br/><i>payee identity hidden</i>"]\n' +
+        '  G --> G4["Relationship Privacy<br/><i>link between parties</i>"]\n' +
+        '  G --> G5["Temporal Privacy<br/><i>timing of payments</i>"]\n' +
+        '  H --> C["Open Challenges"]\n' +
+        '  C --> C1["Privacy vs AML/KYC<br/>compliance tension"]\n' +
+        '  C --> C2["Regulatory auditability<br/>without breaking anonymity"]\n' +
+        '  C --> C3["Scalability of ZK systems<br/>at CBDC scale"]\n' +
+        '  C --> C4["Interoperability<br/>across payment rails"]\n' +
+        '  classDef user fill:#111827,stroke:#EC4899,color:#fff\n' +
+        '  classDef onchain fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  classDef zkp fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class H user\n' +
+        '  class G,G1,G2,G3,G4,G5 onchain\n' +
+        '  class C,C1,C2,C3,C4 threat',
       keyPoints: [
         "Comprehensive taxonomy of privacy goals in digital payments, written " +
           "from a central bank / policy perspective (Bank of Italy)",
@@ -188,6 +240,24 @@ window.CH24_PAPERS = {
         '│  Each user has a privacy budget B (monthly limit).         │\n' +
         '│  ZKP proves remaining budget ≥ 0 without revealing it.     │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  S["Sender<br/>owns coins"]\n' +
+        '  S -->|"ZKP spend proof<br/><i>own inputs, balanced value,<br/>budget valid</i>"| V["Validator"]\n' +
+        '  V -->|"nullifier check"| L["Ledger"]\n' +
+        '  B["Bank<br/>t-of-n trustees"] -->|"threshold BLS<br/>co-sign"| CO["Signed coin<br/>(serial, type, value,<br/>owner_pk, budget_tag)"]\n' +
+        '  CO --> S\n' +
+        '  S -.->|"ElGamal encrypt<br/>to auditor_pk"| AU["t-of-n Auditors"]\n' +
+        '  AU -->|"partial decryptions<br/>combined"| R["Reveal owner<br/><i>under legal process</i>"]\n' +
+        '  S --> BG["Privacy Budget B<br/>ZKP: remaining >= 0<br/><i>without revealing value</i>"]\n' +
+        '  classDef user fill:#111827,stroke:#EC4899,color:#fff\n' +
+        '  classDef onchain fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  classDef zkp fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class S,B user\n' +
+        '  class V,L,CO onchain\n' +
+        '  class BG zkp\n' +
+        '  class AU,R threat',
       keyPoints: [
         "First formal treatment of 'accountable privacy' in decentralized ecash: " +
           "untraceable by default, auditable by threshold committee under legal process",

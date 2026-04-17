@@ -42,6 +42,36 @@ window.CH22_PAPERS = {
         '│  RANGE PROOF needed:                                    │\n' +
         '│  Prove v ∈ [0, 2^64) to prevent negative amounts        │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  subgraph TRAD["Traditional TX"]\n' +
+        '    T1["Input: 500 BTC"]\n' +
+        '    T2["Out1: 100 BTC"]\n' +
+        '    T3["Out2: 400 BTC"]\n' +
+        '    TV["Verify 500 = 100 + 400<br/><i>amounts visible</i>"]\n' +
+        '    T1 --> TV\n' +
+        '    T2 --> TV\n' +
+        '    T3 --> TV\n' +
+        '  end\n' +
+        '  subgraph CT["Confidential TX"]\n' +
+        '    C1["C_in = 500·G + r1·H"]\n' +
+        '    C2["C_out1 = 100·G + r2·H"]\n' +
+        '    C3["C_out2 = 400·G + r3·H"]\n' +
+        '    CV["Verify C_in − C_out1 − C_out2<br/>= 0·G + (r1−r2−r3)·H<br/><i>amounts HIDDEN</i>"]\n' +
+        '    C1 --> CV\n' +
+        '    C2 --> CV\n' +
+        '    C3 --> CV\n' +
+        '  end\n' +
+        '  TV --> H["Homomorphic magic<br/>C(v1,r1) + C(v2,r2) = C(v1+v2, r1+r2)"]\n' +
+        '  CV --> H\n' +
+        '  H --> R["Range proof required<br/>v ∈ [0, 2^64) to block<br/>negative-amount inflation"]\n' +
+        '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+        '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class T1,T2,T3,C1,C2,C3 primitive\n' +
+        '  class TV,CV,H step\n' +
+        '  class R result',
       keyPoints: [
         'Pedersen commitment C = v·G + r·H hides amount v behind random blinding factor r',
         'Homomorphic: C(v₁) + C(v₂) = C(v₁+v₂) — balance verified without opening commitments',
@@ -107,6 +137,24 @@ window.CH22_PAPERS = {
         '│  Bulletproofs+:    ~576 B  █████                     │\n' +
         '│  Bulletproofs++:   ~416 B  ████                      │\n' +
         '└────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  G["Goal: prove v ∈ [0, 2^64)<br/>without revealing v"]\n' +
+        '  S1["Step 1 — Bit decomposition<br/>v = b0·2^0 + b1·2^1 + ... + b63·2^63<br/>Commit aL = (b0,...,b63) and aR = aL − 1"]\n' +
+        '  S2["Step 2 — Inner product reduction<br/>&lt;aL, 2^n&gt; = v AND &lt;aL, aR&gt; = 0<br/>combined into a single inner product"]\n' +
+        '  S3["Step 3 — Recursive halving (log rounds)<br/>n=64 → 32 → 16 → 8 → 4 → 2 → 1<br/>each round commits cross-terms L, R"]\n' +
+        '  G --> S1 --> S2 --> S3\n' +
+        '  S3 --> R1["Borromean ≈ 5000 B"]\n' +
+        '  S3 --> R2["Bulletproofs ≈ 672 B"]\n' +
+        '  S3 --> R3["Bulletproofs+ ≈ 576 B"]\n' +
+        '  S3 --> R4["Bulletproofs++ ≈ 416 B"]\n' +
+        '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+        '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class G primitive\n' +
+        '  class S1,S2,S3 step\n' +
+        '  class R1,R2,R3,R4 result',
       keyPoints: [
         'O(log n) proof size — ~672 bytes for 64-bit range (vs ~5,000 bytes Borromean)',
         'No trusted setup: relies only on discrete log hardness (DDH in random oracle model)',
@@ -169,6 +217,23 @@ window.CH22_PAPERS = {
         '│  Verification speedup: ~15-20%                         │\n' +
         '│  No trusted setup: same security as Bulletproofs       │\n' +
         '└────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  BP["Bulletproofs<br/>&lt;a,b&gt; = Σ aᵢ·bᵢ<br/>672 B for 64-bit range"]\n' +
+        '  BPP["Bulletproofs+<br/>&lt;a,b&gt;^y = Σ y^i·aᵢ·bᵢ<br/>weighted inner product"]\n' +
+        '  BP --> CH["Key change:<br/>y-weighted inner product"]\n' +
+        '  CH --> BPP\n' +
+        '  BPP --> E1["Per-round L,R cross-terms merge<br/>−1 group element per round<br/>saves 2·log(n) elements"]\n' +
+        '  E1 --> R1["576 bytes for 64-bit range<br/>Δ = −96 B (−14%)"]\n' +
+        '  E1 --> R2["Verifier ~15–20% faster<br/>fewer scalar multiplications"]\n' +
+        '  E1 --> R3["No trusted setup<br/>same DL/ROM security"]\n' +
+        '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+        '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class BP,BPP primitive\n' +
+        '  class CH,E1 step\n' +
+        '  class R1,R2,R3 result',
       keyPoints: [
         'Weighted inner product argument: <a,b>ʸ = Σ yⁱ·aᵢ·bᵢ replaces standard inner product',
         '~96 bytes smaller proof for 64-bit range (576 B vs 672 B original)',
@@ -234,6 +299,24 @@ window.CH22_PAPERS = {
         '│  Bulletproofs+:    576 B  ████                        │\n' +
         '│  Bulletproofs++:   416 B  ███  ← THESIS CHOICE        │\n' +
         '└────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  BPP2["Bulletproofs++<br/>thesis range-proof choice"]\n' +
+        '  I1["Innovation 1 — Reciprocal range proof<br/>standard: prove bᵢ ∈ {0,1} for each i<br/>reciprocal: ∏(bᵢ·(bᵢ−1)) = 0<br/>single polynomial check for all 64 bits"]\n' +
+        '  I2["Innovation 2 — Norm argument<br/>replaces &lt;a,b&gt; with ||a||²<br/>saves ~2 group elements per recursion"]\n' +
+        '  BPP2 --> I1\n' +
+        '  BPP2 --> I2\n' +
+        '  I1 --> R1["Borromean ≈ 5000 B"]\n' +
+        '  I1 --> R2["Bulletproofs ≈ 672 B"]\n' +
+        '  I2 --> R3["Bulletproofs+ ≈ 576 B"]\n' +
+        '  I2 --> R4["Bulletproofs++ ≈ 416 B<br/><b>thesis choice</b><br/>−38% vs original"]\n' +
+        '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+        '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class BPP2 primitive\n' +
+        '  class I1,I2 step\n' +
+        '  class R1,R2,R3,R4 result',
       keyPoints: [
         'Reciprocal set-membership proof: ∏ᵢ 1/(bᵢ·(bᵢ-1)·(bᵢ-2)·...) with partial fractions',
         'Norm argument replaces inner product argument — saves further group elements',
@@ -295,6 +378,23 @@ window.CH22_PAPERS = {
         '│                                                        │\n' +
         '│  CHAIN GROWTH: O(1) per output (not O(txs))           │\n' +
         '└────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart LR\n' +
+        '  A["Alice<br/>C_A = 5·G + r1·H"]\n' +
+        '  B["Bob<br/>C_B = 5·G + r2·H"]\n' +
+        '  C["Carol"]\n' +
+        '  A -->|tx1| B\n' +
+        '  B -->|tx2 immediate| C\n' +
+        '  A -. cut-through .-> C\n' +
+        '  C --> K["Kernel excess<br/>k = (r_out − r_in)·G<br/>proves ownership,<br/>no address, no key"]\n' +
+        '  K --> G["Chain growth O(1) per output<br/>intermediate tx erased"]\n' +
+        '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+        '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class A,B,C primitive\n' +
+        '  class K step\n' +
+        '  class G result',
       keyPoints: [
         'No addresses: coins are Pedersen commitments; ownership = knowledge of blinding factor',
         'Cut-through: intermediate outputs that are immediately spent can be removed from chain',
@@ -365,6 +465,24 @@ window.CH22_PAPERS = {
         '│  Plonk       ~1.3 KB  ~3 ms   universal  no           │\n' +
         '│  Halo 2      ~1.5 KB  ~10 ms  none       yes          │\n' +
         '└────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  S["Trusted setup (circuit-specific)<br/>σ = (pk, vk) with toxic waste τ<br/>τ must be destroyed"]\n' +
+        '  P["Proof π = (A, B, C)<br/>A ∈ G1 ≈ 48 B<br/>B ∈ G2 ≈ 96 B<br/>C ∈ G1 ≈ 48 B<br/><b>total ≈ 192 B</b>"]\n' +
+        '  V["Verification (3 pairings, ~3 ms)<br/>e(A,B) = e(α,β) · e(Σ aᵢ·γᵢ, γ) · e(C, δ)"]\n' +
+        '  S --> P --> V\n' +
+        '  V --> R1["Groth16 — 192 B, ~3 ms, circuit-specific setup"]\n' +
+        '  V --> R2["Plonk — ~1.3 KB, ~3 ms, universal setup"]\n' +
+        '  V --> R3["Halo 2 — ~1.5 KB, ~10 ms, no setup, recursive"]\n' +
+        '  S --> T["<b>Threat</b>: toxic waste leak<br/>= forge any proof forever"]\n' +
+        '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+        '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class P primitive\n' +
+        '  class S,V step\n' +
+        '  class R1,R2,R3 result\n' +
+        '  class T threat',
       keyPoints: [
         'Proof size: 3 group elements — A∈G₁, B∈G₂, C∈G₁ (~192 bytes on BLS12-381)',
         'Verification: 3 pairing checks — constant time regardless of circuit complexity',
@@ -431,6 +549,22 @@ window.CH22_PAPERS = {
         '│                                                        │\n' +
         '│  Proof: ~1.3 KB | Setup: universal | Verify: ~3ms     │\n' +
         '└────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  C["Circuit representation<br/>gates aᵢ·bᵢ = cᵢ (mul)<br/>aᵢ + bᵢ = cᵢ (add)<br/>copy constraints tie wires"]\n' +
+        '  PA["Permutation argument<br/>f(X) = (a(X)+βX+γ)(b(X)+βk1·X+γ)(c(X)+βk2·X+γ)<br/>g(X) = (a(X)+βσ1(X)+γ)(b(X)+βσ2(X)+γ)(c(X)+βσ3(X)+γ)<br/>check f/g is a valid permutation"]\n' +
+        '  KZG["KZG polynomial commitment<br/>Commit(f) = f(τ)·G<br/>universal τ for any circuit ≤ degree D"]\n' +
+        '  C --> PA --> KZG\n' +
+        '  KZG --> R["Proof ≈ 1.3 KB<br/>Universal setup (updatable)<br/>Verify ≈ 3 ms<br/><b>production SNARK</b>"]\n' +
+        '  KZG --> T["<b>Threat</b>: SRS trapdoor τ leak<br/>breaks soundness for all circuits"]\n' +
+        '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+        '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class C primitive\n' +
+        '  class PA,KZG step\n' +
+        '  class R result\n' +
+        '  class T threat',
       keyPoints: [
         'Universal trusted setup: one SRS (structured reference string) for all circuits up to size n',
         'Permutation argument (σ): ensures correct wiring between gates without hardcoding circuit',
@@ -503,6 +637,23 @@ window.CH22_PAPERS = {
         '│                                                        │\n' +
         '│  No trusted setup | Recursive | ~1.5 KB proof          │\n' +
         '└────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  P1["π1 = Prove(C1)"]\n' +
+        '  P2["π2 = Prove(C2 ∧ Verify(π1))"]\n' +
+        '  P3["π3 = Prove(C3 ∧ Verify(π2))"]\n' +
+        '  PN["πn = Prove(Cn ∧ Verify(π(n−1)))"]\n' +
+        '  P1 --> P2 --> P3 --> PN\n' +
+        '  PN --> ACC["Accumulation scheme<br/>Acc(π) = running accumulator<br/>defer full verification to chain end"]\n' +
+        '  ACC --> CC["Curve cycle Pallas + Vesta<br/>Pallas.base = Vesta.scalar<br/>Vesta.base = Pallas.scalar<br/>→ efficient in-circuit verify"]\n' +
+        '  CC --> R["No trusted setup<br/>Recursive composition<br/>~1.5 KB proof<br/>used by Zcash Orchard"]\n' +
+        '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+        '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  class P1,P2,P3,PN primitive\n' +
+        '  class ACC,CC step\n' +
+        '  class R result',
       keyPoints: [
         'No trusted setup: security based on discrete log (DLOG) only, no toxic waste risk',
         'Recursive proof composition: a proof can contain verification of another proof',

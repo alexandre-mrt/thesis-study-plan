@@ -47,6 +47,25 @@ window.CH22_GUIDE = {
           '│  → Sum of commitments = commitment to sum of values │\n' +
           '│  → Verify balance WITHOUT knowing any amounts!      │\n' +
           '└─────────────────────────────────────────────────────┘',
+        diagram_mermaid:
+          'flowchart TD\n' +
+          '  V["value v<br/><i>secret amount</i>"]\n' +
+          '  R["blinding factor r<br/><i>random, hides v</i>"]\n' +
+          '  G["generator G<br/>public"]\n' +
+          '  H["generator H<br/>public, unknown log_G(H)"]\n' +
+          '  V --> C["C = v·G + r·H<br/><b>Pedersen commitment</b>"]\n' +
+          '  R --> C\n' +
+          '  G --> C\n' +
+          '  H --> C\n' +
+          '  C --> HOM["Homomorphic property<br/>C1 + C2 = (v1+v2)·G + (r1+r2)·H"]\n' +
+          '  HOM --> OUT["Sum of commitments = commitment to sum<br/>verify balance without revealing amounts"]\n' +
+          '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+          '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+          '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+          '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+          '  class V,R,G,H primitive\n' +
+          '  class C,HOM step\n' +
+          '  class OUT result',
         keyPoints: [
           "Perfectly hiding: given C, an adversary cannot determine v (information-theoretic)",
           "Computationally binding: committer cannot open to a different value (relies on discrete log)",
@@ -194,6 +213,25 @@ window.CH22_GUIDE = {
           '│  Recursive halving: O(log n) proof size              │\n' +
           '│  NO trusted setup (unlike SNARKs)                    │\n' +
           '└─────────────────────────────────────────────────────┘',
+        diagram_mermaid:
+          'flowchart TD\n' +
+          '  PB["<b>Problem</b>: Pedersen hides v,<br/>nothing stops committing to −5"]\n' +
+          '  AT["<b>Inflation attack</b><br/>C_in = 5·G + r1·H<br/>C_out1 = 10·G + r2·H<br/>C_out2 = −5·G + r3·H<br/>balance 5 − 10 − (−5) = 0 ✓"]\n' +
+          '  SOL["Range proof<br/>prove v ∈ [0, 2^64)"]\n' +
+          '  IPA["Inner product argument<br/>recursive halving → O(log n)<br/>no trusted setup"]\n' +
+          '  PB --> AT --> SOL --> IPA\n' +
+          '  IPA --> R1["Borromean ≈ 5000 B"]\n' +
+          '  IPA --> R2["Bulletproofs ≈ 672 B"]\n' +
+          '  IPA --> R3["Bulletproofs+ ≈ 576 B"]\n' +
+          '  IPA --> R4["Bulletproofs++ ≈ 416 B"]\n' +
+          '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+          '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+          '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+          '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+          '  class PB primitive\n' +
+          '  class SOL,IPA step\n' +
+          '  class R1,R2,R3,R4 result\n' +
+          '  class AT threat',
         keyPoints: [
           "Proves a committed value is in [0, 2^64) without revealing it",
           "O(log n) proof size via inner product argument — ~672 bytes for 64-bit",
@@ -356,6 +394,24 @@ window.CH22_GUIDE = {
           '│  • All kernels (one per historical tx)             │\n' +
           '│  • Range proofs for unspent outputs                │\n' +
           '└─────────────────────────────────────────────────────┘',
+        diagram_mermaid:
+          'flowchart TD\n' +
+          '  TX["Mimblewimble transaction<br/>no addresses, no scripts<br/>ownership = knowledge of r"]\n' +
+          '  IN["Inputs<br/>[C_in1, C_in2]<br/>spent commitments"]\n' +
+          '  OUT["Outputs<br/>[C_out1, C_out2]<br/>new commitments"]\n' +
+          '  K["Kernel<br/>excess + signature + fee"]\n' +
+          '  TX --> IN\n' +
+          '  TX --> OUT\n' +
+          '  TX --> K\n' +
+          '  K --> CT["Cut-through<br/>Tx1: A → B,C and Tx2: B → D,E<br/>after: A → C,D,E (B disappears)<br/>kernels K1, K2 persist"]\n' +
+          '  CT --> NODE["Full node only needs:<br/>• block headers<br/>• current UTXO set<br/>• all kernels (1 per tx)<br/>• range proofs for unspent outputs"]\n' +
+          '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+          '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+          '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+          '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+          '  class IN,OUT,K primitive\n' +
+          '  class TX,CT step\n' +
+          '  class NODE result',
         keyPoints: [
           "Extends CT: no addresses at all, ownership proved by blinding factor knowledge",
           "Interactive transaction construction (sender + receiver must coordinate — biggest UX hurdle)",
@@ -525,6 +581,27 @@ window.CH22_GUIDE = {
           '│  • Monero: view key (k_v)                          │\n' +
           '│  • Aptos: Twisted ElGamal (owner decrypts balance) │\n' +
           '└─────────────────────────────────────────────────────┘',
+        diagram_mermaid:
+          'flowchart TD\n' +
+          '  PC["Pedersen commitment<br/>C = v·G + r·H<br/><i>amount hidden</i>"]\n' +
+          '  EG["ElGamal ciphertext (per auditor)<br/>enc_v = (k·G, v·G + k·A)<br/>A = auditor public key"]\n' +
+          '  PC --> TX["On-chain output<br/>C + enc_v published together"]\n' +
+          '  EG --> TX\n' +
+          '  TX --> DEC["Auditor decrypts with a<br/>(v·G + k·A) − a·(k·G) = v·G<br/>→ recover v (small range DLOG)"]\n' +
+          '  DEC --> L1["Tax authority<br/>sees amounts only"]\n' +
+          '  DEC --> L2["Compliance<br/>sees amounts + sender"]\n' +
+          '  DEC --> L3["Regulator<br/>sees everything"]\n' +
+          '  DEC --> L4["Public<br/>sees nothing"]\n' +
+          '  DEC --> EQ["Equivalents<br/>Zcash viewing keys (ivk/ovk)<br/>Monero view key k_v<br/>Aptos twisted ElGamal"]\n' +
+          '  TX --> T["<b>Threat</b>: auditor key compromise<br/>retro-exposes all past amounts"]\n' +
+          '  classDef primitive fill:#111827,stroke:#F59E0B,color:#fff\n' +
+          '  classDef step fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+          '  classDef result fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+          '  classDef threat fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+          '  class PC,EG primitive\n' +
+          '  class TX,DEC step\n' +
+          '  class L1,L2,L3,L4,EQ result\n' +
+          '  class T threat',
         keyPoints: [
           "Encrypt (v, r) to auditor's public key alongside each Pedersen commitment",
           "Auditor decrypts and verifies C = v*G + r*H — sees actual amounts, cannot spend",

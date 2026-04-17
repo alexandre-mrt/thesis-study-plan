@@ -42,6 +42,26 @@ window.CH25_PAPERS = {
         '│                                                            │\n' +
         '│  CBDC RELEVANCE: privacy-preserving retail CBDC design     │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  BIS["BIS WP 1242<br/>Regulatory privacy landscape"]\n' +
+        '  BIS --> PETs["Privacy-Enhancing Technologies"]\n' +
+        '  PETs --> ZKP["Zero-Knowledge Proofs<br/><i>selective disclosure</i>"]\n' +
+        '  PETs --> MPC["Secure Multi-Party Computation<br/><i>distributed</i>"]\n' +
+        '  PETs --> TEE["Trusted Execution Environments<br/><i>hardware</i>"]\n' +
+        '  PETs --> DP["Differential Privacy<br/><i>statistical noise</i>"]\n' +
+        '  PETs --> HE["Homomorphic Encryption<br/><i>compute on ciphertext</i>"]\n' +
+        '  BIS --> REG["Regulatory requirements"]\n' +
+        '  REG --> AML["AML / CFT<br/>transaction transparency"]\n' +
+        '  REG --> GDPR["GDPR / data minimization<br/>privacy by design"]\n' +
+        '  REG --> AUD["Auditability<br/>selective disclosure"]\n' +
+        '  BIS --> CBDC["CBDC relevance<br/><b>privacy-preserving retail CBDC design</b>"]\n' +
+        '  classDef proofsystem fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef prover fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef verifier fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  class BIS,PETs proofsystem\n' +
+        '  class ZKP,MPC,TEE,DP,HE prover\n' +
+        '  class REG,AML,GDPR,AUD,CBDC verifier',
       keyPoints: [
         "Central bank perspective on privacy-enhancing technologies (PETs) for " +
           "digital payments — ZKPs, MPC, TEEs, differential privacy, HE",
@@ -114,6 +134,23 @@ window.CH25_PAPERS = {
         '│                                                            │\n' +
         '│  ZKP STATUS: optional in ARF v1.x, planned for v2.0       │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart LR\n' +
+        '  PID["PID Provider<br/>(e.g. government)"]\n' +
+        '  W["EUDIW<br/>(User wallet)"]\n' +
+        '  RP["Relying Party<br/>(Verifier)"]\n' +
+        '  PID -- "issues PID / EAA" --> W\n' +
+        '  W -- "selective disclosure" --> RP\n' +
+        '  PROT["Key protocols<br/>PID: Personal ID Data<br/>EAA: Electronic Attestation<br/>SD-JWT: Selective Disclosure JWT<br/>mdoc: ISO 18013-5"]\n' +
+        '  ZKP["ZKP status<br/>optional in ARF v1.x<br/><b>planned for v2.0</b>"]\n' +
+        '  W -.-> PROT\n' +
+        '  PROT -.-> ZKP\n' +
+        '  classDef proofsystem fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef prover fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef verifier fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  class PID proofsystem\n' +
+        '  class W,PROT prover\n' +
+        '  class RP,ZKP verifier',
       keyPoints: [
         "European regulatory framework defining the EU Digital Identity Wallet " +
           "(EUDIW): architecture, credential formats, and protocol requirements",
@@ -187,6 +224,23 @@ window.CH25_PAPERS = {
         '│  NO ZKPs: privacy = access control + data minimization     │\n' +
         '│  Comparison baseline: ZKPs would add silent-failure risk   │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  TX["Full Transaction"]\n' +
+        '  TX --> VA["View A<br/>Party 1 + Party 2 data<br/><i>both see this</i>"]\n' +
+        '  TX --> VB["View B<br/>Party 2 + Party 3 data<br/><i>Party 1 hidden</i>"]\n' +
+        '  TX --> VC["View C<br/>Global settlement data<br/><i>all parties</i>"]\n' +
+        '  VA --> MT["Blinded Merkle Tree<br/>tx hash = Merkle root of all views"]\n' +
+        '  VB --> MT\n' +
+        '  VC --> MT\n' +
+        '  MT --> INT["Integrity verified<br/>without full disclosure"]\n' +
+        '  INT --> CON["<b>No ZKPs</b><br/>privacy = access control<br/>+ data minimization"]\n' +
+        '  classDef proofsystem fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef prover fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef verifier fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  class TX proofsystem\n' +
+        '  class VA,VB,VC,MT prover\n' +
+        '  class INT,CON verifier',
       keyPoints: [
         "Enterprise privacy via sub-transaction views: each participant sees only " +
           "the contract sub-views they are a party to, enforced by selective distribution",
@@ -257,6 +311,24 @@ window.CH25_PAPERS = {
         '│  CANTON\'S RESPONSE: sub-transaction views + Daml runtime   │\n' +
         '│  YOUR THESIS RESPONSE: TEE auditor + circuit audits (§5.4) │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  C["Canton critique of ZKPs"]\n' +
+        '  C --> A1["Argument 1: Silent Failures<br/>circuit bug -> invalid proofs accepted<br/><i>Zcash Sapling setup vuln (2019)</i>"]\n' +
+        '  C --> A2["Argument 2: Lack of Auditability<br/>regulators need key<br/><i>right to audit vs full anonymity</i>"]\n' +
+        '  C --> A3["Argument 3: Performance Overhead<br/>Groth16 proving: 1-10s / tx<br/>Verification: ~1ms (ok)"]\n' +
+        '  A1 --> CR["Canton response<br/>sub-transaction views<br/>+ Daml runtime"]\n' +
+        '  A2 --> CR\n' +
+        '  A3 --> CR\n' +
+        '  A1 --> TR["Thesis response<br/>TEE auditor<br/>+ circuit audits (S5.4)"]\n' +
+        '  A2 --> TR\n' +
+        '  A3 --> TR\n' +
+        '  classDef proofsystem fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef prover fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef verifier fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  class C proofsystem\n' +
+        '  class A1,A2,A3 prover\n' +
+        '  class CR,TR verifier',
       keyPoints: [
         "Industry critique of ZKPs for enterprise privacy from Canton Network engineers",
         "Silent failures: ZKP circuit bugs produce invalid proofs that pass " +

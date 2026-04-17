@@ -48,6 +48,25 @@ window.CH21_PAPERS = {
         '│                                                         │\n' +
         '│  Security: EUF-CMA under q-SDH in pairing groups       │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  I["Issuer<br/>signs [m1,m2,m3,m4]"]\n' +
+        '  S["Signature σ<br/>1 group element"]\n' +
+        '  H["Holder<br/>selects subset"]\n' +
+        '  P["Proof π<br/>reveal {m1,m3}<br/>ZK hide {m2,m4}"]\n' +
+        '  V["Verifier<br/>checks π<br/>learns nothing of m2,m4"]\n' +
+        '  SEC["Security<br/>EUF-CMA under q-SDH<br/><i>pairing groups</i>"]\n' +
+        '  I --> S\n' +
+        '  S --> H\n' +
+        '  H --> P\n' +
+        '  P --> V\n' +
+        '  S -.-> SEC\n' +
+        '  classDef issuer fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef crypto fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef verify fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class I issuer\n' +
+        '  class S,P crypto\n' +
+        '  class H,V,SEC verify',
       keyPoints: [
         "Re-examines the formal EUF-CMA security of BBS+ under cleaner assumptions",
         "Proposes a shorter-signature variant (one fewer group element) without sacrificing security",
@@ -107,6 +126,26 @@ window.CH21_PAPERS = {
         '│  ① Stat. anon: server cannot identify user             │\n' +
         '│  ② Comp. anon: computationally unlinkable             │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  subgraph ISS["Issuance (pairing-free)"]\n' +
+        '    I["Issuer"] -->|blind sign| U1["User"]\n' +
+        '  end\n' +
+        '  subgraph SHOW["Showing (server-assisted)"]\n' +
+        '    U2["User (mobile)"] -->|blinded request<br/>unlinkable| S["Server<br/>heavy pairing math"]\n' +
+        '    S -->|partial proof| U2\n' +
+        '    U2 -->|finalize + cheap ECC| V["Verifier"]\n' +
+        '  end\n' +
+        '  U1 -.-> U2\n' +
+        '  V --> C["Two variants<br/>① statistical anonymity<br/>② computational anonymity"]\n' +
+        '  classDef issuer fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef user fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef server fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  class I issuer\n' +
+        '  class U1,U2,V user\n' +
+        '  class S server\n' +
+        '  class C conclusion',
       keyPoints: [
         "Eliminates pairings from the user's device — mobile-friendly anonymous credentials",
         "Two constructions: statistical anonymity (stronger) and computational anonymity",
@@ -164,6 +203,34 @@ window.CH21_PAPERS = {
         '│  ├── Revocation: status list v2.0                      │\n' +
         '│  └── Audit: issuer-side logging with ZK accountability │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart LR\n' +
+        '  R["eIDAS 2.0<br/>requirements"]\n' +
+        '  subgraph OK["Native support"]\n' +
+        '    SD["Selective disclosure ✓"]\n' +
+        '    HB["Holder binding ✓"]\n' +
+        '    XB["Cross-border W3C VC ✓"]\n' +
+        '  end\n' +
+        '  subgraph GAP["Gaps (need extension)"]\n' +
+        '    REV["Revocation △"]\n' +
+        '    AUD["Audit trail △"]\n' +
+        '  end\n' +
+        '  subgraph FIX["Proposed modifications"]\n' +
+        '    SL["Status List v2.0"]\n' +
+        '    ZA["ZK accountability<br/>issuer-side logs"]\n' +
+        '  end\n' +
+        '  R --> OK\n' +
+        '  R --> GAP\n' +
+        '  REV --> SL\n' +
+        '  AUD --> ZA\n' +
+        '  classDef ok fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef gap fill:#1f2937,stroke:#F59E0B,color:#fff\n' +
+        '  classDef fix fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef root fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  class R root\n' +
+        '  class SD,HB,XB ok\n' +
+        '  class REV,AUD gap\n' +
+        '  class SL,ZA fix',
       keyPoints: [
         "Maps BBS+ capabilities to eIDAS 2.0 regulation requirements",
         "Identifies compliance gaps: revocation and audit trail need extensions",
@@ -225,6 +292,25 @@ window.CH21_PAPERS = {
         '│  ZK proof π: "I hold a valid doc with attr P"          │\n' +
         '│  (issuer never involved, doc stays private)            │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  D["Existing document<br/>passport / national ID<br/><i>RSA/ECDSA signed</i>"]\n' +
+        '  subgraph CIRC["zkSNARK circuit"]\n' +
+        '    C1["Verify document<br/>signature in-circuit"]\n' +
+        '    C2["Check predicate<br/>on attributes"]\n' +
+        '    C3["Commit nullifier<br/>anti-reuse"]\n' +
+        '  end\n' +
+        '  P["ZK proof π<br/>I hold a valid doc<br/>with attribute P"]\n' +
+        '  D --> CIRC\n' +
+        '  C1 --> P\n' +
+        '  C2 --> P\n' +
+        '  C3 --> P\n' +
+        '  classDef input fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef circuit fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef output fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class D input\n' +
+        '  class C1,C2,C3 circuit\n' +
+        '  class P output',
       keyPoints: [
         "Converts legacy RSA/ECDSA-signed documents into anonymous credentials via zkSNARK circuits",
         "No issuer cooperation required — works with existing passports, national IDs",
@@ -282,6 +368,33 @@ window.CH21_PAPERS = {
         '│                                                         │\n' +
         '│  ON CHAIN: smart contract verifies proof in O(1)       │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  subgraph ISS["Issuance (t-of-n threshold)"]\n' +
+        '    U1["User"] -->|BlindSign request| A1["Auth 1"]\n' +
+        '    U1 -->|BlindSign request| A2["Auth 2"]\n' +
+        '    U1 -->|BlindSign request| AN["Auth n"]\n' +
+        '    A1 -->|partial σ1| AGG["Aggregate<br/>t-of-n partials"]\n' +
+        '    A2 -->|partial σ2| AGG\n' +
+        '    AN -->|partial σn| AGG\n' +
+        '  end\n' +
+        '  SIG["Credential σ"]\n' +
+        '  AGG --> SIG\n' +
+        '  subgraph SHOW["Showing (selective disclosure)"]\n' +
+        '    RND["Randomize σ → σ\'<br/>fresh each show<br/>unlinkable"]\n' +
+        '    ZK["ZK proof<br/>σ\' valid for attrs<br/>+ disclosed subset"]\n' +
+        '    RND --> ZK\n' +
+        '  end\n' +
+        '  SIG --> RND\n' +
+        '  ZK --> SC["Smart contract<br/>verify in O(1)"]\n' +
+        '  classDef user fill:#111827,stroke:#06B6D4,color:#fff\n' +
+        '  classDef issuer fill:#1f2937,stroke:#10B981,color:#fff\n' +
+        '  classDef crypto fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  classDef chain fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  class U1 user\n' +
+        '  class A1,A2,AN,AGG issuer\n' +
+        '  class SIG,RND,ZK crypto\n' +
+        '  class SC chain',
       keyPoints: [
         "Threshold issuance: t-of-n authorities must cooperate, eliminating single-issuer trust",
         "Selective disclosure via ZK proofs on Coconut signatures (pairing-based)",
@@ -340,6 +453,29 @@ window.CH21_PAPERS = {
         '│                                                         │\n' +
         '│  Privacy: accumulator reveals nothing about holder     │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  C["Credential σ<br/>epoch_tag + data"]\n' +
+        '  A["Authority<br/>publishes accumulator acc_e<br/>for each epoch e"]\n' +
+        '  H["Holder proves<br/>epoch_tag ∈ acc_e"]\n' +
+        '  OK["Valid → proof ✓"]\n' +
+        '  NO["Revoked<br/>tag ∉ acc_e → proof ✗"]\n' +
+        '  PRIV["Privacy preserved<br/>accumulator leaks<br/>nothing about holder"]\n' +
+        '  C --> H\n' +
+        '  A --> H\n' +
+        '  H --> OK\n' +
+        '  H --> NO\n' +
+        '  A -.-> PRIV\n' +
+        '  classDef cred fill:#111827,stroke:#06B6D4,color:#fff\n' +
+        '  classDef auth fill:#1f2937,stroke:#10B981,color:#fff\n' +
+        '  classDef bad fill:#1a1a1a,stroke:#EF4444,color:#fff\n' +
+        '  classDef ok fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  classDef priv fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  class C cred\n' +
+        '  class A,H auth\n' +
+        '  class OK ok\n' +
+        '  class NO bad\n' +
+        '  class PRIV priv',
       keyPoints: [
         "Adds revocation to threshold anonymous credentials without breaking unlinkability",
         "Epoch-based accumulator: revoked credentials fail proof verification",
@@ -398,6 +534,30 @@ window.CH21_PAPERS = {
         '│                                                         │\n' +
         '│  Trade-off: larger proof sizes (~10-100× BBS+)         │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart LR\n' +
+        '  subgraph OLD["Classical (BBS+)"]\n' +
+        '    CL["Security<br/>DL / q-SDH"]\n' +
+        '    BR["Broken by Shor"]\n' +
+        '    CL --> BR\n' +
+        '  end\n' +
+        '  subgraph NEW["Post-Quantum (module lattice)"]\n' +
+        '    PQ["Security<br/>Module-LWE / MSIS"]\n' +
+        '    SF["Safe vs Shor / Grover"]\n' +
+        '    PQ --> SF\n' +
+        '  end\n' +
+        '  F["Module Lattice Signature<br/>Randomized (unlinkable)<br/>Selective disclosure via<br/>lattice commitments<br/>Authority traceability"]\n' +
+        '  T["Trade-off<br/>proof size ~10-100× BBS+"]\n' +
+        '  NEW --> F\n' +
+        '  F --> T\n' +
+        '  classDef old fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  classDef new fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef feat fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  classDef trade fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  class CL,BR old\n' +
+        '  class PQ,SF new\n' +
+        '  class F feat\n' +
+        '  class T trade',
       keyPoints: [
         "First anonymous credential from module lattices with full traceability",
         "Security under Module-LWE and MSIS — believed quantum-resistant",
@@ -458,6 +618,23 @@ window.CH21_PAPERS = {
         '│                                                         │\n' +
         '│  Foundation for: Idemix, BBS+, U-Prove, Coconut        │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  SET["Setup<br/>pairing e: G1×G2→GT<br/>sk=(x,y1..yL)<br/>pk=(g^x,g^y1..g^yL)"]\n' +
+        '  SIGN["Sign [m1..mL]<br/>σ=(A,e,s)<br/>A^e = g^(1/(x+m1+...))"]\n' +
+        '  PROVE["Prove-know(σ)<br/>ZK PoK of σ and attrs<br/>nothing revealed"]\n' +
+        '  DESC["Descendants<br/>Idemix • BBS+<br/>U-Prove • Coconut"]\n' +
+        '  SET --> SIGN\n' +
+        '  SIGN --> PROVE\n' +
+        '  PROVE -.-> DESC\n' +
+        '  classDef setup fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef sign fill:#1f2937,stroke:#10B981,color:#fff\n' +
+        '  classDef prove fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef desc fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  class SET setup\n' +
+        '  class SIGN sign\n' +
+        '  class PROVE prove\n' +
+        '  class DESC desc',
       keyPoints: [
         "Introduced the concept of signing multiple messages with one signature from bilinear maps",
         "Enables zero-knowledge proof of knowledge of a signature without revealing it",
@@ -517,6 +694,30 @@ window.CH21_PAPERS = {
         '│  UNLINKABILITY                                          │\n' +
         '│  Each showing is randomized → verifier cannot link     │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  subgraph ISS["Issuance (blind signature)"]\n' +
+        '    U1["User commits<br/>(A, m1..mk)"]\n' +
+        '    IS["Issuer blind-signs<br/>sees nothing"]\n' +
+        '    UB["User unblinds → σ"]\n' +
+        '    U1 --> IS --> UB\n' +
+        '  end\n' +
+        '  subgraph SHOW["Showing (selective disclosure)"]\n' +
+        '    REV["Reveal subset<br/>S ⊆ {m1..mk}"]\n' +
+        '    ZK["ZK proof<br/>σ valid for remaining"]\n' +
+        '    REV --> ZK\n' +
+        '  end\n' +
+        '  UB --> REV\n' +
+        '  UNL["Unlinkability<br/>each showing randomized"]\n' +
+        '  ZK -.-> UNL\n' +
+        '  classDef user fill:#111827,stroke:#06B6D4,color:#fff\n' +
+        '  classDef issuer fill:#1f2937,stroke:#10B981,color:#fff\n' +
+        '  classDef crypto fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  classDef prop fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  class U1,UB,REV user\n' +
+        '  class IS issuer\n' +
+        '  class ZK crypto\n' +
+        '  class UNL prop',
       keyPoints: [
         "First systematic treatment of selective disclosure in cryptographic credentials",
         "Introduced restricted blind signatures as the issuance primitive",
@@ -577,6 +778,24 @@ window.CH21_PAPERS = {
         '│  Smart contract: verify π, update state atomically     │\n' +
         '│  (no identity, no amount revealed on-chain)            │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  S1["1. Identity setup<br/>threshold issuers<br/>→ credential σ"]\n' +
+        '  S2["2. Payment commit<br/>C = Commit(amount, r)<br/>Pedersen commitment"]\n' +
+        '  S3["3. ZK proof π<br/>I hold σ<br/>∧ amount ≤ balance<br/>∧ C correct"]\n' +
+        '  S4["4. Blockchain verify<br/>smart contract checks π<br/>atomic state update"]\n' +
+        '  OUT["No identity revealed<br/>No amount revealed"]\n' +
+        '  S1 --> S2 --> S3 --> S4 --> OUT\n' +
+        '  classDef setup fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef commit fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef proof fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef chain fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  class S1 setup\n' +
+        '  class S2 commit\n' +
+        '  class S3 proof\n' +
+        '  class S4 chain\n' +
+        '  class OUT conclusion',
       keyPoints: [
         "Combines threshold anonymous credentials + Pedersen commitments for private mobile payments",
         "ZK proof simultaneously proves credential validity and payment amount correctness",
@@ -635,6 +854,30 @@ window.CH21_PAPERS = {
         '│  Blockchain role: store credential commitments,        │\n' +
         '│                   verify proofs on-chain               │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  U["User with credential σ"]\n' +
+        '  subgraph MA["Mode A: fully anonymous"]\n' +
+        '    A1["Show(σ, attrs)<br/>unlinkable proof"]\n' +
+        '  end\n' +
+        '  subgraph MB["Mode B: user-controlled linkability"]\n' +
+        '    B1["Show(σ, attrs, scope)<br/>→ pseudonym_scope"]\n' +
+        '    B2["Same user + same scope<br/>→ same pseudonym"]\n' +
+        '    B3["Different scope<br/>→ unlinkable"]\n' +
+        '    B1 --> B2\n' +
+        '    B1 --> B3\n' +
+        '  end\n' +
+        '  BC["Blockchain<br/>stores commitments<br/>verifies proofs on-chain"]\n' +
+        '  U --> A1\n' +
+        '  U --> B1\n' +
+        '  A1 --> BC\n' +
+        '  B1 --> BC\n' +
+        '  classDef user fill:#111827,stroke:#06B6D4,color:#fff\n' +
+        '  classDef mode fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef chain fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  class U user\n' +
+        '  class A1,B1,B2,B3 mode\n' +
+        '  class BC chain',
       keyPoints: [
         "Decentralized credential issuance and verification without a central authority",
         "User-controlled linkability: pseudonyms scoped to domains prevent cross-service tracking",
@@ -692,6 +935,25 @@ window.CH21_PAPERS = {
         '│  No intermediate issuer cooperation at show time       │\n' +
         '│  Selective disclosure: prove only relevant graph edges  │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart LR\n' +
+        '  subgraph GRAPH["Identity graph (on-chain)"]\n' +
+        '    UNI["University"] -->|attests degree| USER["User node"]\n' +
+        '    BANK["Bank"] -->|attests KYC| USER\n' +
+        '    GOV["Gov"] -->|attests citizenship| USER\n' +
+        '  end\n' +
+        '  ZK["ZK proof<br/>I am a node with edges<br/>from ≥2 issuers<br/>satisfying predicate P"]\n' +
+        '  PROP["Holder-centric<br/>no issuer cooperation at show<br/>selective disclosure of edges"]\n' +
+        '  USER --> ZK\n' +
+        '  ZK --> PROP\n' +
+        '  classDef issuer fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef user fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef proof fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  classDef prop fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  class UNI,BANK,GOV issuer\n' +
+        '  class USER user\n' +
+        '  class ZK proof\n' +
+        '  class PROP prop',
       keyPoints: [
         "Models identity as a directed graph of attribute claims from multiple issuers",
         "ZK proof over graph paths: prove predicates without revealing identity node",
@@ -747,6 +1009,27 @@ window.CH21_PAPERS = {
         '│ Note: Sui gas model differs but relative ordering      │\n' +
         '│ likely preserved. BBS variants ~2× cheaper to verify. │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  BENCH["Ethereum Sepolia benchmark<br/>same testnet, same conditions"]\n' +
+        '  RP["RP-Coconut<br/>proof ~1.2 KB<br/>verify ~350K gas"]\n' +
+        '  TBP["Threshold BBS+<br/>proof ~0.5 KB<br/>verify ~180K gas"]\n' +
+        '  TB["Threshold BBS<br/>proof ~0.4 KB<br/>verify ~150K gas"]\n' +
+        '  NOTE["Sui gas model differs<br/>relative ordering likely preserved<br/>BBS variants ~2× cheaper"]\n' +
+        '  BENCH --> RP\n' +
+        '  BENCH --> TBP\n' +
+        '  BENCH --> TB\n' +
+        '  RP -.-> NOTE\n' +
+        '  TBP -.-> NOTE\n' +
+        '  TB -.-> NOTE\n' +
+        '  classDef root fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef slow fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  classDef fast fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  classDef note fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class BENCH root\n' +
+        '  class RP slow\n' +
+        '  class TBP,TB fast\n' +
+        '  class NOTE note',
       keyPoints: [
         "Direct empirical comparison of RP-Coconut, threshold BBS+, and threshold BBS on Ethereum Sepolia",
         "Measures gas cost, proof generation time, and communication overhead",
@@ -805,6 +1088,29 @@ window.CH21_PAPERS = {
         '│  Verifier checks: π valid for root R                   │\n' +
         '│  Result: anonymous authentication on Sui               │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  subgraph SRC["Source chain (Ethereum)"]\n' +
+        '    TREE["Credential Merkle tree"]\n' +
+        '    ROOT["Root R<br/>cross-chain beacon"]\n' +
+        '    TREE --> ROOT\n' +
+        '  end\n' +
+        '  BR["Bridge / relay"]\n' +
+        '  subgraph DST["Destination chain (Sui)"]\n' +
+        '    USER["User submits π<br/>ZK Merkle membership"]\n' +
+        '    VER["Verifier checks π<br/>valid for root R"]\n' +
+        '    OUT["Anonymous authentication<br/>on Sui"]\n' +
+        '    USER --> VER --> OUT\n' +
+        '  end\n' +
+        '  ROOT --> BR --> DST\n' +
+        '  classDef src fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef bridge fill:#1f2937,stroke:#F59E0B,color:#fff\n' +
+        '  classDef dst fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef out fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  class TREE,ROOT src\n' +
+        '  class BR bridge\n' +
+        '  class USER,VER dst\n' +
+        '  class OUT out',
       keyPoints: [
         "zkSNARKs + Merkle trees enable cross-chain credential verification",
         "Credential commitments on source chain, ZK membership proofs on destination",
@@ -863,6 +1169,36 @@ window.CH21_PAPERS = {
         '│  Dynamic committee: membership changes without reissue │\n' +
         '│  Triple-hiding: hides user, credential, and showing    │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  subgraph NORM["Normal showing: fully anonymous"]\n' +
+        '    SH["Show(σ) → π<br/>unlinkable<br/>issuer/auditor learn nothing"]\n' +
+        '  end\n' +
+        '  subgraph TRACE["Tracing (t-of-n committee)"]\n' +
+        '    SUS["Suspicious proof π"]\n' +
+        '    C1["Committee member 1<br/>decrypts partial tag"]\n' +
+        '    C2["Committee member 2<br/>decrypts partial tag"]\n' +
+        '    CN["Committee member n<br/>decrypts partial tag"]\n' +
+        '    REC["Threshold reconstruct<br/>→ user identity revealed<br/>(only this specific proof)"]\n' +
+        '    SUS --> C1\n' +
+        '    SUS --> C2\n' +
+        '    SUS --> CN\n' +
+        '    C1 --> REC\n' +
+        '    C2 --> REC\n' +
+        '    CN --> REC\n' +
+        '  end\n' +
+        '  PROPS["Dynamic committee<br/>membership rotates<br/>no reissue needed"]\n' +
+        '  TH["Triple-hiding<br/>user • credential • showing"]\n' +
+        '  NORM -.-> TH\n' +
+        '  TRACE -.-> PROPS\n' +
+        '  classDef normal fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef trace fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  classDef committee fill:#1a1a1a,stroke:#6366F1,color:#fff\n' +
+        '  classDef prop fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class SH normal\n' +
+        '  class SUS,REC trace\n' +
+        '  class C1,C2,CN committee\n' +
+        '  class PROPS,TH prop',
       keyPoints: [
         "Accountability layer on anonymous credentials: committee can trace fraud without mass deanonymization",
         "Triple-hiding property: hides user identity, credential content, and showing linkage",
@@ -925,6 +1261,34 @@ window.CH21_PAPERS = {
         '│  - record nullifier (prevents double-registration)     │\n' +
         '│  - bind to blockchain address anonymously              │\n' +
         '└─────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  IN["Public certificate<br/>passport / national ID"]\n' +
+        '  subgraph CIRC["ZK circuit proves"]\n' +
+        '    C1["① valid government signature"]\n' +
+        '    C2["② attributes satisfy predicate P"]\n' +
+        '    C3["③ unique nullifier<br/>H(cert_secret, bc_addr)"]\n' +
+        '  end\n' +
+        '  OUT["π + nullifier<br/>no identity revealed"]\n' +
+        '  subgraph CHAIN["On-chain"]\n' +
+        '    V["Verify π"]\n' +
+        '    N["Record nullifier<br/>prevents double-registration"]\n' +
+        '    B["Bind to blockchain address<br/>anonymously"]\n' +
+        '    V --> N --> B\n' +
+        '  end\n' +
+        '  IN --> CIRC\n' +
+        '  C1 --> OUT\n' +
+        '  C2 --> OUT\n' +
+        '  C3 --> OUT\n' +
+        '  OUT --> CHAIN\n' +
+        '  classDef input fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef circuit fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef output fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  classDef chain fill:#1a1a1a,stroke:#F59E0B,color:#fff\n' +
+        '  class IN input\n' +
+        '  class C1,C2,C3 circuit\n' +
+        '  class OUT output\n' +
+        '  class V,N,B chain',
       keyPoints: [
         "Ties each blockchain address to a unique real-world identity document via ZK proof",
         "Sybil-resistant: nullifier prevents one person from creating multiple accounts",

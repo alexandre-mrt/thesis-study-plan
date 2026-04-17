@@ -49,6 +49,24 @@ window.CH26_PAPERS = {
         '│  PRIVACY: validators never see sub or salt                 │\n' +
         '│  SECURITY: ephemeral key expires at max_epoch              │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  U["User"]\n' +
+        '  G["Google OAuth"]\n' +
+        '  U -- "OAuth login" --> G\n' +
+        '  G --> JWT["JWT<br/>{ sub, aud, nonce, ... }<br/>nonce = H(ephemeral_pk \\|\\| max_epoch \\|\\| rand)"]\n' +
+        '  JWT --> P1["Proof 1: JWT Validity<br/>pi_1 = ZKPoK{ header, payload, sig :<br/>RSA_Verify(pk_google, jwt) AND nonce correct }"]\n' +
+        '  JWT --> P2["Proof 2: Address Derivation<br/>pi_2 = ZKPoK{ sub, salt :<br/>addr = H(iss \\|\\| sub \\|\\| salt \\|\\| aud) }"]\n' +
+        '  P1 --> TX["Sui Transaction<br/>(tx, pi_1, pi_2, ephemeral_sig)"]\n' +
+        '  P2 --> TX\n' +
+        '  TX --> V["Sui Validators<br/>verify pi_1 + pi_2 + ephemeral_sig"]\n' +
+        '  V --> R["<b>Privacy:</b> validators never see sub or salt<br/><b>Security:</b> ephemeral key expires at max_epoch"]\n' +
+        '  classDef suimove fill:#111827,stroke:#8B5CF6,color:#fff\n' +
+        '  classDef consensus fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef txn fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class U,G,JWT suimove\n' +
+        '  class P1,P2 consensus\n' +
+        '  class TX,V,R txn',
       keyPoints: [
         "zkLogin lets users authenticate to Sui with Google/Apple/Facebook OAuth " +
           "without revealing their OAuth identity to validators or on-chain observers",
@@ -125,6 +143,21 @@ window.CH26_PAPERS = {
         '│  Your credential system needs updateable credentials for   │\n' +
         '│  KYC refresh, policy changes, balance cap adjustments      │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  ZKA["ZK Authenticator<br/>Key Properties"]\n' +
+        '  ZKA --> PP["Policy Privacy<br/>verifier learns: satisfied = true/false<br/><i>not which attributes checked</i>"]\n' +
+        '  ZKA --> OU["Oblivious Update<br/>old cred -> new cred<br/><i>indistinguishable from new issuance</i>"]\n' +
+        '  ZKA --> UP["Updateability<br/>issuer updates without re-issuance<br/><i>efficient revocation + refresh</i>"]\n' +
+        '  PP --> TH["Thesis relevance<br/>KYC refresh<br/>policy changes<br/>balance cap adjustments"]\n' +
+        '  OU --> TH\n' +
+        '  UP --> TH\n' +
+        '  classDef suimove fill:#111827,stroke:#8B5CF6,color:#fff\n' +
+        '  classDef consensus fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef txn fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class ZKA suimove\n' +
+        '  class PP,OU,UP consensus\n' +
+        '  class TH txn',
       keyPoints: [
         "Policy-private authenticator: verifier learns only whether a policy is " +
           "satisfied, not which specific policy attributes were checked",
@@ -200,6 +233,19 @@ window.CH26_PAPERS = {
         '│  STATUS: Design in progress at Mysten Labs (as of 2026)    │\n' +
         '│  NIGHT-SHIFT-REVIEW: cite design doc when published        │\n' +
         '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  OBJ["Sui Object Model<br/>{ id, type, owner, version, content }"]\n' +
+        '  OBJ --> CC["ConfidentialCoin object<br/>id: ObjectID<br/>commitment: Pedersen (C = v*G + r*H)<br/>range_proof: Bulletproof / Groth16<br/>audit_ciphertext: ElGamal (optional)"]\n' +
+        '  CC --> TR["Transfer proof (zk-SNARK)<br/>pi = ZKPoK{ v_in, v_out, r_in, r_out :<br/>C_in - C_out = r_excess * H (balance)<br/>v_out >= 0 (range)<br/>v_in = v_out + v_fee (fee) }"]\n' +
+        '  TR --> V["On-chain verification<br/>Sui validators verify pi"]\n' +
+        '  V --> S["<b>Status:</b> design in progress at Mysten Labs (2026)<br/>cite design doc when published"]\n' +
+        '  classDef suimove fill:#111827,stroke:#8B5CF6,color:#fff\n' +
+        '  classDef consensus fill:#1f2937,stroke:#6366F1,color:#fff\n' +
+        '  classDef txn fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class OBJ,CC suimove\n' +
+        '  class TR consensus\n' +
+        '  class V,S txn',
       keyPoints: [
         "Protocol-level confidential payments being designed by Mysten Labs for Sui — " +
           "amounts hidden via Pedersen commitments, validity proved via zk-SNARKs",

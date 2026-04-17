@@ -114,6 +114,26 @@ window.CH23_PAPERS = {
         '│  • Secret Network: emergency key rotation           │\n' +
         '│  • SGX on DDR4: fundamentally broken               │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  N["Normal DCAP flow<br/>Enclave -> DCAP quote -> PCK cert -> Verify"]\n' +
+        '  A["Attacker<br/>DDR4 interposer ($800)"]\n' +
+        '  CPU["CPU"]\n' +
+        '  DIMM["DDR4 DIMM memory"]\n' +
+        '  CPU <--> DIMM\n' +
+        '  A -.captures.-> CPU\n' +
+        '  A -.captures.-> DIMM\n' +
+        '  A --> K["ECDSA signing key<br/><i>extracted in <45 min</i>"]\n' +
+        '  K --> F["Forged SGX quotes<br/>Any DCAP attestation forgeable"]\n' +
+        '  F --> I1["Phala Network<br/>abandoned SGX -> TDX"]\n' +
+        '  F --> I2["Secret Network<br/>emergency key rotation"]\n' +
+        '  F --> I3["SGX on DDR4<br/>fundamentally broken"]\n' +
+        '  classDef attack fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class A,K,F attack\n' +
+        '  class N,CPU,DIMM tee\n' +
+        '  class I1,I2,I3 conclusion',
       keyPoints: [
         'Physical DDR4 interposer captures provisioning traffic during SGX key provisioning',
         'ECDSA signing key extracted in under 45 minutes with under $1000 hardware',
@@ -189,6 +209,22 @@ window.CH23_PAPERS = {
         '│  Impact: Enables fine-grained control-flow leakage  │\n' +
         '│  and data-dependent branch observation in TDX       │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  A["Attacker<br/>(privileged host, VMM)"]\n' +
+        '  CM["Intel TDX countermeasure<br/>if step_count < threshold -> abort TD"]\n' +
+        '  A --> P["Tuned PMI<br/>Performance Monitor Interrupt<br/>fires at N steps, N just above threshold"]\n' +
+        '  P --> B["Countermeasure never triggers<br/><i>off-by-one design flaw</i>"]\n' +
+        '  B --> O["Attacker observes<br/>per-instruction TD state<br/>(registers, flags)"]\n' +
+        '  O --> L["Control-flow leakage<br/>Data-dependent branch observation"]\n' +
+        '  L --> I["Patch: TDX Module firmware update + microcode<br/><b>Even well-designed countermeasures can fail</b>"]\n' +
+        '  CM -.bypassed by.-> P\n' +
+        '  classDef attack fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class A,P,B,O,L attack\n' +
+        '  class CM tee\n' +
+        '  class I conclusion',
       keyPoints: [
         'Single-stepping attacks let an attacker observe per-instruction CPU state inside a TD',
         'Intel added a countermeasure to TDX: detect abnormally small step counts and abort',
@@ -266,6 +302,28 @@ window.CH23_PAPERS = {
         '│  └── SGX QE converts → Quote (remote)             │\n' +
         '│        verified by Intel Trust Authority (ITA)     │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  subgraph TCB["Trusted Computing Base"]\n' +
+        '    CPU["CPU + TDX Module<br/>(SEAM firmware)"]\n' +
+        '  end\n' +
+        '  subgraph UNTRUSTED["Untrusted"]\n' +
+        '    VMM["VMM / Host OS"]\n' +
+        '    BIOS["BIOS / EFI"]\n' +
+        '    OTHER["Other VMs"]\n' +
+        '  end\n' +
+        '  TD["Trust Domain (TD)<br/>MRTD = SHA-384 of initial image<br/>RTMR0 firmware boot chain<br/>RTMR1 OS<br/>RTMR2 app<br/>RTMR3 user-defined"]\n' +
+        '  CPU --> TD\n' +
+        '  TD --> R["TDCALL[TDG.MR.REPORT]<br/>-> TDREPORT (local)<br/>MRTD + RTMRs + TD info + MAC"]\n' +
+        '  R --> Q["SGX QE converts<br/>-> Quote (remote)"]\n' +
+        '  Q --> ITA["Intel Trust Authority (ITA)<br/>JWT verification response"]\n' +
+        '  ITA --> I["On-chain verifier accepts TDX attestation<br/><b>Primary TEE backend for thesis</b>"]\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef attack fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class CPU,TD,R,Q,ITA tee\n' +
+        '  class VMM,BIOS,OTHER attack\n' +
+        '  class I conclusion',
       keyPoints: [
         'TDX creates hardware-isolated Trust Domains (VMs) where even the hypervisor is untrusted',
         'SEAM mode: TDX Module firmware runs in a new CPU privilege level, managing TD lifecycle',
@@ -341,6 +399,25 @@ window.CH23_PAPERS = {
         '│  HES  → CCA Platform Token (platform measurements) │\n' +
         '│  Verified via IETF RATS CCA profile                │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  subgraph WORLDS["ARM CCA Four-World Architecture"]\n' +
+        '    ROOT["Root World<br/>(EL3 FW)<br/>Boot chain, HES RoT"]\n' +
+        '    REALM["Realm World<br/>VM1, VM2, VM3<br/>Managed by RMM (EL2)"]\n' +
+        '    SECURE["Secure World<br/>(TrustZone)<br/>OP-TEE"]\n' +
+        '    NORMAL["Normal World<br/>Rich OS + Apps<br/>Hypervisor (untrusted to Realms)"]\n' +
+        '  end\n' +
+        '  REALM --> T1["RSI_ATTEST_TOKEN_INIT"]\n' +
+        '  T1 --> RMM["RMM -> Realm Attestation Token<br/>(CBOR / COSE)"]\n' +
+        '  RMM --> HES["HES -> CCA Platform Token<br/>(platform measurements)"]\n' +
+        '  HES --> V["Verified via IETF RATS CCA profile"]\n' +
+        '  V --> I["TEE-agnostic verification accepts CCA<br/><b>Alternative backend for mobile/edge</b>"]\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef attack fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class ROOT,REALM,SECURE,T1,RMM,HES,V tee\n' +
+        '  class NORMAL attack\n' +
+        '  class I conclusion',
       keyPoints: [
         'Four hardware worlds: Normal, Secure, Root, Realm — each enforced by NS/NSE bits',
         'Realm Management Extension (RME): hardware support for Realm world isolation',
@@ -422,6 +499,22 @@ window.CH23_PAPERS = {
         '│  │   Trust: math only, not hardware   │             │\n' +
         '│  └────────────────────────────────────┘             │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  IN["Input data"]\n' +
+        '  TEE["TEE<br/>Fast off-chain computation<br/>(native speed, no proof cost)<br/><i>Produces output + witness</i>"]\n' +
+        '  ZKVM["zkVM<br/>Proof generation<br/>(verifiable, trustless)<br/><i>Produces ZK proof &pi;</i>"]\n' +
+        '  V["On-chain verifier<br/>Verify &pi; in O(1) (cheap)<br/>Trust: math only, not hardware"]\n' +
+        '  IN --> TEE\n' +
+        '  TEE -->|witness| ZKVM\n' +
+        '  ZKVM -->|proof| V\n' +
+        '  V --> I["Compositional trust<br/>TEE speed + ZKP soundness<br/><b>Direct theoretical foundation for thesis</b>"]\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef defense fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class IN,TEE tee\n' +
+        '  class ZKVM,V defense\n' +
+        '  class I conclusion',
       keyPoints: [
         'TCU = TEE for fast off-chain computation + zkVM for verifiable on-chain proof',
         'TEE provides efficiency (native speed), zkVM provides soundness (mathematical proof)',
@@ -498,6 +591,32 @@ window.CH23_PAPERS = {
         '│  Security: attacker must compromise t distinct     │\n' +
         '│  TEE hardware platforms simultaneously             │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  TX["Transactions"]\n' +
+        '  OLD["Traditional TEE Rollup<br/>Single TEE operator<br/><i>single point of failure</i>"]\n' +
+        '  TDX["Intel TDX node"]\n' +
+        '  SEV["AMD SEV-SNP node"]\n' +
+        '  CCA["ARM CCA node"]\n' +
+        '  CONS["Threshold consensus<br/>t-of-n agreement"]\n' +
+        '  BATCH["Valid batch committed on-chain"]\n' +
+        '  TX -.contrast.-> OLD\n' +
+        '  TX --> TDX\n' +
+        '  TX --> SEV\n' +
+        '  TX --> CCA\n' +
+        '  TDX -->|vote| CONS\n' +
+        '  SEV -->|vote| CONS\n' +
+        '  CCA -->|vote| CONS\n' +
+        '  CONS --> BATCH\n' +
+        '  BATCH --> I["Attacker must compromise t distinct TEE vendors<br/><b>Heterogeneous trust eliminates single-vendor capture</b>"]\n' +
+        '  classDef attack fill:#1f2937,stroke:#EF4444,color:#fff\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef defense fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class OLD attack\n' +
+        '  class TDX,SEV,CCA tee\n' +
+        '  class CONS,BATCH,TX defense\n' +
+        '  class I conclusion',
       keyPoints: [
         'Heterogeneous TEE rollup: multiple TEE vendors in threshold committee prevents single-vendor capture',
         'Threat model: assumes any individual TEE can be compromised, system remains safe if t nodes are honest',
@@ -572,6 +691,24 @@ window.CH23_PAPERS = {
         '│  Zcash ZKP (Groth16) → hides amounts/identity      │\n' +
         '│  TEE (SGX) → protects key material during ops      │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  LC["Light client"]\n' +
+        '  ENC["SGX Enclave (ZLiTE server)<br/>Zcash full node logic<br/>Processes shielded TXs<br/>Private key ops inside<br/>SGX attestation proof"]\n' +
+        '  LC -->|request + TLS| ENC\n' +
+        '  ENC -->|attested response| V["Light client verifies SGX attestation<br/>Trusts response is from genuine Zcash code"]\n' +
+        '  ZKP["Zcash Groth16 ZKP<br/>hides amounts / identity"]\n' +
+        '  TEE["TEE (SGX)<br/>protects key material during ops"]\n' +
+        '  V --> ZKP\n' +
+        '  V --> TEE\n' +
+        '  ZKP --> I["2019 precursor to TEE + ZKP privacy pattern<br/><b>Now broken by WireTap 2025 -> migrate to TDX</b>"]\n' +
+        '  TEE --> I\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef defense fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class LC,ENC,V,TEE tee\n' +
+        '  class ZKP defense\n' +
+        '  class I conclusion',
       keyPoints: [
         'Combines TEE (SGX) with Zcash ZKP-based privacy: TEE protects key material, ZKP hides tx details',
         'Enables trustless light clients: SGX attestation proves server runs genuine Zcash code',
@@ -649,6 +786,23 @@ window.CH23_PAPERS = {
         '│  Hybrid: Hot Proof for high-frequency ops          │\n' +
         '│           Cold Proof for settlement / disputes     │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  HOT["Hot Proofs (TEE-based)<br/>Prover inside TEE<br/>Channel state proof<br/>TEE attestation = trust anchor<br/><i>Fast: <1ms per proof</i><br/><i>Cost: hardware trust required</i>"]\n' +
+        '  COLD["Cold Proofs (ZKP-based)<br/>Prover anywhere<br/>Groth16 / Halo2 proof<br/>No hardware trust<br/><i>Slow: 1-10 seconds</i><br/><i>Cost: proving computation</i>"]\n' +
+        '  VH["Verifier on-chain<br/>accepts attestation quote"]\n' +
+        '  VC["Verifier on-chain<br/>accepts ZK proof"]\n' +
+        '  HOT -->|attestation quote| VH\n' +
+        '  COLD -->|ZK proof| VC\n' +
+        '  VH --> HYBRID["Hybrid model<br/>Hot Proof for high-frequency ops<br/>Cold Proof for settlement / disputes"]\n' +
+        '  VC --> HYBRID\n' +
+        '  HYBRID --> I["Payment tier model for thesis<br/><b>Small payments -> Hot; Large -> Cold</b>"]\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef defense fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class HOT,VH tee\n' +
+        '  class COLD,VC defense\n' +
+        '  class HYBRID,I conclusion',
       keyPoints: [
         'Hot Proofs (TEE): fast, cheap, hardware-dependent trust — ideal for Lightning channel state proofs',
         'Cold Proofs (ZKP): slow, expensive, cryptographic trust — ideal for settlement and dispute resolution',
@@ -728,6 +882,26 @@ window.CH23_PAPERS = {
         '│          │  record)      │                          │\n' +
         '│          └───────────────┘                          │\n' +
         '└─────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  H1["Hospital 1<br/>TEE private data inside"]\n' +
+        '  H2["Hospital 2<br/>TEE private data inside"]\n' +
+        '  HN["Hospital N<br/>TEE private data inside"]\n' +
+        '  AGG["Aggregation<br/>of local gradients"]\n' +
+        '  ZKP["ZKP (Halo2 / Nova)<br/>Proves gradients were computed<br/>on valid private data"]\n' +
+        '  BC["Blockchain Audit Trail<br/>permanent record of every round"]\n' +
+        '  H1 -->|local gradient| AGG\n' +
+        '  H2 -->|local gradient| AGG\n' +
+        '  HN -->|local gradient| AGG\n' +
+        '  AGG --> ZKP\n' +
+        '  ZKP -->|ZK proof| BC\n' +
+        '  BC --> I["TEE + ZKP + blockchain triad<br/>validated in healthcare<br/><b>Thesis applies same triad to identity</b>"]\n' +
+        '  classDef tee fill:#111827,stroke:#10B981,color:#fff\n' +
+        '  classDef defense fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
+        '  class H1,H2,HN,AGG tee\n' +
+        '  class ZKP,BC defense\n' +
+        '  class I conclusion',
       keyPoints: [
         'TEE (SGX/TDX) protects private data during federated learning computation',
         'Halo2 or Nova ZKP proves gradient computations were performed on valid private data',

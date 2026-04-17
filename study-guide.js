@@ -26,6 +26,38 @@ const TECHNICAL_DATA = {
 
 const BLOCK_KEY_MAP = { 1: 'block1', 2: 'block2' };
 
+/* === Mermaid rendering (shared with paper-guide.js) === */
+let __sgMermaidConfigured = false;
+let __sgMermaidSeq = 0;
+
+function renderStudyGuideMermaid(host, src) {
+  if (typeof mermaid === 'undefined') return;
+  if (!__sgMermaidConfigured) {
+    mermaid.initialize({
+      startOnLoad: false, theme: 'dark', securityLevel: 'strict',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      themeVariables: {
+        primaryColor: '#1a1a1a', primaryTextColor: '#e5e5e5',
+        primaryBorderColor: '#06B6D4', lineColor: '#94a3b8',
+        secondaryColor: '#1f2937', tertiaryColor: '#111827',
+        background: '#0f0f0f', mainBkg: '#1a1a1a',
+        nodeBorder: '#06B6D4', clusterBkg: '#111827', clusterBorder: '#334155',
+      },
+    });
+    __sgMermaidConfigured = true;
+  }
+  const id = 'sg-mmd-' + (++__sgMermaidSeq);
+  mermaid.render(id, src).then(({ svg }) => {
+    host.innerHTML = svg;
+  }).catch((err) => {
+    console.error('[study-guide] Mermaid render failed', err);
+    const fallback = document.createElement('pre');
+    fallback.className = 'concept-diagram';
+    fallback.textContent = src;
+    host.replaceWith(fallback);
+  });
+}
+
 /* === State Persistence === */
 
 function loadGuideState() {
@@ -170,7 +202,13 @@ function buildIntuitiveContent(concept, dayNum) {
     container.appendChild(analogy);
   }
 
-  if (concept.diagram) {
+  if (concept.diagram_mermaid) {
+    const host = document.createElement('div');
+    host.className = 'concept-diagram-mermaid mermaid';
+    host.textContent = concept.diagram_mermaid;
+    container.appendChild(host);
+    renderStudyGuideMermaid(host, concept.diagram_mermaid);
+  } else if (concept.diagram) {
     const diagram = document.createElement('pre');
     diagram.className = 'concept-diagram';
     diagram.textContent = concept.diagram;
