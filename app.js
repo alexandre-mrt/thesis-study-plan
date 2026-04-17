@@ -219,6 +219,9 @@ function switchPlan() {
     planInitialized = true;
     window.PLAN.init();
   }
+
+  // T14: Switch to plan Pomodoro preset
+  setPomodoroPreset('plan');
 }
 
 function switchDay(chapterKey) {
@@ -342,49 +345,6 @@ function restoreActiveDay() {
   } catch {
     /* non-critical */
   }
-}
-
-// T14: Switch to Plan tab and apply plan Pomodoro preset.
-// Called by initDayTabs when data-day="plan" tab is clicked,
-// or directly by T13 agent code once the Plan tab is implemented.
-function switchPlan() {
-  const tabs = $$('.day-tab');
-  const sections = $$('.day-section');
-  const zkSection = $('#zk-deepdive');
-  const planSection = $('#plan-section');
-
-  tabs.forEach((tab) => {
-    const isActive = tab.dataset.day === 'plan';
-    tab.classList.toggle('active', isActive);
-    tab.setAttribute('aria-selected', String(isActive));
-  });
-
-  sections.forEach((sec) => {
-    const isActive = sec.dataset.day === 'plan';
-    sec.classList.toggle('active', isActive);
-    sec.hidden = !isActive;
-  });
-
-  if (zkSection) {
-    zkSection.classList.remove('active');
-    zkSection.hidden = true;
-  }
-
-  if (planSection) {
-    planSection.classList.add('active');
-    planSection.hidden = false;
-  }
-
-  try {
-    localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, 'plan');
-  } catch {
-    /* non-critical */
-  }
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  // T14: Switch to plan Pomodoro preset
-  setPomodoroPreset('plan');
 }
 
 // T14: Apply a Pomodoro preset. Does NOT reset a running timer —
