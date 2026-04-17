@@ -4,9 +4,9 @@
     "project": "thesis-study-plan",
     "branch": "feat/night-shift-2026-04-17-plan-sota",
     "started_at": "2026-04-17T16:45:00+02:00",
-    "iteration": 2,
-    "total_tasks": 18,
-    "completed_tasks": 10,
+    "iteration": 3,
+    "total_tasks": 19,
+    "completed_tasks": 14,
     "mission": "Transform thesis-study-plan into full 15-week (75 sessions \u00d7 2h = 150h) thesis prep program with SOTA content, Plan tab, weekly research loop, morning briefing integration. See NIGHT_SHIFT_THESIS_PREP_SPEC.md.",
     "window": "2026-04-20 to 2026-08-01",
     "cadence": "weekdays, 10h/week, 2h/session"
@@ -154,7 +154,7 @@
       "id": "T9",
       "title": "Plan tab: plan.js renderer",
       "description": "Create plan.js: loads sessions.json, renders 15-week \u00d7 5-day grid, color-coded cells by chapter, click \u2192 detail modal with objectives/materials/exercises, completion checkbox with localStorage key 'plan:session:<id>', progress bars (overall + this week), streak counter. Deep-link via ?session=<id>.",
-      "status": "pending",
+      "status": "completed",
       "priority": 1,
       "depends_on": [
         "T1"
@@ -167,7 +167,7 @@
       ],
       "iterations_attempted": 0,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:25:00+02:00"
     },
     {
       "id": "T10",
@@ -211,7 +211,7 @@
       "id": "T12",
       "title": "Integrate SOTA data files into chapter tabs",
       "description": "Edit index.html and chapter sections to include sota-ch21.js..sota-ch26.js and sota-rust.js. Add renderer hook in paper-guide.js or new sota-renderer.js to display SOTA cards within each chapter tab. Update search.js to index SOTA content.",
-      "status": "pending",
+      "status": "completed",
       "priority": 2,
       "depends_on": [
         "T2",
@@ -233,7 +233,7 @@
       ],
       "iterations_attempted": 0,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:25:00+02:00"
     },
     {
       "id": "T13",
@@ -302,7 +302,7 @@
       "id": "T16",
       "title": "Weekly update script",
       "description": "Create scripts/weekly-update.sh (executable): reads research-log/ entries of last 7 days, extracts new findings into chapter data files, regenerates search index, commits with conventional message, pushes to main. Document invocation in README.md.",
-      "status": "pending",
+      "status": "completed",
       "priority": 2,
       "depends_on": [
         "T15"
@@ -316,13 +316,13 @@
       ],
       "iterations_attempted": 0,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:25:00+02:00"
     },
     {
       "id": "T17",
       "title": "Morning briefing addon \u2014 thesis research digest",
       "description": "Create ~/.claude/skills/morning-thesis-addon/skill.md that can be invoked by the existing morning briefing. It reads research-log/ last 7 days + study-plan/sessions.json for today's session + research-queue.md next SOTA topic. Document how to wire into existing briefing.",
-      "status": "pending",
+      "status": "completed",
       "priority": 2,
       "depends_on": [
         "T15"
@@ -336,7 +336,7 @@
       ],
       "iterations_attempted": 0,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:25:00+02:00"
     },
     {
       "id": "T18",
@@ -356,6 +356,27 @@
       "agent_type": "night-qa",
       "isolation": "none",
       "files": [],
+      "iterations_attempted": 0,
+      "blocked_reason": null,
+      "completed_at": null
+    },
+    {
+      "id": "T19",
+      "title": "Mobile flashcard deck (interactive spaced repetition)",
+      "description": "Add a Flashcards tab with mobile-first UI. Short knowledge facts (not math-heavy) drawn from chapter guides + SOTA. Tap-to-flip card, mark correct/wrong, failed cards re-queue later in session. No external SRS lib \u2014 simple fail-retry queue. Persist deck state to localStorage.",
+      "status": "pending",
+      "priority": 1,
+      "depends_on": [],
+      "parallel_group": "D",
+      "agent_type": "night-coder",
+      "isolation": "worktree",
+      "files": [
+        "flashcards.js",
+        "flashcards.css",
+        "flashcard-data.js",
+        "index.html",
+        "app.js"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
       "completed_at": null
