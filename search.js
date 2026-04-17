@@ -252,7 +252,7 @@ function buildSearchIndex() {
         blockTitle: 'SOTA \u2014 Ch ' + (CHAPTER_LABELS[chKey] || chKey),
         searchText: searchText,
         link: item.link || '',
-        year: item.year || null,
+        timestamp: item.year || null,
       });
     });
   });

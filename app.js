@@ -535,6 +535,7 @@ function saveTimerState() {
       phase: timerState.phase,
       running: timerState.running,
       savedAt: Date.now(),
+      preset: activePomodoroPreset,
     };
     localStorage.setItem(STORAGE_KEYS.TIMER_STATE, JSON.stringify(data));
   } catch {
@@ -548,6 +549,9 @@ function restoreTimerState() {
     if (!raw) return;
 
     const data = JSON.parse(raw);
+    if (data.preset && POMODORO_PRESETS[data.preset]) {
+      activePomodoroPreset = data.preset;
+    }
     timerState = {
       ...timerState,
       seconds: data.seconds,
@@ -564,7 +568,8 @@ function restoreTimerState() {
         timerState = { ...timerState, seconds: remaining, running: true };
       } else {
         const nextPhase = data.phase === PHASE.WORK ? PHASE.BREAK : PHASE.WORK;
-        const nextSeconds = nextPhase === PHASE.WORK ? POMODORO.WORK_SECONDS : POMODORO.BREAK_SECONDS;
+        const preset = POMODORO_PRESETS[activePomodoroPreset] || POMODORO_PRESETS.chapters;
+        const nextSeconds = nextPhase === PHASE.WORK ? preset.work * 60 : preset.break * 60;
         timerState = { ...timerState, phase: nextPhase, seconds: nextSeconds, running: false };
       }
     }

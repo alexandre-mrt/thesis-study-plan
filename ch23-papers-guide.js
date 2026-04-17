@@ -186,7 +186,7 @@ window.CH23_PAPERS = {
         '│  ┌─────────────────────────────────────┐            │\n' +
         '│  │  Tuned PMI (Perf Monitor Interrupt) │            │\n' +
         '│  │  fires at exactly N steps, where    │            │\n' +
-        '│  │  N is just above Intel's threshold  │            │\n' +
+        '│  │  N is just above Intel\'s threshold  │            │\n' +
         '│  │  → Countermeasure never triggers    │            │\n' +
         '│  │  → Attacker observes per-instruction│            │\n' +
         '│  │    TD state (registers, flags)      │            │\n' +
@@ -364,7 +364,7 @@ window.CH23_PAPERS = {
         'ARM CCA is relevant as an alternative TEE backend for mobile and edge scenarios. ' +
         'Your thesis covers ARM CCA in the related work section as the future of ' +
         'mobile TEE computing. The IETF RATS attestation format used by CCA is more ' +
-        'standardized than Intel TDX's format, and could simplify the attestation ' +
+        'standardized than Intel TDX\'s format, and could simplify the attestation ' +
         'verification module in your Sui smart contract. If your system is deployed on ' +
         'ARM-based cloud infrastructure (AWS Graviton with future CCA support), the ' +
         'TEE-agnostic architecture handles it without redesign.',
