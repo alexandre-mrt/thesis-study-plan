@@ -202,13 +202,7 @@ function buildIntuitiveContent(concept, dayNum) {
     container.appendChild(analogy);
   }
 
-  if (concept.diagram_mermaid) {
-    const host = document.createElement('div');
-    host.className = 'concept-diagram-mermaid mermaid';
-    host.textContent = concept.diagram_mermaid;
-    container.appendChild(host);
-    renderStudyGuideMermaid(host, concept.diagram_mermaid);
-  } else if (concept.diagram) {
+  if (concept.diagram) {
     const diagram = document.createElement('pre');
     diagram.className = 'concept-diagram';
     diagram.textContent = concept.diagram;

@@ -184,13 +184,7 @@ function buildPaperIntuitiveContent(paper) {
     container.appendChild(analogy);
   }
 
-  if (paper.diagram_mermaid) {
-    const host = document.createElement('div');
-    host.className = 'concept-diagram-mermaid mermaid';
-    host.textContent = paper.diagram_mermaid;
-    container.appendChild(host);
-    renderPaperMermaid(host, paper.diagram_mermaid);
-  } else if (paper.diagram) {
+  if (paper.diagram) {
     const diagram = document.createElement('pre');
     diagram.className = 'concept-diagram';
     diagram.textContent = paper.diagram;

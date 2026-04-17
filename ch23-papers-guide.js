@@ -20,26 +20,35 @@ window.CH23_PAPERS = {
         'can listen to the temperature changes inside the duct and deduce what is happening in ' +
         'the vault without ever opening it. TEE.Fail shows that TDX and SEV-SNP both have ' +
         'these ventilation ducts in the form of power draw, cache timing, and memory bus signals.',
-      diagram_mermaid:
-        'flowchart TD\n' +
-        '  A["Attacker<br/>$1000 hardware"]\n' +
-        '  A --> P["Power analysis<br/>RAPL interface<br/><i>Leaks AES key bytes</i>"]\n' +
-        '  A --> C["Cache timing<br/>Prime+Probe on LLC<br/><i>Reveals data layout</i>"]\n' +
-        '  A --> M["Memory bus<br/>DDR4 interposer<br/><i>Plaintext memory reads</i>"]\n' +
-        '  P --> V1["Intel TDX<br/>Sapphire Rapids"]\n' +
-        '  C --> V1\n' +
-        '  M --> V1\n' +
-        '  P --> V2["AMD SEV-SNP<br/>Milan, Genoa"]\n' +
-        '  C --> V2\n' +
-        '  M --> V2\n' +
-        '  V1 --> I["No single TEE is side-channel-immune<br/><b>TEE-agnostic + hybrid ZKP design</b>"]\n' +
-        '  V2 --> I\n' +
-        '  classDef attack fill:#1f2937,stroke:#EF4444,color:#fff\n' +
-        '  classDef vendor fill:#111827,stroke:#10B981,color:#fff\n' +
-        '  classDef conclusion fill:#1a1a1a,stroke:#06B6D4,color:#fff\n' +
-        '  class A,P,C,M attack\n' +
-        '  class V1,V2 vendor\n' +
-        '  class I conclusion',
+      diagram:
+        '┌─────────────────────────────────────────────────────┐\n' +
+        '│            TEE.Fail: Attack Surface Map             │\n' +
+        '├─────────────────────────────────────────────────────┤\n' +
+        '│                                                     │\n' +
+        '│  Attacker ($1000 hardware)                          │\n' +
+        '│       │                                             │\n' +
+        '│       ├── Power analysis → RAPL interface           │\n' +
+        '│       │     • Measures CPU power draw per 1ms       │\n' +
+        '│       │     • Leaks AES key bytes during encrypt    │\n' +
+        '│       │                                             │\n' +
+        '│       ├── Cache timing → Prime+Probe on LLC         │\n' +
+        '│       │     • Shared L3 cache between enclave & OS  │\n' +
+        '│       │     • Access pattern reveals data layout    │\n' +
+        '│       │                                             │\n' +
+        '│       └── Memory bus → DDR4 interposer              │\n' +
+        '│             • Physical tap on DIMM slot             │\n' +
+        '│             • Reads plaintext memory accesses       │\n' +
+        '│                                                     │\n' +
+        '│  Affected:                                          │\n' +
+        '│  ┌─────────────┐  ┌──────────────┐                 │\n' +
+        '│  │ Intel TDX   │  │ AMD SEV-SNP  │                 │\n' +
+        '│  │ (Sapphire   │  │ (Milan,      │                 │\n' +
+        '│  │  Rapids)    │  │  Genoa)      │                 │\n' +
+        '│  └─────────────┘  └──────────────┘                 │\n' +
+        '│                                                     │\n' +
+        '│  Implication: No single TEE is side-channel-immune  │\n' +
+        '│  → TEE-agnostic + hybrid design is necessary        │\n' +
+        '└─────────────────────────────────────────────────────┘',
       keyPoints: [
         'Side-channel attacks break TDX and SEV-SNP with under $1000 of commodity hardware',
         'RAPL power interface leaks cryptographic key material (accessible to unprivileged software)',
