@@ -182,20 +182,10 @@ function buildDeepdiveSectionCard(sectionData, index, savedState) {
     diagramWrap.appendChild(diagramLabel);
 
     const raw = sectionData.diagram;
-    const mermaidSrc = typeof raw === 'object' && raw.type === 'mermaid' ? raw.src : null;
-
-    if (mermaidSrc && typeof mermaid !== 'undefined') {
-      const host = document.createElement('div');
-      host.className = 'zk-dd-diagram-mermaid mermaid';
-      host.textContent = mermaidSrc;
-      diagramWrap.appendChild(host);
-      renderMermaidWhenVisible(host, mermaidSrc);
-    } else {
-      const diagram = document.createElement('pre');
-      diagram.className = 'zk-dd-diagram';
-      diagram.textContent = typeof raw === 'string' ? raw : (raw && raw.src) || '';
-      diagramWrap.appendChild(diagram);
-    }
+    const diagram = document.createElement('pre');
+    diagram.className = 'zk-dd-diagram';
+    diagram.textContent = typeof raw === 'string' ? raw : (raw && raw.src) || '';
+    diagramWrap.appendChild(diagram);
 
     body.appendChild(diagramWrap);
   }
