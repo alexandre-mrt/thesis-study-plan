@@ -70,20 +70,25 @@ body {
 
 .nav-inner {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  min-width: 0;
 }
 
 .nav-left {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
+
+.nav-right { flex-shrink: 0; }
 
 .nav-title {
   font-weight: 700;
@@ -95,7 +100,16 @@ body {
 .day-tabs {
   display: flex;
   gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  min-width: 0;
+  flex: 1 1 auto;
+  -webkit-mask-image: linear-gradient(90deg, black 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, black 92%, transparent 100%);
 }
+.day-tabs::-webkit-scrollbar { display: none; }
+.day-tab { flex-shrink: 0; }
 
 .day-tab {
   display: flex;
@@ -1062,8 +1076,8 @@ body {
   margin: 0 2px;
 }
 
-/* === Responsive: Tablet === */
-@media (max-width: 768px) {
+/* === Responsive: Tablet + narrow desktop === */
+@media (max-width: 900px) {
   html, body { overflow-x: hidden; }
   :root { --nav-height: auto; }
   .nav { height: auto; padding: 10px 0; position: sticky; }
@@ -1099,8 +1113,22 @@ body {
     font-size: 12px;
   }
 
-  /* Hamburger button: always visible on mobile */
-  .mobile-menu-btn { display: flex; }
+  /* Hamburger button: always visible on mobile, 44px touch target */
+  .mobile-menu-btn { display: flex; min-width: 44px; min-height: 44px; justify-content: center; align-items: center; padding: 10px; }
+
+  /* Touch-target minimums on mobile */
+  .study-guide-toggle,
+  .exercise-toggle,
+  .view-btn,
+  .global-view-btn,
+  .pomo-btn,
+  .lexicon-toggle,
+  .quick-link,
+  .flashcard-flip,
+  .chapter-btn {
+    min-height: 44px;
+  }
+  .checkbox-wrap input[type="checkbox"] { width: 22px; height: 22px; }
 
   /* nav-right and search: hidden in collapsed state (default), shown when expanded */
   .nav-right { display: none; width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
