@@ -393,7 +393,10 @@ function setPomodoroPreset(presetKey) {
   const preset = POMODORO_PRESETS[presetKey];
   if (!preset) return;
   activePomodoroPreset = presetKey;
-  // Only update the mode indicator; do not interrupt a running timer
+  if (!timerState.running) {
+    const seconds = timerState.phase === PHASE.WORK ? preset.work * 60 : preset.break * 60;
+    timerState = { ...timerState, seconds };
+  }
   renderTimer();
 }
 

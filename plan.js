@@ -16,11 +16,9 @@ const PLAN_CHAPTER_LABELS = {
   ch25: 'Ch 2.5', ch26: 'Ch 2.6', rust: 'Rust', synthesis: 'Synth',
 };
 
-/* NIGHT-SHIFT-REVIEW: `synthesis` has no --chapter-color in plan.css.
- * Using ch26 (purple) as fallback tint. Add .plan-cell[data-chapter="synthesis"] rule if desired. */
 const CHAPTER_DATA_ATTR = {
   ch21: 'ch21', ch22: 'ch22', ch23: 'ch23', ch24: 'ch24',
-  ch25: 'ch25', ch26: 'ch26', rust: 'rust', synthesis: 'ch26',
+  ch25: 'ch25', ch26: 'ch26', rust: 'rust', synthesis: 'synthesis',
 };
 
 const PHASE_LABELS = {

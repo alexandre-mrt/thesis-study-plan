@@ -396,6 +396,7 @@
 .plan-cell[data-chapter="ch25"] { --chapter-color: var(--color-ch25); }
 .plan-cell[data-chapter="ch26"] { --chapter-color: var(--color-ch26); }
 .plan-cell[data-chapter="rust"] { --chapter-color: var(--color-rust); }
+.plan-cell[data-chapter="synthesis"] { --chapter-color: #A3E635; }
 
 /* Phase legend dot colors */
 .plan-legend-item[data-phase="p1"] { --legend-color: var(--color-ch21); }
@@ -799,6 +800,7 @@
 .plan-modal-content[data-chapter="ch25"] { --chapter-color: var(--color-ch25); }
 .plan-modal-content[data-chapter="ch26"] { --chapter-color: var(--color-ch26); }
 .plan-modal-content[data-chapter="rust"] { --chapter-color: var(--color-rust); }
+.plan-modal-content[data-chapter="synthesis"] { --chapter-color: #A3E635; }
 
 /* Modal responsive */
 @media (max-width: 768px) {
