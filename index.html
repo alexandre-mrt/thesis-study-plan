@@ -52,6 +52,10 @@
             <span class="day-tab-dot" style="background: var(--color-rust)"></span>
             Rust
           </button>
+          <button class="day-tab" data-day="method" role="tab" aria-selected="false" aria-controls="method-section">
+            <span class="day-tab-dot" style="background: #F43F5E"></span>
+            Method
+          </button>
           <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
             <span class="day-tab-dot" style="background: #8B5CF6"></span>
             ZK Deep Dive
@@ -944,6 +948,328 @@
         <button class="study-guide-toggle" style="--day-color: var(--color-rust)">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="rust" data-block="1"></div>
       </div>
+    </section>
+
+    <!-- ===== METHOD — Reading & Learning Methodology ===== -->
+    <section class="day-section" id="method-section" data-day="method" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: #F43F5E">
+        <div class="day-label">Methodology</div>
+        <h1 class="day-title">How to Read &amp; Learn Efficiently</h1>
+        <p class="day-date">Evidence-based techniques tailored to your brain</p>
+      </div>
+
+      <!-- Core Philosophy -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Your Brain&rsquo;s Two Modes</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Key insight:</strong> Your brain alternates between <em>focused mode</em> (intense concentration) and <em>diffuse mode</em> (relaxed background processing). You already know your brain works well with pauses &mdash; the science confirms it. The trick is to <strong>design your study sessions around both modes deliberately</strong>.
+        </div>
+        <div style="padding: 1.5rem; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-secondary); background: var(--bg-card); border-radius: var(--radius-md); margin: 1rem 1.5rem; white-space: pre; overflow-x: auto; line-height: 1.6;">
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;                  YOUR LEARNING CYCLE                      &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;                                                            &#9474;
+&#9474;   &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;     &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;     &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;       &#9474;
+&#9474;   &#9474;  FOCUSED  &#9474; ──→ &#9474;   BREAK   &#9474; ──→ &#9474;  DIFFUSE  &#9474;       &#9474;
+&#9474;   &#9474;   MODE    &#9474;     &#9474;  5-10min  &#9474;     &#9474;   MODE    &#9474;       &#9474;
+&#9474;   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;       &#9474;
+&#9474;   25 min deep          Walk, stretch,       &#9474;              &#9474;
+&#9474;   reading               no screens           &#9474; Background  &#9474;
+&#9474;                                               &#9474; connections &#9474;
+&#9474;   &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;                              &#9474;              &#9474;
+&#9474;   &#9474;  RECALL   &#9474; ←────────────────────────&#9472;&#9496;              &#9474;
+&#9474;   &#9474;  &amp; TEST  &#9474;     After break, test yourself            &#9474;
+&#9474;   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     before re-reading                       &#9474;
+&#9474;                                                            &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+        </div>
+        <p style="padding: 0 1.5rem 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+          <strong>Source:</strong> Barbara Oakley, <em>Learning How to Learn</em> (Coursera, 40M+ enrolled). The &ldquo;incubation effect&rdquo; is well-documented in cognitive science &mdash; your diffuse mode builds neural connections that focused mode alone cannot.
+        </p>
+      </div>
+
+      <!-- The Three-Pass Method -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">The Three-Pass Method (Keshav)</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>The gold standard for reading research papers.</strong> From S. Keshav&rsquo;s widely-cited &ldquo;How to Read a Paper&rdquo; (ACM SIGCOMM). Do NOT read linearly. Each pass has a specific goal.
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; padding: 1.5rem;">
+
+          <!-- Pass 1 -->
+          <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.5rem; border-top: 3px solid #F43F5E;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <span style="background: rgba(244,63,94,0.15); color: #F43F5E; font-weight: 700; font-size: 1.2rem; width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</span>
+              <div>
+                <strong style="font-size: 1.1rem;">Bird&rsquo;s Eye View</strong>
+                <div style="color: var(--text-muted); font-size: 0.8rem;">5&ndash;10 minutes</div>
+              </div>
+            </div>
+            <ul style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8; padding-left: 1.2rem;">
+              <li>Read title, abstract, introduction</li>
+              <li>Read section headings only</li>
+              <li>Glance at figures and their captions</li>
+              <li>Read conclusion</li>
+              <li>Scan references (which ones do you already know?)</li>
+            </ul>
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(244,63,94,0.08); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-secondary);">
+              <strong>After Pass 1, answer the 5 C&rsquo;s:</strong><br>
+              Category &bull; Context &bull; Correctness &bull; Contributions &bull; Clarity<br>
+              <em>If the paper isn&rsquo;t relevant, stop here. No guilt.</em>
+            </div>
+          </div>
+
+          <!-- Pass 2 -->
+          <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.5rem; border-top: 3px solid #F59E0B;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <span style="background: rgba(245,158,11,0.15); color: #F59E0B; font-weight: 700; font-size: 1.2rem; width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;">2</span>
+              <div>
+                <strong style="font-size: 1.1rem;">Detailed Read</strong>
+                <div style="color: var(--text-muted); font-size: 0.8rem;">~1 hour (with breaks)</div>
+              </div>
+            </div>
+            <ul style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8; padding-left: 1.2rem;">
+              <li>Read carefully but skip proofs/complex math</li>
+              <li>Study every figure, diagram, and table</li>
+              <li>Annotate key claims in the margin</li>
+              <li>Note unread references to follow up</li>
+              <li>Write a 3-sentence summary from memory</li>
+            </ul>
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(245,158,11,0.08); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-secondary);">
+              <strong>Your brain tip:</strong> Take a 10-min walk after Pass 2. Let diffuse mode integrate what you read. Then write the summary <em>without</em> looking at the paper.
+            </div>
+          </div>
+
+          <!-- Pass 3 -->
+          <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.5rem; border-top: 3px solid #10B981;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <span style="background: rgba(16,185,129,0.15); color: #10B981; font-weight: 700; font-size: 1.2rem; width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</span>
+              <div>
+                <strong style="font-size: 1.1rem;">Deep Reconstruction</strong>
+                <div style="color: var(--text-muted); font-size: 0.8rem;">4+ hours (only for core papers)</div>
+              </div>
+            </div>
+            <ul style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8; padding-left: 1.2rem;">
+              <li>Mentally reconstruct the paper from scratch</li>
+              <li>Work through proofs and math line-by-line</li>
+              <li>Identify hidden assumptions</li>
+              <li>Compare construction with alternatives</li>
+              <li>Ask: &ldquo;How would I improve this?&rdquo;</li>
+            </ul>
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(16,185,129,0.08); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-secondary);">
+              <strong>Only do Pass 3 for &ldquo;core&rdquo; papers.</strong> For your thesis, that&rsquo;s ~15 of 44 papers. The rest stop at Pass 1 or 2. This is not laziness &mdash; it&rsquo;s strategic allocation.
+            </div>
+          </div>
+        </div>
+
+        <p style="padding: 0 1.5rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
+          Source: S. Keshav, <a href="https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf" target="_blank" rel="noopener" style="color: #F43F5E;">&ldquo;How to Read a Paper&rdquo;</a> (ACM SIGCOMM, 2007). Cross-referenced with <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7392212/" target="_blank" rel="noopener" style="color: #F43F5E;">&ldquo;Ten simple rules for reading a scientific paper&rdquo;</a> (PLoS Computational Biology, 2020).
+        </p>
+      </div>
+
+      <!-- Your Optimized Session -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Your Optimized Study Session</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Designed for your brain.</strong> You process well with pauses and background integration. Here&rsquo;s the protocol, combining Pomodoro timing + spaced retrieval + diffuse mode breaks.
+        </div>
+
+        <div style="padding: 1.5rem;">
+          <div style="display: grid; gap: 1rem;">
+
+            <!-- Block 1 -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem; display: grid; grid-template-columns: 80px 1fr; gap: 1rem; align-items: start;">
+              <div style="text-align: center;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #F43F5E;">25 min</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">FOCUS</div>
+              </div>
+              <div>
+                <strong>Pass 1 of 2&ndash;3 papers</strong>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Skim title, abstract, headings, figures, conclusion. Use the 5 C&rsquo;s to decide: skip, pass 2, or core (pass 3 later). Mark status in the study plan.</p>
+              </div>
+            </div>
+
+            <!-- Break 1 -->
+            <div style="background: rgba(244,63,94,0.05); border: 1px solid rgba(244,63,94,0.15); border-radius: var(--radius-md); padding: 1rem; display: grid; grid-template-columns: 80px 1fr; gap: 1rem; align-items: center;">
+              <div style="text-align: center;">
+                <div style="font-size: 1.2rem; font-weight: 600; color: #F43F5E;">5 min</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">BREAK</div>
+              </div>
+              <div style="color: var(--text-secondary); font-size: 0.9rem;">Walk, stretch, look out the window. <strong>No screens.</strong> Your brain is connecting the dots.</div>
+            </div>
+
+            <!-- Block 2 -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem; display: grid; grid-template-columns: 80px 1fr; gap: 1rem; align-items: start;">
+              <div style="text-align: center;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #F59E0B;">25 min</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">FOCUS</div>
+              </div>
+              <div>
+                <strong>Pass 2 of one paper</strong>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Read carefully. Study figures. Annotate claims. Note which referenced papers you need. Skip proofs for now.</p>
+              </div>
+            </div>
+
+            <!-- Break 2 -->
+            <div style="background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: var(--radius-md); padding: 1rem; display: grid; grid-template-columns: 80px 1fr; gap: 1rem; align-items: center;">
+              <div style="text-align: center;">
+                <div style="font-size: 1.2rem; font-weight: 600; color: #F59E0B;">10 min</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">DIFFUSE</div>
+              </div>
+              <div style="color: var(--text-secondary); font-size: 0.9rem;">Longer break. Walk outside if possible. <strong>Your brain is now building the mental model.</strong> This is when the &ldquo;aha&rdquo; moments happen.</div>
+            </div>
+
+            <!-- Block 3 -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem; display: grid; grid-template-columns: 80px 1fr; gap: 1rem; align-items: start;">
+              <div style="text-align: center;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #10B981;">15 min</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">RECALL</div>
+              </div>
+              <div>
+                <strong>Active recall test (without looking at the paper)</strong>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Write from memory: (1) What problem does the paper solve? (2) What is the core construction? (3) How does it connect to your thesis? Then check against the paper. The gaps reveal what you <em>actually</em> learned.</p>
+              </div>
+            </div>
+
+            <!-- Block 4 -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem; display: grid; grid-template-columns: 80px 1fr; gap: 1rem; align-items: start;">
+              <div style="text-align: center;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: #6366F1;">25 min</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">FOCUS</div>
+              </div>
+              <div>
+                <strong>Interleave: switch to a different chapter</strong>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">If you just read a Ch 2.1 paper (anonymous credentials), now read a Ch 2.2 paper (range proofs) or Ch 2.3 (TEE). Interleaving forces your brain to compare and contrast, building deeper connections between thesis chapters.</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius-md); font-size: 0.9rem; color: var(--text-secondary);">
+            <strong style="color: #6366F1;">Why this works for you:</strong> The 25+5+25+10+15+25 cycle (~2 hours) gives your brain 3 focused blocks with 2 diffuse breaks and 1 recall block. The interleaving in block 4 forces cross-chapter connections (e.g., &ldquo;how do Bulletproofs++ range proofs interact with BBS+ credential proofs?&rdquo;). After 2 hours, take a real 30-min break. Your brain will keep processing.
+          </div>
+        </div>
+
+        <p style="padding: 0 1.5rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
+          Sources: <a href="https://journals.sagepub.com/doi/abs/10.1177/2372732215624708" target="_blank" rel="noopener" style="color: #F43F5E;">Kang (2016), &ldquo;Spaced Repetition Promotes Efficient and Effective Learning&rdquo;</a> &bull;
+          <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12292963/" target="_blank" rel="noopener" style="color: #F43F5E;">Investigating Break-Taking Techniques (2025)</a> &bull;
+          <a href="https://pdf.retrievalpractice.org/spacing/InterleavedRetrievalPracticePromotesScienceLearning_SanaYan_2022.pdf" target="_blank" rel="noopener" style="color: #F43F5E;">Sana &amp; Yan (2022), Interleaved Retrieval Practice</a>
+        </p>
+      </div>
+
+      <!-- Paper Triage Strategy -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Paper Triage: Your 44 Papers, Strategically</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Not all papers deserve the same effort.</strong> Use the relevance badges in the study plan to guide your depth.
+        </div>
+
+        <div style="padding: 1.5rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem; border-left: 3px solid #06B6D4;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <span style="background: rgba(6,182,212,0.15); color: #06B6D4; font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 999px;">CORE</span>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">~15 papers</span>
+              </div>
+              <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                <strong>Pass 1 + 2 + 3.</strong> Full reconstruction. Work through the math. Implement a toy version if possible. These are the papers your thesis builds on directly.
+              </p>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem; border-left: 3px solid var(--text-muted);">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <span style="background: rgba(255,255,255,0.08); color: var(--text-secondary); font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 999px;">RELATED</span>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">~15 papers</span>
+              </div>
+              <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                <strong>Pass 1 + 2.</strong> Understand the contribution and how it relates. No need for proof reconstruction. Cite them, know what they do, move on.
+              </p>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem; border-left: 3px solid rgba(255,255,255,0.15);">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <span style="background: rgba(255,255,255,0.04); color: var(--text-muted); font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 999px;">CONTEXT</span>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">~14 papers</span>
+              </div>
+              <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                <strong>Pass 1 only.</strong> Skim abstract + conclusion. Know they exist. Reference for completeness. 5 minutes max per paper.
+              </p>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.2); border-radius: var(--radius-md);">
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+              <strong style="color: #F43F5E;">Time estimate:</strong>
+              Context papers (14 &times; 10 min) = <strong>~2.5 hours</strong> &bull;
+              Related papers (15 &times; 1.5 hours) = <strong>~22 hours</strong> &bull;
+              Core papers (15 &times; 6 hours) = <strong>~90 hours</strong><br>
+              Total: ~115 hours of focused reading over 4&ndash;5 months before thesis starts. That&rsquo;s about 6&ndash;7 hours per week.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retention Techniques -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Retention Techniques</h2>
+        </div>
+
+        <div style="padding: 1.5rem; display: grid; gap: 1.5rem;">
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem;">
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #F43F5E;">1. Active Recall (not re-reading)</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              After reading a paper, close it. Write down: <em>What was the main contribution? What technique did they use? How does it connect to my thesis?</em> Only then re-open to check. Research shows recall doubles retention vs. re-reading (Karpicke &amp; Blunt, 2011).
+            </p>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem;">
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #F59E0B;">2. Spaced Repetition</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              Review paper summaries at expanding intervals: 1 day &rarr; 3 days &rarr; 1 week &rarr; 2 weeks &rarr; 1 month. The paper recap cards on this site are your review material. Revisit the &ldquo;Technical&rdquo; view of each paper card on the spaced schedule.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem;">
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #10B981;">3. Interleaving (mix chapters)</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              Never read 3 papers from the same chapter in a row. Alternate: BBS+ (Ch 2.1) &rarr; Bulletproofs++ (Ch 2.2) &rarr; TEE.Fail (Ch 2.3). This feels harder but produces 43% better retention in controlled studies (Rohrer &amp; Taylor, 2007).
+            </p>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem;">
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #6366F1;">4. Explain to Someone (or Rubber Duck)</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              Use the &ldquo;Intuitive&rdquo; view of each paper card as inspiration: can you explain the paper&rsquo;s core idea using the analogy? If not, you don&rsquo;t understand it yet. The Feynman technique: teach it simply, find the gaps, go back and learn those gaps.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 1.25rem;">
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #EC4899;">5. Sleep On It (literally)</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+              Read a challenging paper in the evening. Sleep. Review your notes the next morning. Sleep consolidates procedural and declarative memory (Walker, 2008). Your brain literally replays and strengthens the neural pathways formed during reading.
+            </p>
+          </div>
+        </div>
+
+        <p style="padding: 0 1.5rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
+          Sources:
+          <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8759977/" target="_blank" rel="noopener" style="color: #F43F5E;">Evidence of the Spacing Effect (PMC, 2022)</a> &bull;
+          <a href="https://www.learningscientists.org/blog/2021/3/4-1" target="_blank" rel="noopener" style="color: #F43F5E;">SQ3R / Learning Scientists</a> &bull;
+          <a href="https://www.science.org/content/article/how-seriously-read-scientific-paper" target="_blank" rel="noopener" style="color: #F43F5E;">Science Magazine &mdash; How to seriously read a paper</a>
+        </p>
+      </div>
+
     </section>
 
     <!-- ZK DEEP DIVE -->
