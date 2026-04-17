@@ -47,6 +47,21 @@ window.DAY2_GUIDE = {
           "Your thesis builds an anonymous credential system on Sui. Users receive credentials (e.g., KYC-verified, accredited investor) and prove properties without revealing identity, enabling private payments and compliant DeFi.",
         thesisExample:
           "In your thesis, anonymous credentials are the bridge between identity and privacy on Sui. A government issues a credential containing (name, age, nationality, KYC_level) signed with BBS+. When the user wants to make a private payment, they present a zero-knowledge proof that they hold a valid credential with KYC_level >= 2 — the Sui verifier learns only this fact, not the user's identity. The same credential works at different merchants without creating a traceable profile.",
+        history: {
+          inventor: "David Chaum (DigiCash)",
+          year: 1985,
+          context: "Chaum introduced blind signatures and anonymous credentials in his 1985 paper 'Security without Identification: Transaction Systems to Make Big Brother Obsolete.' Before Chaum, every digital identity transaction required revealing full identity. His eCash company (DigiCash, founded 1990) built the first privacy-preserving digital payment system.",
+          funFact: "DigiCash went bankrupt in 1998 — Chaum later said it was 'too early for the market.' The lineage runs Chaum 1985 → Brands 1993 (efficient blind signatures) → CL 2001 → BBS 2004 → BBS+ 2009 → SAAC 2025 (your thesis builds on this chain).",
+        },
+        limitations: [
+          "Revocation is fundamentally hard: revoking a credential without breaking unlinkability requires cryptographic accumulators, which add O(n) witness update cost for n credentials or require a trusted update server",
+          "Credential transfer prevention relies on the assumption that users will not share their secret key — there is no cryptographic mechanism to prevent a user from giving their full credential to someone else",
+          "Multi-show unlinkability means the issuer cannot detect abuse (e.g., one credential shared by 100 users) without adding linkability, creating a privacy-accountability tension",
+        ],
+        exercises: [
+          { type: "conceptual", question: "Explain why multi-show unlinkability is both a feature and a risk. How does your thesis address the credential-sharing problem?", hint: "Think about what happens if a user shares their secret key with 100 friends — how would the system detect this without breaking unlinkability?", answer: "Multi-show unlinkability means each presentation looks like a different user, so the issuer cannot track usage patterns. This is a feature for privacy but a risk because a single credential could be shared widely without detection. The thesis can mitigate this with rate-limiting at the TEE layer (TEE counts presentations per epoch) or with linkable presentations for high-value transactions where accountability outweighs privacy." },
+          { type: "design", question: "Design a credential issuance flow for your Sui system where a government issues a KYC credential. What attributes would you include, and which would be disclosed for a DeFi lending protocol?", hint: "Consider what a lending protocol legally needs (KYC level, accreditation status) vs. what it does not need (name, exact age, address).", answer: "Attributes: (name, date_of_birth, nationality, address, KYC_level, accreditation_status, credential_expiry). For a DeFi lending protocol, disclose only: KYC_level >= 2 (as a predicate, not the exact value) and accreditation_status = true. Everything else (name, DOB, nationality, address) stays hidden. The Groth16 circuit on Sui verifies the BBS+ signature is valid over all attributes while only checking the two predicates." },
+        ],
       },
       {
         name: "CL Signatures (Camenisch-Lysyanskaya)",
@@ -88,6 +103,22 @@ window.DAY2_GUIDE = {
           "CL signatures were the first practical anonymous credential scheme. Understanding CL helps you appreciate why BBS+ is preferred for Sui: CL keys are too large for on-chain storage and verification is expensive in circuits.",
         thesisExample:
           "CL signatures were the original anonymous credential scheme (IBM's Idemix). For your thesis comparison, CL uses RSA groups (~256B keys, slow modular exponentiation) while BBS+ uses pairings (~48B keys, faster operations). Your thesis argues for BBS+ over CL: BBS+ is 5x faster for selective disclosure, has smaller proofs, and aligns with BLS12-381 already used by Sui — making on-chain verification significantly cheaper.",
+        history: {
+          inventor: "Jan Camenisch and Anna Lysyanskaya (IBM Zurich / Brown University)",
+          year: 2001,
+          context: "Published 'An Efficient System for Non-transferable Anonymous Credentials with Optional Anonymity Revocation' at EUROCRYPT 2001, then the more practical 'A Signature Scheme with Efficient Protocols' at SCN 2002 (the version commonly called 'CL signatures'). Built on Chaum's 1985 foundations but made multi-message signing practical.",
+          funFact: "CL signatures became the core of IBM's Identity Mixer (Idemix) system, deployed in the Hyperledger Fabric blockchain. Lysyanskaya was only 25 when the first CL paper was published — she completed her PhD at MIT under Ron Rivest (the 'R' in RSA).",
+        },
+        limitations: [
+          "RSA-based: public keys are ~2048-4096 bits (256-512 bytes), compared to 48 bytes for BBS+ on BLS12-381 — prohibitively expensive for on-chain storage on Sui where storage costs ~76 MIST per byte",
+          "Modular exponentiation over RSA groups is ~10x slower than elliptic curve scalar multiplication, making CL proof generation take 200-500ms vs ~50ms for BBS+",
+          "CL requires a trusted RSA modulus generation ceremony (n = p*q where p,q must be secret) — if the factors leak, all credentials become forgeable",
+          "Not compatible with pairing-based SNARKs (Groth16): encoding RSA operations inside a BLS12-381 arithmetic circuit requires expensive non-native field arithmetic, inflating circuit size by 100x+",
+        ],
+        exercises: [
+          { type: "comparison", question: "Compare the key sizes and proof generation times of CL vs BBS+ signatures. Why does this make CL impractical for on-chain verification on Sui?", hint: "Consider Sui's storage pricing model and the gas cost of verifying modular exponentiation vs. pairing checks in a smart contract.", answer: "CL uses RSA groups with ~256B public keys and requires modular exponentiation (200-500ms proof generation). BBS+ uses BLS12-381 with ~48B keys and pairing-based operations (~50ms proof generation). On Sui, storing a CL public key costs ~5x more in storage fees. Worse, encoding RSA arithmetic inside a Groth16 circuit (which operates over BLS12-381's scalar field) requires non-native field emulation, inflating the circuit from ~10K constraints to 1M+, making on-chain verification infeasible." },
+          { type: "conceptual", question: "Why does the RSA trusted setup for CL signatures pose a different risk than the Groth16 trusted setup ceremony?", hint: "Think about what happens if the trapdoor leaks in each case — what can the attacker do?", answer: "If the RSA factors (p, q) leak, the attacker can forge arbitrary CL signatures — they can create credentials for any identity with any attributes. If the Groth16 toxic waste (tau) leaks, the attacker can forge proofs but cannot forge the underlying BBS+ signatures. The CL trapdoor compromises the credential system entirely, while the Groth16 trapdoor only compromises proof soundness (and can be mitigated with multi-party ceremonies like Powers of Tau)." },
+        ],
       },
       {
         name: "BBS+ Signatures",
@@ -132,6 +163,23 @@ window.DAY2_GUIDE = {
           "BBS+ is the primary candidate for your thesis credential system. It uses the same pairing-friendly curves as Groth16 (BLS12-381), making it efficient to verify BBS+ signature proofs inside SNARKs on Sui.",
         thesisExample:
           "BBS+ is THE signature scheme for your credential layer. The issuer signs attributes (a1,...,a10) with one BBS+ signature. During payment on Sui, the user randomizes the signature (A' = A^r) making each presentation unlinkable, then proves in zero-knowledge that specific attributes satisfy the verifier's policy. The pairing equation e(A', X~) = e(A_bar, g~_2) is what your Groth16 circuit encodes for on-chain verification.",
+        history: {
+          inventor: "Dan Boneh, Xavier Boyen, Hovav Shacham (Stanford University)",
+          year: 2004,
+          context: "BBS was published as 'Short Group Signatures' at CRYPTO 2004 — named after the authors' initials (Boneh-Boyen-Shacham). The '+' variant was introduced by Man Ho Au, Willy Susilo, and Yi Mu (University of Wollongong) in 2006, improving the scheme for efficient multi-message signing and proof of knowledge protocols.",
+          funFact: "BBS+ is now under IRTF standardization by the Crypto Forum Research Group (draft-irtf-cfrg-bbs-signatures). The W3C also adopted it for the VC Data Integrity BBS Cryptosuite (2023). Boneh went on to become one of the most cited cryptographers alive, co-authoring the BLS signature scheme used by Ethereum 2.0 and Sui.",
+        },
+        limitations: [
+          "Requires pairing-friendly curves (BLS12-381): scalar multiplication on BLS12-381 is 10-20x slower than on non-pairing curves like Curve25519, and pairing computation itself costs ~1ms per evaluation",
+          "Proof size grows linearly with the number of hidden attributes: each hidden message adds ~48 bytes (one G1 element) to the proof, so a credential with 20 hidden attributes produces a ~1KB proof",
+          "No post-quantum security: BBS+ relies on the hardness of the Discrete Logarithm Problem in pairing groups, which is broken by Shor's algorithm — a quantum computer with ~4000 logical qubits could forge signatures",
+          "The IRTF standardization is still in draft status (not finalized as of 2025), meaning the exact API and serialization format may change, creating integration risk for early adopters",
+        ],
+        exercises: [
+          { type: "calculation", question: "A BBS+ credential has 15 attributes. During a Sui DeFi interaction, the user discloses 3 attributes and hides 12. Estimate the proof size in bytes, knowing each hidden attribute adds ~48 bytes (one G1 point) and the base proof overhead is ~240 bytes.", hint: "Base proof = 240B (contains A', Abar, challenge, response for e and s). Each hidden attribute adds one scalar response (~32B) plus the commitment overhead.", answer: "Base proof overhead: ~240 bytes (A' in G1 = 48B, Abar in G1 = 48B, challenge = 32B, response_e = 32B, response_s = 32B, response_r = 48B). Hidden attributes: 12 * 32 bytes (scalar responses) = 384 bytes. Total: ~624 bytes. This fits comfortably in a single Sui transaction (max 128KB). In practice, the BBS+ proof is then wrapped inside a Groth16 SNARK, compressing it to a constant ~192 bytes regardless of hidden attributes." },
+          { type: "design", question: "Why does your thesis wrap BBS+ verification inside a Groth16 circuit instead of verifying BBS+ directly on-chain? What are the tradeoffs?", hint: "Think about gas costs: a BBS+ pairing check requires 2 pairings on-chain (~2M gas each), while Groth16 verification requires 3 pairings but proves arbitrary statements.", answer: "Direct BBS+ verification on Sui would require 2 pairing operations (~4M gas) and scale with the number of disclosed attributes. Wrapping BBS+ in Groth16 costs 3 pairings (~6M gas) but is CONSTANT regardless of credential complexity. The Groth16 approach also lets you combine BBS+ verification with range proofs, revocation checks, and policy predicates in a single proof — one on-chain verification covers everything. The tradeoff: Groth16 requires a trusted setup ceremony and proof generation takes ~2-5 seconds client-side (vs. ~50ms for raw BBS+ proof)." },
+          { type: "conceptual", question: "BBS+ has no post-quantum security. How would you future-proof your thesis credential system against quantum computers?", hint: "Consider hybrid approaches: what if the credential contains both a BBS+ signature and a lattice-based signature?", answer: "A hybrid approach: issue credentials with both a BBS+ signature (for current efficiency) and a lattice-based signature like Dilithium (for post-quantum security). During the transition period, verifiers accept either proof type. When quantum computers become practical, deprecate BBS+ and switch to lattice-based selective disclosure schemes (e.g., based on Module-LWE). The credential format stays the same — only the signature and proof mechanism change. This is the approach recommended by NIST's post-quantum migration guidelines." },
+        ],
       },
       {
         name: "Selective Disclosure",
@@ -172,6 +220,22 @@ window.DAY2_GUIDE = {
           "Selective disclosure is the key feature for your thesis use cases. A user can prove 'I am KYC-verified and accredited' to a DeFi protocol on Sui without revealing their name, nationality, or any other personal data.",
         thesisExample:
           "Selective disclosure is the UX differentiator of your system. A user with credential (name, age=25, country=CH, KYC=3) can prove 'age >= 18 AND country in EU/CH' to a Sui DeFi protocol without revealing their exact age (25), name, or KYC level. For payments below the threshold, they only prove 'valid credential exists.' This flexibility means one credential covers convenience stores, DeFi protocols, and regulated exchanges with different disclosure levels.",
+        history: {
+          inventor: "Stefan Brands (CWI Amsterdam / Credentica)",
+          year: 1993,
+          context: "While Chaum introduced the concept of anonymous credentials in 1985, Stefan Brands formalized practical selective disclosure in his 1993 PhD thesis 'Untraceable Off-line Cash in Wallets with Observers.' Brands showed how to reveal individual attributes from a signed credential without a full ZK proof. His scheme was later acquired by Microsoft (U-Prove, 2008).",
+          funFact: "Microsoft acquired Brands' company Credentica in 2008 and released U-Prove as an open specification, but it never achieved mainstream adoption. Meanwhile, the EU Digital Identity Wallet (eIDAS 2.0, mandated by 2026) chose the BBS+/SD-JWT approach for selective disclosure — validating the concept 30 years after Brands' original work.",
+        },
+        limitations: [
+          "Range proofs (e.g., age >= 18) are expensive: a Bulletproof range proof for a 64-bit value adds ~672 bytes and ~50ms verification time; encoding range checks in Groth16 adds ~10K constraints per predicate",
+          "Set membership proofs ('country in {CH, DE, FR, ...}') scale linearly with set size when done naively — a Merkle proof approach reduces this to O(log n) but adds tree management complexity",
+          "The verifier's disclosure policy must be fixed before proof generation — dynamic policies (where the verifier decides what to ask after seeing partial data) are not supported without interactive protocols",
+          "Correlation attacks: even with selective disclosure, if a user always discloses the same unusual combination of attributes (e.g., age=97 AND country=LI), the verifier can re-identify them statistically",
+        ],
+        exercises: [
+          { type: "design", question: "Design three disclosure policies for your Sui payment system: (1) a coffee shop, (2) a DeFi lending protocol, (3) a regulated exchange. What attributes does each verifier need?", hint: "Think about regulatory requirements at each tier: no KYC for small payments, basic KYC for DeFi, full KYC for exchanges. Map this to specific credential attributes.", answer: "(1) Coffee shop: disclose NOTHING — only prove 'I hold a valid, non-revoked credential' (existence proof). (2) DeFi lending: disclose KYC_level >= 2 (predicate) and accreditation_status = true (exact value) — hides name, age, nationality. (3) Regulated exchange: disclose name, nationality, date_of_birth (for sanctions screening), KYC_level >= 3 — this is the maximum disclosure level, approaching traditional KYC but still keeping address and other attributes private." },
+          { type: "conceptual", question: "How do correlation attacks threaten selective disclosure, and what countermeasures can your thesis system employ?", hint: "If only 3 people in Switzerland are exactly 97 years old, disclosing 'age >= 95 AND country = CH' effectively identifies you. How do you prevent this?", answer: "Correlation attacks exploit the uniqueness of attribute combinations. Countermeasures: (1) Use predicates instead of exact values (age >= 18 instead of age = 25). (2) Coarsen disclosed values (country_region = 'Western Europe' instead of country = CH). (3) The credential issuer can add k-anonymity guarantees: refuse to issue credentials with attribute combinations shared by fewer than k users. (4) The verifier policy should be audited to reject policies that could re-identify users with high probability." },
+        ],
       },
       {
         name: "W3C Verifiable Credentials & DIDs",
@@ -218,6 +282,22 @@ window.DAY2_GUIDE = {
           "Your thesis maps the VC/DID model onto Sui. DIDs could be Sui addresses, VCs are issued off-chain (or anchored on-chain), and VPs are ZK proofs verified by Sui smart contracts. This bridges W3C standards with blockchain verification.",
         thesisExample:
           "Your system implements W3C Verifiable Credentials on Sui. Each user has a DID (did:sui:<wallet_object_id>) resolved from a Sui object. Credentials follow the VC data model with BBS+ as the proof mechanism. The VP (Verifiable Presentation) sent to a Sui smart contract contains the selective disclosure proof. This standards compliance means your thesis system could interoperate with the EU Digital Identity Wallet (eIDAS 2.0) — a massive real-world adoption vector.",
+        history: {
+          inventor: "W3C Credentials Community Group (Manu Sporny, Dave Longley, et al.)",
+          year: 2019,
+          context: "The W3C Verifiable Credentials Data Model 1.0 became a W3C Recommendation in November 2019. DIDs (Decentralized Identifiers) reached W3C Recommendation status in July 2022. The work built on earlier efforts: Christopher Allen's 'Self-Sovereign Identity' principles (2016), the Rebooting the Web of Trust workshops (2015+), and the Sovrin Foundation's Hyperledger Indy (2017).",
+          funFact: "There are now 100+ registered DID methods (did:web, did:key, did:ion, did:ethr, etc.) but no dominant standard has emerged. The EU's eIDAS 2.0 regulation (2024) mandates that all EU member states offer digital identity wallets by 2026, using VC-compatible formats — this is the largest-scale deployment of verifiable credentials in history, targeting 450 million EU citizens.",
+        },
+        limitations: [
+          "The VC ecosystem is fragmented: JSON-LD credentials (used by W3C VC Data Integrity) and JWT credentials (used by OpenID4VC) have different serialization, proof formats, and tooling — interoperability between them requires translation layers",
+          "DID resolution depends on the DID method: did:web relies on DNS/HTTPS (centralized), did:key has no revocation, did:ethr requires an Ethereum node — no DID method satisfies all requirements (decentralized + resolvable + revocable + privacy-preserving)",
+          "The VC Data Model does not specify a standard for selective disclosure — this is left to proof suites (BBS+, SD-JWT), creating a 'proof format war' between competing approaches",
+          "Storing VCs on-chain (for availability) conflicts with GDPR's right to erasure: personal data committed to an immutable blockchain cannot be deleted, even if encrypted",
+        ],
+        exercises: [
+          { type: "design", question: "Design a did:sui DID method for your thesis. What would the DID document contain, how would it be resolved, and where would it be stored on Sui?", hint: "Think about Sui's object model: a DID document could be a Sui object owned by the user's address. Resolution = reading the object. What fields go in the DID document?", answer: "DID format: did:sui:<object_id>. The DID document is a Sui object containing: (1) public keys for authentication (Ed25519 for Sui transactions, BLS12-381 for BBS+ credential binding), (2) service endpoints (e.g., credential storage URL), (3) controller field (the Sui address that owns the object). Resolution: call sui_getObject with the object_id. Key rotation: the controller transfers the object or updates it via a Move function. Cost: ~0.01 SUI for creation, free for resolution (read-only RPC call)." },
+          { type: "comparison", question: "Compare how your thesis system handles VCs vs. how the EU Digital Identity Wallet (eIDAS 2.0) handles them. Where could they interoperate?", hint: "eIDAS 2.0 uses SD-JWT and mdoc formats. Your thesis uses BBS+. The interoperability point is at the credential issuance and attribute level.", answer: "eIDAS 2.0 wallets use SD-JWT (selective disclosure via hash-based redaction) and ISO 18013-5 mdoc format. Your thesis uses BBS+ for ZK-based selective disclosure. Interoperability: (1) At issuance: a government could issue the same attributes in both SD-JWT (for eIDAS compliance) and BBS+ (for Sui ZK proofs) formats. (2) At the attribute level: both systems encode the same claims (name, DOB, nationality) — a bridge service could re-sign eIDAS credentials with BBS+ for use on Sui. (3) The DID layer is already interoperable if did:sui follows the W3C DID spec." },
+        ],
       },
       {
         name: "Revocation Mechanisms",
@@ -259,6 +339,22 @@ window.DAY2_GUIDE = {
           "On Sui, the revocation accumulator can be stored as a shared object, updated by the issuer. Users fetch the latest accumulator and generate a non-membership proof as part of their credential presentation ZK circuit.",
         thesisExample:
           "Your thesis uses an on-chain RSA accumulator for revocation. When an issuer revokes a credential (e.g., expired passport), they update the accumulator on Sui. During each payment, the user includes a non-revocation proof: 'my credential is NOT in the revoked set.' This proof is bundled into the Groth16 circuit alongside the credential proof — one on-chain verification covers both validity and non-revocation, keeping gas costs constant.",
+        history: {
+          inventor: "Josh Benaloh and Michael de Mare (Yale University)",
+          year: 1993,
+          context: "Benaloh and de Mare introduced cryptographic accumulators in 'One-Way Accumulators: A Decentralized Alternative to Digital Signatures' at EUROCRYPT 1993. Camenisch and Lysyanskaya later adapted accumulators for anonymous credential revocation in their 2002 paper 'Dynamic Accumulators and Application to Efficient Revocation of Anonymous Credentials.' The Hyperledger AnonCreds specification (2023) uses CL-based accumulators for revocation.",
+          funFact: "The simplest revocation approach — a revocation list (CRL) — was proposed in X.509 certificates in 1988. It took 15 years to develop privacy-preserving revocation that does not reveal WHICH credential is being checked. Even today, most deployed credential systems use non-private revocation (OCSP, CRLs) because accumulator-based revocation is complex to implement correctly.",
+        },
+        limitations: [
+          "Witness updates are expensive: when k credentials are revoked in an epoch, each remaining user must update their witness — naive approach is O(k) multiplications per user per epoch, though batching reduces this to O(1) amortized with an update server",
+          "RSA accumulators require a trusted setup (same problem as CL): the accumulator modulus n = p*q must have secret factors. Pairing-based accumulators (Nguyen 2005) avoid this but are less efficient",
+          "Revocation latency vs. privacy tradeoff: checking revocation in real-time requires the accumulator to be updated on-chain after every revocation, creating a timing side-channel (the verifier learns WHEN the accumulator last changed)",
+          "On Sui, the accumulator is a shared object — concurrent revocations by multiple issuers create contention, as shared object transactions go through Sui's consensus path (~400ms) rather than the fast path (~200ms)",
+        ],
+        exercises: [
+          { type: "design", question: "Design the revocation flow for your Sui credential system. Where is the accumulator stored, who updates it, and how does the user prove non-revocation inside the Groth16 circuit?", hint: "The accumulator value lives on-chain as a shared Sui object. The user fetches it via RPC, computes a non-membership witness locally, and includes it in the circuit.", answer: "Flow: (1) Issuer creates a Sui shared object containing the RSA accumulator value and epoch counter. (2) To revoke credential #42, the issuer calls revoke(42) which updates acc = acc * g^(s+42)^(-1) on-chain. (3) Before each payment, the user fetches the latest accumulator via sui_getObject. (4) The user computes their non-membership witness w_i such that w_i^(s+id_i) = acc (using the public accumulator and their credential ID). (5) Inside the Groth16 circuit, the user proves: 'I know w_i such that e(w_i, g2^s * g2^id_i) = e(acc, g2)' (pairing-based check). The accumulator value is a public input to the circuit." },
+          { type: "conceptual", question: "Why can you NOT simply publish a list of revoked credential IDs on Sui? What privacy property would this break?", hint: "Think about what happens when the verifier checks the revocation list — can they learn which credential the user holds?", answer: "Publishing a plaintext revocation list breaks unlinkability. If the verifier sees the list {id_42, id_87, id_103} and the user proves 'my id is not in this list,' the verifier now knows the user's credential ID is NOT 42, 87, or 103. With repeated interactions and a shrinking candidate set, the verifier can eventually identify the user. Accumulator-based revocation avoids this: the user proves non-membership against a single opaque value (the accumulator), and the proof reveals nothing about which specific credential was checked." },
+        ],
       },
     ],
   },
@@ -308,6 +404,22 @@ window.DAY2_GUIDE = {
           "In your thesis, TEEs can run credential issuance or ZK proof generation in a protected environment. This enables a hybrid trust model where TEE handles performance-critical operations while ZKPs provide the mathematical guarantee.",
         thesisExample:
           "In your thesis, TEEs provide the fast path for credential verification. When low latency matters (point-of-sale payments), the merchant's TEE verifies the BBS+ credential in ~1ms instead of waiting for on-chain ZKP verification (~500ms proof generation + block time). The TEE guarantees the merchant's software honestly checks the credential without seeing the hidden attributes — hardware-enforced privacy at payment-terminal speed.",
+        history: {
+          inventor: "Multiple vendors (ARM TrustZone 2004, Intel SGX 2015, AMD SEV 2016)",
+          year: 2004,
+          context: "ARM introduced TrustZone in 2004 for mobile devices (secure boot, DRM, mobile payments). Intel announced SGX in 2013 and shipped it in Skylake processors (2015) for server-side confidential computing. AMD followed with SEV (Secure Encrypted Virtualization) in 2016 for VM-level isolation. The Confidential Computing Consortium (Linux Foundation, 2019) now coordinates cross-vendor TEE standardization.",
+          funFact: "The concept of a 'secure coprocessor' dates back to the IBM 4758 cryptographic coprocessor (1998), which self-destructed (zeroized keys) if tampered with physically. Modern TEEs achieve similar goals in software using CPU microcode, without the dramatic hardware self-destruction.",
+        },
+        limitations: [
+          "TEE security fundamentally depends on trusting the CPU manufacturer (Intel, AMD, ARM) — a compromised or backdoored manufacturing process invalidates all security guarantees, and there is no way to independently verify silicon integrity",
+          "Side-channel attacks have repeatedly broken TEE confidentiality: Foreshadow/L1TF (2018), Plundervolt (2019), AEPIC Leak (2022), WireTap (CCS 2025) — each new CPU generation brings new attack surfaces",
+          "Performance overhead: SGX enclave transitions (ECALL/OCALL) cost ~8,000-14,000 CPU cycles each, and the EPC memory limit (128-256MB) causes expensive page swapping for large workloads",
+          "TEEs provide confidentiality and integrity but NOT availability: a malicious OS can refuse to schedule the enclave, starve it of resources, or simply kill the process",
+        ],
+        exercises: [
+          { type: "conceptual", question: "Why does your thesis use TEEs as a 'performance optimization' rather than a 'trust anchor'? What happens if every TEE in the system is compromised simultaneously?", hint: "Think about the fallback path: if TEEs break, what still works? If ZKPs break (math is wrong), what still works?", answer: "TEEs depend on hardware trust (Intel/AMD) which has been broken repeatedly by side-channel attacks. If all TEEs are compromised, the system falls back to pure ZKP verification: users generate Groth16 proofs client-side and verify on-chain. This is slower (~2-5s proving vs. ~1ms TEE verification) but relies only on mathematical hardness assumptions (DLP, pairing hardness) which have held for 40+ years. The thesis architecture treats TEE compromise as a 'when, not if' event and ensures the system degrades gracefully rather than catastrophically." },
+          { type: "comparison", question: "Compare Intel SGX, AMD SEV, and ARM TrustZone across three dimensions: isolation granularity, memory encryption, and attestation model.", hint: "SGX = per-process enclaves, SEV = per-VM encryption, TrustZone = two-world partition (secure/normal). Think about what each model protects against.", answer: "SGX: process-level isolation, encrypts enclave memory pages (EPC) with MEE, remote attestation via EPID/DCAP (proves specific code is running). AMD SEV: VM-level isolation, encrypts entire VM memory with per-VM keys (SEV-SNP adds integrity), remote attestation via AMD's signing key. ARM TrustZone: two-world hardware partition (secure world vs. normal world), no memory encryption by default (added in ARMv9 CCA), limited attestation (no standard remote attestation protocol). For your thesis: SGX gives the finest granularity (protect just the BBS+ verification code), SEV is better for full confidential VMs, TrustZone is relevant for mobile wallets." },
+        ],
       },
       {
         name: "Intel SGX Enclaves",
@@ -350,6 +462,22 @@ window.DAY2_GUIDE = {
           "SGX enclaves can host a credential issuer or a ZK prover on Sui validators. The enclave ensures that secret keys (issuer signing key, user private data) never leave the protected environment, even if the host machine is compromised.",
         thesisExample:
           "Your TEE layer uses SGX enclaves on Sui validator nodes or payment processors. The enclave loads the BBS+ verification logic and issuer public keys, sealed to MRENCLAVE. Users submit encrypted credential presentations to the enclave via ECALL. The enclave verifies the BBS+ proof, checks the policy, and returns only accept/reject — the credential attributes never leave the encrypted enclave memory, even if the validator node's OS is compromised.",
+        history: {
+          inventor: "Intel Corporation",
+          year: 2015,
+          context: "SGX was announced in Intel's ISA extensions documentation in 2013 and first shipped in 6th-gen Core processors (Skylake, 2015). It was designed to protect code and data from a compromised OS, hypervisor, or BIOS. The first major deployment was for DRM (Netflix 4K required SGX for content protection). Intel deprecated SGX in consumer CPUs (12th-gen Alder Lake, 2022) but continues supporting it in server-grade Xeon processors.",
+          funFact: "Intel removed SGX from consumer CPUs in 2022 after years of side-channel attacks embarrassed the 'impenetrable enclave' marketing. However, cloud providers (Azure Confidential Computing, Alibaba Cloud) doubled down on SGX for servers. The WireTap attack (CCS 2025) later showed that even DCAP attestation keys could be extracted with <$1000 of equipment — the cat-and-mouse game continues.",
+        },
+        limitations: [
+          "EPC (Enclave Page Cache) is limited to 128-256MB: workloads exceeding this trigger page swapping through the untrusted OS, adding ~1000x latency per swapped page and creating page-fault side channels observable by the OS",
+          "ECALL/OCALL transitions cost 8,000-14,000 cycles each (~3-5 microseconds) — a chatty interface design with frequent enclave transitions can degrade throughput by 10-100x compared to native execution",
+          "Intel deprecated SGX in consumer CPUs (12th-gen Alder Lake, 2022), limiting deployment to Xeon server processors — this means end-user devices cannot run SGX enclaves, restricting TEE-based credential verification to server infrastructure",
+          "Sealing binds data to either MRENCLAVE (code identity) or MRSIGNER (developer identity) — sealed data becomes unrecoverable if the enclave binary is updated (MRENCLAVE changes) unless migration logic is explicitly implemented",
+        ],
+        exercises: [
+          { type: "design", question: "Design the ECALL interface for an SGX enclave that verifies BBS+ credentials in your Sui payment system. What functions would you expose, and what data crosses the enclave boundary?", hint: "Minimize the ECALL surface: ideally one function that takes an encrypted credential presentation and returns accept/reject. Think about what must NOT leave the enclave.", answer: "ECALL interface: (1) ecall_init(sealed_config) — loads issuer public keys and verification policy from sealed storage. (2) ecall_verify(encrypted_presentation, nonce) -> {accept: bool, attestation_report: bytes} — the main function. Input: the user's BBS+ proof encrypted with the enclave's public key. Output: accept/reject boolean plus an attestation report binding the result to the nonce. Inside the enclave: decrypt presentation, verify BBS+ signature, check attribute predicates against policy, check non-revocation. NOTHING else crosses the boundary — no attributes, no intermediate values, no credential IDs." },
+          { type: "conceptual", question: "Why did Intel deprecate SGX in consumer CPUs but keep it in Xeon server processors? What does this mean for your thesis architecture?", hint: "Think about the threat model difference: consumer devices are physically controlled by the user (they ARE the attacker), while servers are in controlled data centers.", answer: "In the consumer threat model, the CPU owner IS the potential attacker (wants to bypass DRM, extract secrets). Side-channel attacks require physical access or root privilege, which the owner has. SGX on consumer CPUs was primarily used for DRM, which became indefensible after Foreshadow. In the server model, the attacker is a co-tenant or compromised admin — SGX protects against cloud provider insiders. For the thesis: TEE-based credential verification must run on servers (Sui validators, payment processors), not end-user devices. The user's wallet generates proofs client-side (ZKP, no TEE needed). This aligns with the hybrid architecture: TEE on servers for speed, ZKP on clients for trustlessness." },
+        ],
       },
       {
         name: "Remote Attestation",
@@ -392,6 +520,22 @@ window.DAY2_GUIDE = {
           "Remote attestation is critical for your thesis trust model. A Sui smart contract (or off-chain verifier) can verify that a TEE-based credential issuer is running the correct code, bridging hardware trust guarantees into the blockchain protocol.",
         thesisExample:
           "Before sending their credential to a TEE, the user verifies via remote attestation that the enclave is running the correct verification code (MRENCLAVE matches the audited binary). The attestation report includes a fresh nonce from the user, preventing replay. On Sui, the attestation could be verified on-chain once, and subsequent users trust the attested enclave — amortizing the attestation cost across many credential verifications.",
+        history: {
+          inventor: "Trusted Computing Group (TCG) / Intel",
+          year: 2003,
+          context: "The concept of remote attestation was formalized by the Trusted Computing Group (TCG) in the TPM 1.2 specification (2003), using Platform Configuration Registers (PCRs) to measure boot state. Intel adapted this for SGX with EPID-based attestation (2015) where platforms prove membership in a group without revealing individual identity. Intel later introduced DCAP (Data Center Attestation Primitives, 2018) for decentralized attestation that does not require contacting Intel's servers.",
+          funFact: "EPID (Enhanced Privacy ID) uses group signatures — all SGX platforms share a group key, so the attestation verifier cannot distinguish individual CPUs. This was designed for privacy, but it also means Intel cannot selectively revoke a single compromised CPU without revoking the entire group. DCAP switched to ECDSA (per-platform keys) to fix this, but at the cost of revealing platform identity.",
+        },
+        limitations: [
+          "IAS (Intel Attestation Service) is centralized: if Intel's servers are down or Intel decides to revoke attestation for a platform, the enclave cannot prove its integrity — this is a single point of failure for any system relying on IAS",
+          "DCAP eliminates the Intel dependency but introduces a new problem: per-platform ECDSA keys reveal platform identity, breaking the privacy guarantees that EPID provided — a verifier can track which physical machine generated each attestation",
+          "Attestation reports prove code identity (MRENCLAVE) at load time but NOT runtime behavior: if the enclave code has a bug that leaks secrets through a side channel, the attestation still shows 'correct code is running'",
+          "The WireTap attack (CCS 2025) demonstrated that DCAP attestation keys can be extracted with <$1000 of hardware equipment, enabling attestation forgery — an attacker can produce fake attestation reports for code that is not actually running in an enclave",
+        ],
+        exercises: [
+          { type: "design", question: "Design the attestation verification flow for your Sui system. Should attestation be verified on-chain or off-chain? How do you handle attestation expiry?", hint: "On-chain ECDSA signature verification is feasible on Sui (~2000 gas). But the attestation report contains Intel's certificate chain — do you verify the full chain on-chain?", answer: "Hybrid approach: (1) The TEE operator submits the full DCAP attestation report + Intel certificate chain to a Sui smart contract ONCE. (2) The contract verifies the ECDSA signature chain (root CA -> PCK cert -> attestation report), checks MRENCLAVE against a whitelist, and stores a 'TEE_ATTESTED' flag with an expiry timestamp. (3) Subsequent users check the flag (cheap: read a Sui object) rather than re-verifying the full attestation. (4) Re-attestation required every 24 hours or when the enclave restarts. (5) A governance mechanism allows updating the MRENCLAVE whitelist when the enclave binary is upgraded." },
+          { type: "conceptual", question: "After the WireTap attack (CCS 2025) showed DCAP key extraction is possible, how should your thesis adjust its trust model for TEE attestation?", hint: "If attestation can be forged, the TEE's 'proof of correct execution' is no longer reliable. What is the fallback?", answer: "WireTap means DCAP attestation is no longer a reliable trust anchor — an attacker with physical access can forge attestation reports. Thesis adjustment: (1) Never rely on TEE attestation alone for high-value operations. (2) Use TEE as a performance optimization with ZKP as the trust anchor: the TEE result is treated as a 'fast hint' that is periodically verified by a Groth16 proof. (3) For critical operations (credential issuance), require BOTH TEE attestation AND a ZKP that the issuance was correct. (4) Implement 'attestation freshness bonds': the TEE operator stakes SUI tokens that are slashed if their TEE is proven to have produced incorrect results — economic security complements hardware security." },
+        ],
       },
       {
         name: "Side-Channel Attacks",
@@ -435,6 +579,91 @@ window.DAY2_GUIDE = {
           "Side-channel risk is why your thesis does not rely on TEEs alone. The hybrid architecture uses ZKPs as the trust anchor (math-based, no side channels) and TEEs as a performance optimization. If the TEE is compromised, the ZKP layer still guarantees correctness.",
         thesisExample:
           "Side channels are the main threat to your TEE layer. During BBS+ verification inside SGX, the pairing computation accesses different memory locations depending on the credential attributes. A cache-timing attack could infer which attributes are present. Your thesis mitigates this with constant-time BBS+ implementation — all attribute slots are processed regardless of disclosure policy, ensuring uniform memory access patterns.",
+        history: {
+          inventor: "Paul Kocher (Cryptography Research Inc.)",
+          year: 1996,
+          context: "Kocher published 'Timing Attacks on Implementations of Diffie-Hellman, RSA, DSS, and Other Systems' at CRYPTO 1996, demonstrating that secret keys could be extracted by measuring computation time. The field exploded with Spectre and Meltdown (January 2018, Google Project Zero / TU Graz), which showed speculative execution could bypass all software-based memory isolation. For SGX specifically: Foreshadow/L1TF (August 2018) broke enclave confidentiality via L1 cache, Plundervolt (December 2019) used voltage glitching to corrupt enclave computations, AEPIC Leak (August 2022) leaked enclave data through the APIC MMIO interface, and WireTap (CCS 2025) extracted DCAP attestation keys.",
+          funFact: "The Foreshadow attack was independently discovered by two teams simultaneously: one from KU Leuven (Belgium) and one from the University of Michigan/University of Adelaide. Intel assigned it CVE-2018-3615 and patched it with microcode updates, but the fix reduced SGX performance by 20-40% due to L1 cache flushing on every enclave transition.",
+        },
+        limitations: [
+          "Side channels are fundamentally unpatchable at the hardware level: each fix introduces new performance overhead (Foreshadow fix: 20-40% SGX slowdown from L1 cache flushing), and new attack vectors are discovered every 1-2 years",
+          "Constant-time implementations prevent timing attacks but do not protect against cache-line attacks, power analysis, or electromagnetic emanation — defense requires addressing ALL channels simultaneously",
+          "ORAM (Oblivious RAM) hides memory access patterns but adds 10-100x overhead: each memory access becomes O(log n) accesses to random locations, making it impractical for performance-critical credential verification",
+          "Microarchitectural attacks (Spectre, MDS, LVI) exploit CPU design choices that are shared across all Intel/AMD processors — they cannot be fixed without fundamental CPU redesign, only mitigated with performance-costly software workarounds",
+        ],
+        exercises: [
+          { type: "conceptual", question: "During BBS+ verification inside SGX, which specific operations leak information through cache timing, and how would you make them constant-time?", hint: "Pairing computations involve conditional branches based on scalar bits (double-and-add for point multiplication). Each branch accesses different cache lines.", answer: "Leaky operations: (1) Scalar multiplication in G1/G2 uses double-and-add, where 'add' only executes for 1-bits of the scalar — cache probing reveals which iterations performed addition, leaking the scalar. (2) Hash-to-curve operations for attribute encoding may take different branch paths depending on attribute values. (3) The selective disclosure check ('is attribute i disclosed?') branches on the disclosure set. Constant-time fixes: (1) Use Montgomery ladder for scalar multiplication (always performs both double and add). (2) Use constant-time hash-to-curve (SWU map, not try-and-increment). (3) Process ALL attribute slots regardless of disclosure — always compute the commitment, discard unused results." },
+          { type: "comparison", question: "Rank the following SGX attacks by severity for your thesis system: Foreshadow, Plundervolt, AEPIC Leak, WireTap. Which one is most dangerous for credential confidentiality?", hint: "Consider the attack requirements (remote vs. physical access, root vs. user privilege) and what each attack extracts (enclave memory, attestation keys, computation corruption).", answer: "Ranking for credential confidentiality: (1) WireTap (CCS 2025) — MOST DANGEROUS: extracts DCAP attestation keys, enabling attestation forgery. An attacker can fake a TEE and receive decrypted credentials in plaintext. Requires <$1000 hardware but physical access. (2) Foreshadow/L1TF (2018) — reads enclave memory via L1 cache, could extract credential attributes during verification. Requires root on the host. Mitigated by microcode updates but at 20-40% performance cost. (3) AEPIC Leak (2022) — leaks enclave data through APIC registers, requires root. Narrower scope than Foreshadow. (4) Plundervolt (2019) — corrupts computations via voltage glitching but does not directly leak secrets. Could cause incorrect verification (accept invalid credentials) but requires physical access and specialized equipment." },
+        ],
+      },
+      {
+        name: "Confidential Computing Landscape",
+        analogy:
+          "SGX is one brand of armored truck, but the vault industry has many manufacturers. AMD SEV-SNP, ARM CCA, and RISC-V Keystone each build their vaults differently — some encrypt entire rooms (VMs), others partition buildings in half (secure world). Choosing a single vendor is a single point of failure, so your system must speak multiple vault dialects.",
+        diagram: [
+          "┌─────────────────────────────────────┐",
+          "│   Confidential Computing Landscape   │",
+          "├──────────┬──────────┬────────────────┤",
+          "│ Intel    │ AMD      │ ARM            │",
+          "│ SGX/TDX  │ SEV-SNP  │ CCA/TrustZone  │",
+          "├──────────┼──────────┼────────────────┤",
+          "│ Process  │ VM-level │ Realm-level    │",
+          "│ enclaves │ encryp.  │ (CCA) or 2-   │",
+          "│ (SGX) or │ per-VM   │ world split    │",
+          "│ VM (TDX) │ keys +   │ (TrustZone)   │",
+          "│          │ integrity│                │",
+          "├──────────┼──────────┼────────────────┤",
+          "│ DCAP     │ SEV-SNP  │ CCA attestation│",
+          "│ attest.  │ attest.  │ (ARMv9)       │",
+          "├──────────┼──────────┼────────────────┤",
+          "│ Server   │ Server + │ Mobile + Edge  │",
+          "│ only     │ Cloud    │ + Server       │",
+          "└──────────┴──────────┴────────────────┘",
+          "",
+          "RISC-V Keystone (open-source TEE):",
+          "┌────────────────────────────────┐",
+          "│ Security Monitor (M-mode)      │",
+          "│ ┌──────────┐ ┌──────────┐      │",
+          "│ │ Enclave1 │ │ Enclave2 │      │",
+          "│ │ (S-mode) │ │ (S-mode) │      │",
+          "│ └──────────┘ └──────────┘      │",
+          "│ PMP-enforced isolation         │",
+          "└────────────────────────────────┘",
+        ].join("\n"),
+        keyPoints: [
+          "AMD SEV-SNP: encrypts entire VM memory with per-VM keys, adds integrity protection (SNP = Secure Nested Paging) against hypervisor tampering",
+          "ARM CCA (Confidential Compute Architecture, ARMv9 2021): introduces Realms as a new isolation primitive, separate from TrustZone secure world",
+          "Intel TDX (Trust Domain Extensions): VM-level confidential computing, successor to SGX for multi-tenant cloud workloads",
+          "RISC-V Keystone: open-source TEE framework using Physical Memory Protection (PMP), auditable hardware with no vendor trust",
+          "Vendor diversity reduces single-point-of-failure risk: a vulnerability in one TEE platform does not compromise the entire system",
+        ],
+        publicPrivate: [
+          { item: "AMD SEV-SNP VM memory", status: "private", holder: "Guest VM", when: "Always (encrypted with per-VM key, integrity-checked)" },
+          { item: "AMD SEV-SNP attestation report", status: "public", holder: "Verifier", when: "During attestation (signed by AMD root key)" },
+          { item: "ARM CCA Realm memory", status: "private", holder: "Realm", when: "Always (isolated from Normal World and Secure World)" },
+          { item: "ARM CCA attestation token", status: "public", holder: "Verifier", when: "During attestation (via CCA attestation service)" },
+          { item: "RISC-V Keystone enclave memory", status: "private", holder: "Enclave", when: "Always (PMP-enforced, monitor-mediated)" },
+          { item: "Hardware vendor root key", status: "private", holder: "Vendor (AMD/ARM/Intel)", when: "Always (used to sign attestation)" },
+        ],
+        connections:
+          "Your thesis benefits from TEE portability. If the credential verification logic is designed to run on any TEE (not just SGX), the system can migrate across cloud providers and hardware platforms, reducing vendor lock-in and improving resilience against platform-specific attacks.",
+        thesisExample:
+          "For production deployment, your thesis should abstract the TEE layer behind a common interface: ConfidentialRuntime.verify(presentation) -> {accept, attestation}. The first implementation targets SGX (most mature tooling), but AMD SEV-SNP on Azure and ARM CCA on mobile are the migration paths. When a Foreshadow-class attack hits Intel, operators switch to AMD SEV-SNP nodes without changing the Sui smart contract — it verifies any valid attestation chain from a whitelisted set of TEE vendors.",
+        history: {
+          inventor: "AMD (SEV 2016, SEV-SNP 2020), ARM (TrustZone 2004, CCA 2021), Keystone (MIT/Berkeley 2020)",
+          year: 2016,
+          context: "AMD introduced SEV (Secure Encrypted Virtualization) in EPYC processors (2016), encrypting VM memory from the hypervisor. SEV-ES (Encrypted State, 2019) added register protection. SEV-SNP (Secure Nested Paging, 2020) added integrity against hypervisor replay/remap attacks — the critical missing piece. ARM launched TrustZone in 2004 for mobile (used in billions of phones for secure boot, payment, DRM) and introduced CCA (Confidential Compute Architecture) in ARMv9 (2021) with hardware-enforced Realms. RISC-V Keystone (Dayeol Lee et al., MIT/Berkeley, EuroSys 2020) pioneered open-source TEEs using Physical Memory Protection.",
+          funFact: "ARM TrustZone runs on over 10 billion devices (every modern smartphone has it), making it the most deployed TEE by volume. Yet it has the weakest isolation model — no memory encryption by default, and the secure world shares physical memory with the normal world. Samsung Knox, which secures 100M+ enterprise phones, is built on TrustZone despite its known limitations.",
+        },
+        limitations: [
+          "AMD SEV-SNP still trusts the AMD Platform Security Processor (PSP), a closed-source ARM Cortex-A5 coprocessor inside every EPYC CPU — PSP firmware vulnerabilities (CVE-2021-26311, CVE-2023-31315) can undermine all SEV-SNP guarantees",
+          "ARM CCA Realms are too new for production: ARMv9 CCA-capable hardware (Arm Cortex-X4, 2023+) has limited server deployment, and the attestation infrastructure is still maturing compared to Intel DCAP",
+          "RISC-V Keystone relies on Physical Memory Protection (PMP) which provides coarser granularity than SGX page-level encryption — a single PMP entry protects a contiguous memory range, limiting the number of concurrent enclaves to the hardware PMP entry count (typically 8-16)",
+        ],
+        exercises: [
+          { type: "design", question: "Design a vendor-agnostic TEE abstraction layer for your Sui credential system. What interface would allow switching between SGX, SEV-SNP, and ARM CCA without changing the smart contract?", hint: "Think about what the Sui smart contract needs to verify: an attestation report binding a result to specific code. The attestation format differs per vendor, but the semantic content (code hash, result, nonce) is the same.", answer: "Abstract interface: (1) TEE_VENDOR_REGISTRY: on-chain Sui object mapping vendor IDs to root CA public keys ({INTEL_SGX: pk1, AMD_SEV: pk2, ARM_CCA: pk3}). (2) UniversalAttestation struct: {vendor_id, code_hash, result_hash, nonce, signature, cert_chain}. (3) Smart contract verify(): look up vendor root key, verify cert_chain, check code_hash against whitelist, verify signature over (code_hash, result_hash, nonce). Each vendor's attestation is normalized into UniversalAttestation by the client SDK. The contract never touches vendor-specific formats. Adding a new TEE vendor = adding a root key to the registry via governance." },
+          { type: "comparison", question: "For your thesis, rank AMD SEV-SNP, ARM CCA, and RISC-V Keystone as alternatives to SGX. Which is the best migration target if Intel deprecates SGX entirely?", hint: "Consider: server availability (cloud providers), attestation maturity, tooling ecosystem, and the specific needs of BBS+ credential verification (compute-intensive, small memory footprint).", answer: "Ranking for thesis migration: (1) AMD SEV-SNP — best migration target. Available on Azure, AWS, and GCP (EPYC processors). VM-level isolation means the BBS+ verification code runs in a standard VM (no enclave porting needed). Attestation via AMD root key is well-understood. Tradeoff: VM granularity is coarser than SGX enclaves (larger TCB). (2) ARM CCA — best for mobile wallets. If the thesis extends to mobile credential presentation, CCA Realms on ARMv9 phones provide hardware isolation. But server-side CCA deployment is limited in 2026. (3) RISC-V Keystone — most trustworthy (open-source hardware + software) but least practical. No major cloud provider offers Keystone instances. Best for academic validation and long-term vision of fully auditable TEEs." },
+        ],
       },
       {
         name: "Trust Model: TEE vs ZKP",
@@ -482,6 +711,23 @@ window.DAY2_GUIDE = {
           "This is the central architectural insight of your thesis. On Sui, TEEs accelerate credential issuance and proof generation while ZKP circuits provide the on-chain verification. If a TEE is compromised, users can fall back to pure ZK proofs, maintaining the system security guarantees.",
         thesisExample:
           "Your thesis makes an explicit architectural choice: TEE for speed, ZKP for trust. Low-value payments (coffee, transit) use TEE verification (~1ms, trusting hardware). High-value payments or DeFi interactions use on-chain Groth16 (~500ms, trustless math). If an SGX vulnerability is discovered, the system gracefully degrades to ZKP-only mode — slower but still secure. This dual-path architecture is the core contribution of your thesis.",
+        history: {
+          inventor: "Fan Zhang et al. (Cornell/IC3, Town Crier) and Raymond Cheng et al. (Oasis Labs, Ekiden)",
+          year: 2016,
+          context: "Town Crier (Zhang et al., CCS 2016, Cornell/IC3) was the first system to bridge TEE hardware trust into blockchain smart contracts, using SGX enclaves as authenticated data feeds for Ethereum. Ekiden (Cheng et al., IEEE EuroS&P 2019, Oasis Labs) generalized this to confidential smart contract execution with TEE compute and blockchain verification. The complementary trust insight — ZKP provides mathematical trust (holds unless P=NP or DLP falls), TEE provides hardware trust (holds unless side-channel attack succeeds) — became a foundational design principle for privacy-preserving blockchain systems including Oasis Network (2020) and Secret Network.",
+          funFact: "Town Crier's SGX-based oracle was broken by the Foreshadow attack (2018) just two years after publication, vindicating the need for a ZKP fallback. The Oasis Network (launched 2020, from the Ekiden team) adopted the TEE+ZKP hybrid model specifically because pure TEE trust had proven fragile. Secret Network chose TEE-only and suffered when SGX vulnerabilities were disclosed — a cautionary tale your thesis explicitly addresses.",
+        },
+        limitations: [
+          "The hybrid model adds architectural complexity: two verification paths (TEE fast path + ZKP fallback) means double the code surface, double the audit surface, and complex state management for path switching",
+          "Defining the threshold between TEE-path and ZKP-path is policy-dependent and subjective: a $50 payment might be 'low-value' for one user and 'high-value' for another — the threshold must be configurable per-verifier without creating discrimination",
+          "During TEE compromise recovery, there is a window where the system operates in degraded mode (ZKP-only): proof generation time increases from ~1ms to ~2-5 seconds, potentially causing transaction timeouts for latency-sensitive applications",
+          "The ZKP fallback assumes users have sufficient client-side compute for proof generation: mobile devices with limited CPUs may struggle with Groth16 proving (~10-30 seconds on a phone vs. ~2 seconds on a laptop), creating a UX disparity",
+        ],
+        exercises: [
+          { type: "design", question: "Design the path-selection logic for your Sui payment system. Given a payment request, how does the system decide whether to use the TEE fast path or the ZKP trustless path?", hint: "Consider: payment amount, verifier preference, TEE attestation freshness, user device capability, and current system load.", answer: "Path selection algorithm: (1) Check TEE availability: is there an attested TEE with fresh attestation (<24h)? If no, force ZKP path. (2) Check payment amount: if amount > VERIFIER_THRESHOLD (configurable per merchant, default 1000 SUI), force ZKP path. (3) Check verifier preference: some DeFi protocols may require ZKP-only for regulatory compliance. (4) Check user preference: privacy-maximalist users can opt for ZKP-only mode. (5) Default: TEE fast path for all other cases. The decision is made client-side by the wallet SDK, and the chosen path is encoded in the transaction. The Sui smart contract validates either a TEE attestation report or a Groth16 proof — it does not care which path was used." },
+          { type: "conceptual", question: "If a critical SGX zero-day is published tomorrow, describe the emergency response procedure for your thesis system. What happens to in-flight transactions?", hint: "Think about: announcement detection, TEE path shutdown, ZKP path activation, user communication, attestation revocation.", answer: "Emergency response: (1) Detection: the Sui smart contract includes a TEE_EMERGENCY_PAUSE flag controllable by a governance multisig. (2) Within minutes: governance triggers pause, disabling TEE path for all new transactions. (3) In-flight TEE transactions already submitted to Sui are still verified (they were generated before the compromise). (4) All users fall back to ZKP path automatically — the wallet SDK detects the pause flag and generates Groth16 proofs instead. (5) The TEE operator re-deploys with patched enclave binary, obtains new attestation, and submits it on-chain. (6) Governance verifies the new MRENCLAVE and unpauses TEE path. (7) During degraded mode: expected latency increase from ~200ms to ~3-5 seconds per payment. Communication: push notification to wallet apps explaining 'enhanced security mode active.'" },
+          { type: "comparison", question: "Compare the trust assumptions of your thesis system vs. a pure ZKP system (like Zcash) vs. a pure TEE system (like Secret Network). What are the tradeoffs?", hint: "Zcash trusts math only. Secret Network trusts SGX only. Your thesis trusts both with graceful degradation. What does each system sacrifice?", answer: "Pure ZKP (Zcash): trusts math (DLP hardness), no hardware dependency. Tradeoff: slow proof generation (~40s for Zcash Sapling), high client-side compute requirements, trusted setup ceremony risk. Pure TEE (Secret Network): trusts Intel SGX, fast computation (~1ms). Tradeoff: single point of failure (Intel), vulnerable to side-channel attacks, no mathematical fallback — if SGX is broken, ALL transaction privacy is lost retroactively (attacker can decrypt historical encrypted state). Hybrid (your thesis): trusts math AND hardware, uses each where it is strongest. Tradeoff: added complexity, two code paths to audit, degraded mode during TEE compromise. But uniquely: the system NEVER has zero privacy guarantees — if TEE breaks, ZKP covers; if ZKP is too slow, TEE accelerates. This is strictly more robust than either pure approach." },
+        ],
       },
     ],
   },

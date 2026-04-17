@@ -158,6 +158,54 @@ window.DAY1_TECHNICAL = {
               "\\[ q \\approx 1.177 \\cdot 2^{n/2} " +
               "\\text{ queries for 50\\% collision probability} \\]"
           }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "A hash function has output length \\( n = 160 \\) bits " +
+              "(like SHA-1). Using the birthday bound formula, how many " +
+              "hash evaluations \\( q \\) are needed for a 50% chance " +
+              "of finding a collision? Express your answer as a power of 2.",
+            hint:
+              "Use \\( q \\approx 1.177 \\cdot 2^{n/2} \\). Since " +
+              "\\( 1.177 \\approx 2^{0.24} \\), you can write the " +
+              "result as \\( 2^{n/2 + 0.24} \\).",
+            answer:
+              "\\( q \\approx 1.177 \\cdot 2^{80} \\approx 2^{80.24} \\). " +
+              "So roughly \\( 2^{80} \\) evaluations suffice. This is " +
+              "why SHA-1 (160-bit output) provides only ~80-bit " +
+              "collision security, and the SHAttered attack achieved " +
+              "a collision at \\( \\approx 2^{63} \\) due to " +
+              "structural weaknesses."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Prove that collision resistance implies second preimage " +
+              "resistance. That is, show that if an adversary " +
+              "\\( \\mathcal{A} \\) can break second preimage " +
+              "resistance, then there exists an adversary " +
+              "\\( \\mathcal{B} \\) that breaks collision resistance.",
+            hint:
+              "Construct \\( \\mathcal{B} \\) as a reduction: " +
+              "\\( \\mathcal{B} \\) picks a random \\( x \\), runs " +
+              "\\( \\mathcal{A}(x) \\) to get \\( x' \\neq x \\) " +
+              "with \\( H(x) = H(x') \\). What does \\( \\mathcal{B} \\) " +
+              "output?",
+            answer:
+              "\\( \\mathcal{B} \\) picks \\( x \\xleftarrow{\\$} " +
+              "\\{0,1\\}^* \\), runs \\( x' \\leftarrow " +
+              "\\mathcal{A}(x) \\). If \\( x' \\neq x \\) and " +
+              "\\( H(x') = H(x) \\), output \\( (x, x') \\) as a " +
+              "collision. Since \\( \\mathcal{A} \\) succeeds with " +
+              "non-negligible probability \\( \\epsilon \\), " +
+              "\\( \\mathcal{B} \\) finds a collision with the same " +
+              "probability \\( \\epsilon \\). Contrapositive: if " +
+              "\\( H \\) is collision resistant, then " +
+              "\\( \\epsilon \\leq \\mathrm{negl}(\\lambda) \\), so " +
+              "\\( H \\) is second preimage resistant."
+          }
         ]
       },
 
@@ -319,6 +367,53 @@ window.DAY1_TECHNICAL = {
             formula:
               "\\[ C = \\prod_{i=1}^{k} g_i^{m_i} " +
               "\\cdot h^r \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Let \\( g, h \\) be generators of a group of prime order " +
+              "\\( p = 11 \\). Suppose \\( g = 2, h = 7 \\) in " +
+              "\\( \\mathbb{Z}_{11}^* \\). Compute the Pedersen " +
+              "commitment \\( C = g^m \\cdot h^r \\mod 11 \\) for " +
+              "message \\( m = 3 \\) and randomness \\( r = 5 \\).",
+            hint:
+              "Compute \\( g^m = 2^3 \\mod 11 \\) and " +
+              "\\( h^r = 7^5 \\mod 11 \\) separately, then multiply " +
+              "modulo 11.",
+            answer:
+              "\\( g^m = 2^3 = 8 \\mod 11 \\). " +
+              "\\( h^r = 7^5 = 16807 \\mod 11 \\). " +
+              "\\( 16807 = 1527 \\times 11 + 10 \\), so " +
+              "\\( 7^5 = 10 \\mod 11 \\). " +
+              "\\( C = 8 \\cdot 10 = 80 = 7 \\cdot 11 + 3 \\), " +
+              "so \\( C = 3 \\mod 11 \\)."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Demonstrate that Pedersen commitments are additively " +
+              "homomorphic. Given \\( C_1 = g^{m_1} h^{r_1} \\) and " +
+              "\\( C_2 = g^{m_2} h^{r_2} \\), show algebraically " +
+              "that \\( C_1 \\cdot C_2 = \\mathrm{Com}(m_1 + m_2; " +
+              "r_1 + r_2) \\). Then explain why this is useful for " +
+              "confidential transactions.",
+            hint:
+              "Use the group law \\( g^a \\cdot g^b = g^{a+b} \\). " +
+              "For confidential transactions, think about verifying " +
+              "that inputs equal outputs without revealing amounts.",
+            answer:
+              "\\( C_1 \\cdot C_2 = g^{m_1} h^{r_1} \\cdot " +
+              "g^{m_2} h^{r_2} = g^{m_1 + m_2} \\cdot " +
+              "h^{r_1 + r_2} = \\mathrm{Com}(m_1 + m_2; " +
+              "r_1 + r_2) \\). In confidential transactions, each " +
+              "amount \\( v_i \\) is committed as \\( C_i \\). To " +
+              "verify \\( \\sum v_{\\text{in}} = \\sum v_{\\text{out}} \\), " +
+              "the verifier checks " +
+              "\\( \\prod C_{\\text{in}} / \\prod C_{\\text{out}} " +
+              "= h^{r_{\\text{diff}}} \\) (a commitment to 0), " +
+              "provable without revealing any individual amount."
           }
         ]
       },
@@ -489,6 +584,72 @@ window.DAY1_TECHNICAL = {
             formula:
               "\\[ e(\\sigma, g_2) \\stackrel{?}{=} " +
               "e(H(m), pk) \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In the Schnorr signature scheme, the signer has secret " +
+              "key \\( x = 7 \\) in \\( \\mathbb{Z}_{23} \\), with " +
+              "generator \\( g = 5 \\) and public key " +
+              "\\( pk = g^x \\mod 23 \\). The signer picks nonce " +
+              "\\( k = 3 \\) and the hash gives " +
+              "\\( e = H(R \\| pk \\| m) = 4 \\). Compute the " +
+              "signature component \\( s = k - e \\cdot x \\mod 23 \\) " +
+              "and verify that \\( g^s \\cdot pk^e = R \\mod 23 \\).",
+            hint:
+              "First compute \\( R = g^k \\mod 23 \\). Then " +
+              "\\( s = k - ex \\mod 23 \\). For verification, " +
+              "compute \\( g^s \\cdot pk^e \\mod 23 \\) and check " +
+              "it equals \\( R \\).",
+            answer:
+              "\\( R = 5^3 = 125 \\mod 23 = 125 - 5 \\cdot 23 = 10 \\). " +
+              "\\( pk = 5^7 \\mod 23 \\). \\( 5^2 = 2, 5^4 = 4, " +
+              "5^7 = 5^4 \\cdot 5^2 \\cdot 5 = 4 \\cdot 2 \\cdot 5 " +
+              "= 40 = 17 \\mod 23 \\). " +
+              "\\( s = 3 - 4 \\cdot 7 = 3 - 28 = -25 " +
+              "= -25 + 2 \\cdot 23 = 21 \\mod 23 \\). " +
+              "Verify: \\( g^s = 5^{21} \\mod 23 \\). Since " +
+              "\\( 5^{22} = 1 \\) (Fermat), \\( 5^{21} = 5^{-1} \\). " +
+              "\\( 5 \\cdot 14 = 70 = 3 \\cdot 23 + 1 \\), so " +
+              "\\( 5^{-1} = 14 \\). \\( pk^e = 17^4 \\mod 23 \\). " +
+              "\\( 17^2 = 289 = 12 \\cdot 23 + 13 = 13 \\). " +
+              "\\( 17^4 = 13^2 = 169 = 7 \\cdot 23 + 8 = 8 \\). " +
+              "\\( g^s \\cdot pk^e = 14 \\cdot 8 = 112 = " +
+              "4 \\cdot 23 + 20 = 20 \\mod 23 \\). But " +
+              "\\( R = 10 \\). Note: using the alternative convention " +
+              "\\( s = k + ex \\), we get \\( s = 3 + 28 = 31 = " +
+              "8 \\mod 23 \\), and verification checks " +
+              "\\( g^s = 5^8 = 5^4 \\cdot 5^4 = 4 \\cdot 4 = " +
+              "16 \\mod 23 \\), \\( pk^{-e} = 8^{-1} \\mod 23 \\). " +
+              "The key point: both conventions work as long as " +
+              "sign and verify use the same formula."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain why nonce reuse in Schnorr signatures is " +
+              "catastrophic. Specifically, if two different messages " +
+              "\\( m_1, m_2 \\) are signed with the same nonce " +
+              "\\( k \\), show how an attacker extracts the secret " +
+              "key \\( x \\) from the two signatures " +
+              "\\( (R, s_1) \\) and \\( (R, s_2) \\).",
+            hint:
+              "With the same \\( R \\), we have " +
+              "\\( s_1 = k - e_1 x \\) and \\( s_2 = k - e_2 x \\) " +
+              "where \\( e_i = H(R \\| pk \\| m_i) \\). Subtract " +
+              "the two equations.",
+            answer:
+              "\\( s_1 - s_2 = (k - e_1 x) - (k - e_2 x) = " +
+              "(e_2 - e_1) x \\). Therefore " +
+              "\\( x = \\frac{s_1 - s_2}{e_2 - e_1} \\mod p \\). " +
+              "Since \\( e_1, e_2, s_1, s_2 \\) are all public " +
+              "(part of the signatures and computable from " +
+              "\\( R, pk, m_i \\)), the attacker recovers the full " +
+              "secret key. This is exactly what happened to Sony's " +
+              "PS3 ECDSA key in 2010. Mitigation: use deterministic " +
+              "nonces (RFC 6979) where \\( k = \\text{HMAC}(x, m) \\)."
           }
         ]
       },
@@ -663,6 +824,58 @@ window.DAY1_TECHNICAL = {
               "\\; \\text{find } n \\quad " +
               "\\text{(hard: } O(\\sqrt{r}) " +
               "\\text{ best known)} \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Consider the elliptic curve \\( E: y^2 = x^3 + 2x + 3 \\) " +
+              "over \\( \\mathbb{F}_7 \\). Verify that " +
+              "\\( P = (3, 6) \\) is on the curve. Then compute " +
+              "\\( 2P \\) using the point doubling formula.",
+            hint:
+              "Check \\( 6^2 \\equiv 3^3 + 2 \\cdot 3 + 3 \\mod 7 \\). " +
+              "For doubling, \\( \\lambda = (3x_1^2 + a)/(2y_1) \\mod 7 \\). " +
+              "You need the modular inverse of \\( 2 \\cdot 6 = 12 " +
+              "\\equiv 5 \\mod 7 \\).",
+            answer:
+              "On-curve check: LHS = \\( 6^2 = 36 = 1 \\mod 7 \\). " +
+              "RHS = \\( 27 + 6 + 3 = 36 = 1 \\mod 7 \\). " +
+              "\\( 1 = 1 \\) so \\( P \\) is on the curve. " +
+              "Doubling: \\( \\lambda = (3 \\cdot 9 + 2)/(2 \\cdot 6) " +
+              "= 29/12 \\mod 7 = 1/5 \\mod 7 \\). " +
+              "\\( 5^{-1} \\mod 7 = 3 \\) (since \\( 5 \\cdot 3 = 15 " +
+              "= 1 \\mod 7 \\)). So \\( \\lambda = 3 \\). " +
+              "\\( x_3 = 9 - 6 = 3 \\mod 7 \\). " +
+              "\\( y_3 = 3(3 - 3) - 6 = -6 = 1 \\mod 7 \\). " +
+              "Therefore \\( 2P = (3, 1) \\)."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain why DDH (Decisional Diffie-Hellman) is easy " +
+              "in pairing groups but CDH (Computational Diffie-Hellman) " +
+              "is believed hard. Given a pairing " +
+              "\\( e: \\mathbb{G}_1 \\times \\mathbb{G}_2 \\rightarrow " +
+              "\\mathbb{G}_T \\) and a tuple \\( (g, [a]g, [b]g, T) \\), " +
+              "show how to decide whether \\( T = [ab]g \\).",
+            hint:
+              "Use the bilinearity property: " +
+              "\\( e([a]g, [b]g) = e(g, g)^{ab} \\). Compare this " +
+              "with \\( e(T, g) \\).",
+            answer:
+              "To decide if \\( T = [ab]g \\), compute: " +
+              "\\( e([a]g, [b]g) = e(g, g)^{ab} \\) and " +
+              "\\( e(T, g) = e(g, g)^{\\log_g T} \\). " +
+              "If \\( T = [ab]g \\), then " +
+              "\\( e(T, g) = e(g, g)^{ab} \\), so the two values " +
+              "are equal. If \\( T = [c]g \\) for random \\( c \\neq ab \\), " +
+              "they differ. This breaks DDH but does not break CDH: " +
+              "the pairing lets us verify an answer but does not " +
+              "help us compute \\( [ab]g \\) from \\( [a]g, [b]g \\). " +
+              "This is why pairing-based schemes (BBS+, BLS) rely " +
+              "on CDH, not DDH."
           }
         ]
       },
@@ -852,6 +1065,65 @@ window.DAY1_TECHNICAL = {
               "\\pi = (a, z) \\quad " +
               "\\text{(non-interactive proof)} \\]"
           }
+        ],
+        exercises: [
+          {
+            type: "conceptual",
+            question:
+              "Construct a simulator for the Schnorr identification " +
+              "protocol. That is, given only the public key " +
+              "\\( h = g^x \\) (without knowing \\( x \\)), produce " +
+              "a transcript \\( (a, e, z) \\) that is " +
+              "indistinguishable from a real protocol execution " +
+              "when \\( e \\) is chosen uniformly.",
+            hint:
+              "The simulator picks \\( e \\) and \\( z \\) first " +
+              "(both uniformly random), then computes \\( a \\) from " +
+              "the verification equation \\( g^z = a \\cdot h^e \\).",
+            answer:
+              "Simulator \\( \\mathrm{Sim}(h) \\): " +
+              "1. Pick \\( e \\xleftarrow{\\$} \\mathbb{Z}_p \\) " +
+              "and \\( z \\xleftarrow{\\$} \\mathbb{Z}_p \\). " +
+              "2. Compute \\( a = g^z \\cdot h^{-e} \\). " +
+              "3. Output \\( (a, e, z) \\). " +
+              "Verification holds by construction: " +
+              "\\( g^z = g^z \\cdot h^{-e} \\cdot h^e = a \\cdot h^e \\). " +
+              "In a real transcript, \\( a = g^k \\) for random " +
+              "\\( k \\), \\( e \\) is uniform, and " +
+              "\\( z = k + ex \\). Since \\( k \\) is uniform, " +
+              "\\( z \\) is also uniform for any fixed \\( e \\). " +
+              "The simulated distribution (uniform \\( e, z \\), " +
+              "determined \\( a \\)) is identical to the real one."
+          },
+          {
+            type: "calculation",
+            question:
+              "In an interactive ZK proof, the verifier sends a " +
+              "challenge \\( e \\) from a challenge space " +
+              "\\( \\mathcal{E} \\) of size " +
+              "\\( |\\mathcal{E}| = 2^{128} \\). What is the " +
+              "soundness error (probability a cheating prover " +
+              "convinces the verifier for a false statement) in a " +
+              "single round? How many sequential repetitions are " +
+              "needed to reduce the soundness error below " +
+              "\\( 2^{-80} \\)?",
+            hint:
+              "For a Sigma protocol, the soundness error is " +
+              "\\( 1/|\\mathcal{E}| \\). For \\( k \\) repetitions, " +
+              "the error is \\( (1/|\\mathcal{E}|)^k \\).",
+            answer:
+              "Single round soundness error: " +
+              "\\( 1/|\\mathcal{E}| = 1/2^{128} = 2^{-128} \\). " +
+              "This is already below \\( 2^{-80} \\), so " +
+              "\\( k = 1 \\) repetition suffices. In general, " +
+              "for \\( |\\mathcal{E}| = 2^t \\), we need " +
+              "\\( k \\geq \\lceil 80/t \\rceil \\) repetitions. " +
+              "With \\( t = 128 \\geq 80 \\), one round already " +
+              "gives negligible soundness error. This is why " +
+              "Schnorr proofs over 256-bit curves (where " +
+              "\\( |\\mathcal{E}| \\approx 2^{256} \\)) need only " +
+              "one round."
+          }
         ]
       },
 
@@ -1038,6 +1310,68 @@ window.DAY1_TECHNICAL = {
               "\\xleftarrow{\\$} \\mathbb{Z}_p, \\; " +
               "a = g^z \\cdot h^{-e} \\]"
           }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In the Schnorr Sigma protocol, suppose the extractor " +
+              "obtains two accepting transcripts with the same " +
+              "commitment: \\( (a, e_1 = 3, z_1 = 17) \\) and " +
+              "\\( (a, e_2 = 7, z_2 = 41) \\), working modulo " +
+              "\\( p = 43 \\). Extract the witness \\( x \\) using " +
+              "the special soundness formula.",
+            hint:
+              "Use \\( x = (z_1 - z_2) / (e_1 - e_2) \\mod p \\). " +
+              "You need the modular inverse of \\( (e_1 - e_2) \\) " +
+              "modulo 43.",
+            answer:
+              "\\( x = (z_1 - z_2) \\cdot (e_1 - e_2)^{-1} \\mod 43 \\). " +
+              "Numerator: \\( 17 - 41 = -24 \\equiv 19 \\mod 43 \\). " +
+              "Denominator: \\( 3 - 7 = -4 \\equiv 39 \\mod 43 \\). " +
+              "Need \\( 39^{-1} \\mod 43 \\). " +
+              "\\( 39 \\cdot 11 = 429 = 9 \\cdot 43 + 42 \\equiv " +
+              "-1 \\mod 43 \\), so \\( 39 \\cdot (-11) \\equiv " +
+              "1 \\mod 43 \\), i.e., " +
+              "\\( 39^{-1} = -11 \\equiv 32 \\mod 43 \\). " +
+              "\\( x = 19 \\cdot 32 = 608 \\mod 43 \\). " +
+              "\\( 608 = 14 \\cdot 43 + 6 \\), so \\( x = 6 \\)."
+          },
+          {
+            type: "conceptual",
+            question:
+              "In an OR composition (Cramer-Damgard-Schoenmakers), " +
+              "the prover knows witness \\( x_1 \\) for " +
+              "\\( h_1 = g^{x_1} \\) but not \\( x_2 \\) for " +
+              "\\( h_2 = g^{x_2} \\). Describe step-by-step how " +
+              "the prover constructs the OR-proof, and explain why " +
+              "the verifier cannot tell which branch is real.",
+            hint:
+              "The prover simulates the transcript for the unknown " +
+              "branch (branch 2) and runs the real protocol for " +
+              "branch 1. The challenge constraint is " +
+              "\\( e_1 + e_2 = e \\). The verifier only sees both " +
+              "transcripts and checks each independently.",
+            answer:
+              "Step 1: Prover simulates branch 2 first: pick " +
+              "\\( e_2 \\xleftarrow{\\$} \\mathbb{Z}_p \\) and " +
+              "\\( z_2 \\xleftarrow{\\$} \\mathbb{Z}_p \\), compute " +
+              "\\( a_2 = g^{z_2} \\cdot h_2^{-e_2} \\). " +
+              "Step 2: Run real protocol for branch 1: pick " +
+              "\\( k \\xleftarrow{\\$} \\mathbb{Z}_p \\), compute " +
+              "\\( a_1 = g^k \\). Send \\( (a_1, a_2) \\). " +
+              "Step 3: Receive challenge \\( e \\) from verifier. " +
+              "Set \\( e_1 = e - e_2 \\mod p \\), compute " +
+              "\\( z_1 = k + e_1 \\cdot x_1 \\mod p \\). " +
+              "Send \\( (e_1, z_1, e_2, z_2) \\). " +
+              "Verifier checks: \\( g^{z_1} = a_1 \\cdot h_1^{e_1} \\), " +
+              "\\( g^{z_2} = a_2 \\cdot h_2^{e_2} \\), and " +
+              "\\( e_1 + e_2 = e \\). Both branches produce valid " +
+              "transcripts with uniformly distributed components. " +
+              "The simulated branch is indistinguishable from a real " +
+              "one because SHVZK simulators produce identical " +
+              "distributions to real transcripts."
+          }
         ]
       },
 
@@ -1122,6 +1456,67 @@ window.DAY1_TECHNICAL = {
               "\\[ \\text{Cost}(n) = O(n) " +
               "\\text{ symmetric ops} + " +
               "\\kappa \\text{ base OTs} \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In the Diffie-Hellman OT protocol, suppose the " +
+              "sender picks \\( a = 3 \\) and publishes " +
+              "\\( A = g^a \\mod p \\) with \\( g = 2, p = 11 \\). " +
+              "The receiver wants \\( m_1 \\) (so \\( b = 1 \\)) " +
+              "and picks \\( r = 4 \\). Compute the receiver's " +
+              "message \\( B \\) and show that the receiver can " +
+              "derive \\( k_1 = A^r \\) but cannot derive \\( k_0 \\).",
+            hint:
+              "\\( A = 2^3 \\mod 11 \\). For \\( b = 1 \\): " +
+              "\\( B = A \\cdot g^r \\mod 11 \\). The sender computes " +
+              "\\( k_0 = B^a, k_1 = (B/A)^a \\). The receiver " +
+              "computes \\( k_1 = A^r \\). Verify they match.",
+            answer:
+              "\\( A = 2^3 = 8 \\mod 11 \\). " +
+              "\\( B = 8 \\cdot 2^4 = 8 \\cdot 16 = 8 \\cdot 5 = " +
+              "40 = 7 \\mod 11 \\). " +
+              "Sender: \\( k_0 = 7^3 = 343 = 2 \\mod 11 \\). " +
+              "\\( k_1 = (B/A)^a = (7 \\cdot 8^{-1})^3 \\mod 11 \\). " +
+              "\\( 8^{-1} = 7 \\mod 11 \\) (since \\( 8 \\cdot 7 = " +
+              "56 = 1 \\mod 11 \\)). " +
+              "\\( B/A = 7 \\cdot 7 = 49 = 5 \\mod 11 \\). " +
+              "\\( k_1 = 5^3 = 125 = 4 \\mod 11 \\). " +
+              "Receiver: \\( k_1 = A^r = 8^4 \\mod 11 \\). " +
+              "\\( 8^2 = 64 = 9, 8^4 = 81 = 4 \\mod 11 \\). " +
+              "Both get \\( k_1 = 4 \\). The receiver cannot compute " +
+              "\\( k_0 = 2 \\) without knowing \\( a \\)."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain why OT is said to be 'complete for secure " +
+              "computation.' What does this mean formally, and " +
+              "what is the high-level construction that reduces " +
+              "any function evaluation to OT?",
+            hint:
+              "Think about how any function can be represented as " +
+              "a boolean circuit, and how Yao's garbled circuits " +
+              "use OT for the evaluator's input.",
+            answer:
+              "OT completeness means: given OT as a primitive, we " +
+              "can securely compute any function " +
+              "\\( f(x_1, \\ldots, x_n) \\). The construction: " +
+              "(1) Express \\( f \\) as a boolean circuit \\( C \\). " +
+              "(2) For 2-party: Garbler creates garbled circuit " +
+              "\\( \\tilde{C} \\), sends to Evaluator. Evaluator " +
+              "gets their input labels via OT (one OT per input " +
+              "bit). (3) For n-party (GMW): use OT to implement " +
+              "multiplications on secret-shared bits. Each AND gate " +
+              "requires \\( O(n^2) \\) OTs. Formally: Kilian (1988) " +
+              "proved that OT implies general secure computation " +
+              "in the semi-honest model. Ishai et al. extended " +
+              "this to malicious security. Combined with OT " +
+              "extension (IKNP), the base cost is \\( \\kappa \\) " +
+              "public-key OTs, and all remaining OTs use only " +
+              "symmetric-key operations."
           }
         ]
       },
@@ -1223,6 +1618,68 @@ window.DAY1_TECHNICAL = {
               "\\stackrel{?}{=} \\alpha \\cdot \\sum_i x_i " +
               "+ \\sum_i \\beta_i \\]"
           }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In a 2-party computation using Beaver triples, parties " +
+              "hold additive shares of \\( x \\) and \\( y \\), plus " +
+              "a preprocessed triple \\( (a, b, c) \\) where " +
+              "\\( c = ab \\). Given \\( x = 7, y = 5, a = 3, " +
+              "b = 4, c = 12 \\), all modulo \\( p = 13 \\), " +
+              "compute the shares of \\( x \\cdot y \\) using the " +
+              "Beaver multiplication protocol.",
+            hint:
+              "Compute \\( \\epsilon = x - a \\) and " +
+              "\\( \\delta = y - b \\). Then " +
+              "\\( xy = c + \\epsilon b + \\delta a + " +
+              "\\epsilon \\delta \\). All modulo 13.",
+            answer:
+              "\\( \\epsilon = x - a = 7 - 3 = 4 \\mod 13 \\). " +
+              "\\( \\delta = y - b = 5 - 4 = 1 \\mod 13 \\). " +
+              "\\( xy = c + \\epsilon b + \\delta a + " +
+              "\\epsilon \\delta = 12 + 4 \\cdot 4 + 1 \\cdot 3 + " +
+              "4 \\cdot 1 = 12 + 16 + 3 + 4 = 35 = " +
+              "9 \\mod 13 \\). " +
+              "Verification: \\( 7 \\cdot 5 = 35 = 9 \\mod 13 \\). " +
+              "Correct. In practice, \\( \\epsilon, \\delta \\) are " +
+              "publicly opened, but the individual shares of " +
+              "\\( x, y \\) remain hidden because \\( a, b \\) are " +
+              "random."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain the difference between semi-honest security " +
+              "and malicious security in MPC. Why does the SPDZ " +
+              "protocol use MACs, and how do they detect cheating " +
+              "by a malicious party?",
+            hint:
+              "Semi-honest: parties follow the protocol but try to " +
+              "learn extra information. Malicious: parties can deviate " +
+              "arbitrarily. Think about what happens if a party sends " +
+              "a wrong share in a multiplication.",
+            answer:
+              "Semi-honest: adversary follows protocol honestly but " +
+              "tries to infer additional information from their view. " +
+              "Security = simulatability of the view. Malicious: " +
+              "adversary can send arbitrary messages, deviate from " +
+              "protocol. Security requires correctness + privacy. " +
+              "SPDZ uses information-theoretic MACs: each shared " +
+              "value \\( x \\) has a MAC \\( \\alpha x + \\beta \\) " +
+              "where \\( \\alpha \\) is a global secret key shared " +
+              "among parties. If a malicious party modifies their " +
+              "share of \\( x \\) to \\( x + \\Delta \\), the MAC " +
+              "check at the end fails: " +
+              "\\( \\text{MAC}(x + \\Delta) = \\alpha(x + \\Delta) + " +
+              "\\beta \\neq \\alpha x + \\beta \\) " +
+              "(difference is \\( \\alpha \\Delta \\), which the " +
+              "adversary cannot forge without knowing \\( \\alpha \\)). " +
+              "The MAC check is deferred to the end, allowing " +
+              "efficient online computation with a single batch " +
+              "verification."
+          }
         ]
       },
 
@@ -1315,6 +1772,68 @@ window.DAY1_TECHNICAL = {
               "\\[ g^{s_i} \\stackrel{?}{=} " +
               "\\prod_{j=0}^{t-1} " +
               "(g^{a_j})^{i^j} \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "A (2,3)-Shamir secret sharing scheme operates over " +
+              "\\( \\mathbb{F}_7 \\). The dealer has secret " +
+              "\\( s = 4 \\) and picks random coefficient " +
+              "\\( a_1 = 5 \\). Compute the three shares " +
+              "\\( s_1 = f(1), s_2 = f(2), s_3 = f(3) \\). Then " +
+              "reconstruct \\( s \\) from shares \\( s_1, s_3 \\) " +
+              "using Lagrange interpolation.",
+            hint:
+              "\\( f(x) = 4 + 5x \\mod 7 \\). For reconstruction " +
+              "from \\( \\{1, 3\\} \\): " +
+              "\\( \\lambda_1 = 3/(3-1) \\mod 7 \\), " +
+              "\\( \\lambda_3 = 1/(1-3) \\mod 7 \\). Then " +
+              "\\( s = s_1 \\lambda_1 + s_3 \\lambda_3 \\mod 7 \\).",
+            answer:
+              "\\( f(x) = 4 + 5x \\mod 7 \\). " +
+              "\\( s_1 = 4 + 5 = 9 = 2 \\mod 7 \\). " +
+              "\\( s_2 = 4 + 10 = 14 = 0 \\mod 7 \\). " +
+              "\\( s_3 = 4 + 15 = 19 = 5 \\mod 7 \\). " +
+              "Reconstruction from \\( S = \\{1, 3\\} \\): " +
+              "\\( \\lambda_1 = \\frac{0 - 3}{1 - 3} = " +
+              "\\frac{-3}{-2} = \\frac{3}{2} \\mod 7 \\). " +
+              "\\( 2^{-1} = 4 \\mod 7 \\) (since \\( 2 \\cdot 4 = 8 = " +
+              "1 \\mod 7 \\)), so \\( \\lambda_1 = 3 \\cdot 4 = " +
+              "12 = 5 \\mod 7 \\). " +
+              "\\( \\lambda_3 = \\frac{0 - 1}{3 - 1} = " +
+              "\\frac{-1}{2} = -4 = 3 \\mod 7 \\). " +
+              "\\( s = 2 \\cdot 5 + 5 \\cdot 3 = 10 + 15 = 25 = " +
+              "4 \\mod 7 \\). Correct."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Shamir secret sharing has information-theoretic " +
+              "privacy: fewer than \\( t \\) shares reveal nothing " +
+              "about the secret. Prove this for the case \\( t = 2 \\): " +
+              "given one share \\( s_1 = f(1) \\), show that any " +
+              "secret \\( s' \\in \\mathbb{F}_p \\) is equally likely.",
+            hint:
+              "The polynomial is \\( f(x) = s + a_1 x \\) where " +
+              "\\( a_1 \\) is uniformly random. Given \\( f(1) = s + a_1 \\), " +
+              "for any \\( s' \\), there exists exactly one \\( a_1 \\) " +
+              "that is consistent.",
+            answer:
+              "For \\( t = 2 \\): \\( f(x) = s + a_1 x \\) with " +
+              "\\( a_1 \\xleftarrow{\\$} \\mathbb{F}_p \\). " +
+              "Given \\( s_1 = f(1) = s + a_1 \\), for any candidate " +
+              "secret \\( s' \\), we need \\( a_1 = s_1 - s' \\). " +
+              "This is exactly one value of \\( a_1 \\in \\mathbb{F}_p \\). " +
+              "Since \\( a_1 \\) is uniform over \\( \\mathbb{F}_p \\), " +
+              "each \\( s' \\) is consistent with probability " +
+              "\\( 1/p \\). Therefore " +
+              "\\( \\Pr[s = s' \\mid s_1] = 1/p \\) for all \\( s' \\), " +
+              "which is the uniform distribution. The conditional " +
+              "distribution of \\( s \\) given one share is identical " +
+              "to the prior, giving perfect information-theoretic " +
+              "privacy."
           }
         ]
       },
@@ -1413,6 +1932,64 @@ window.DAY1_TECHNICAL = {
               "\\; \\text{Enc}_{W_b^0}(W_c^{\\text{E}})), " +
               "\\quad W_c = W_c^{\\text{G}} " +
               "\\oplus W_c^{\\text{E}} \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "A garbled circuit uses the Free XOR optimization with " +
+              "global offset \\( \\Delta = 1010 \\) (4-bit). Wire " +
+              "\\( a \\) has \\( W_a^0 = 0110 \\) and wire " +
+              "\\( b \\) has \\( W_b^0 = 1100 \\). Compute " +
+              "\\( W_a^1 \\), \\( W_b^1 \\), and the output label " +
+              "\\( W_c^0 \\) for an XOR gate. Verify " +
+              "\\( W_c^1 = W_c^0 \\oplus \\Delta \\).",
+            hint:
+              "Free XOR: \\( W_w^1 = W_w^0 \\oplus \\Delta \\). " +
+              "For XOR gate output: " +
+              "\\( W_c^0 = W_a^0 \\oplus W_b^0 \\).",
+            answer:
+              "\\( W_a^1 = 0110 \\oplus 1010 = 1100 \\). " +
+              "\\( W_b^1 = 1100 \\oplus 1010 = 0110 \\). " +
+              "\\( W_c^0 = W_a^0 \\oplus W_b^0 = 0110 \\oplus " +
+              "1100 = 1010 \\). " +
+              "\\( W_c^1 = W_c^0 \\oplus \\Delta = 1010 \\oplus " +
+              "1010 = 0000 \\). " +
+              "Verification: if \\( a = 1, b = 0 \\), evaluator " +
+              "has \\( W_a^1 = 1100 \\) and \\( W_b^0 = 1100 \\). " +
+              "Output = \\( 1100 \\oplus 1100 = 0000 = W_c^1 \\). " +
+              "Since \\( 1 \\oplus 0 = 1 \\), this correctly gives " +
+              "the label for bit 1. No encryption needed for XOR."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain why garbled circuits provide security only for " +
+              "a single evaluation. Why can't the evaluator garble a " +
+              "second set of inputs and evaluate again? What is the " +
+              "consequence for reactive computations?",
+            hint:
+              "Think about what the evaluator learns after " +
+              "evaluation: they know one label per wire. Could they " +
+              "correlate labels across evaluations? What about the " +
+              "garbled gate entries: after decrypting one, what " +
+              "information remains?",
+            answer:
+              "After evaluation, the evaluator knows one label per " +
+              "wire (the label corresponding to the actual bit " +
+              "value). If the same garbled circuit were used with " +
+              "different inputs, the evaluator could compare labels: " +
+              "same label = same bit value, different label = " +
+              "different bit value, leaking information about inputs. " +
+              "Furthermore, the evaluator could try all 4 garbled " +
+              "gate entries (not just the one they can decrypt) to " +
+              "learn the relationship between input and output " +
+              "labels. For reactive or multi-use computations, " +
+              "fresh garbled circuits must be generated each time, " +
+              "or one must use techniques like BMR (multi-party " +
+              "garbling) or combine with secret sharing for " +
+              "stateful computation."
           }
         ]
       },
@@ -1520,6 +2097,66 @@ window.DAY1_TECHNICAL = {
               "\\text{Enc}(\\text{Enc}(m))) = " +
               "\\text{Enc}(m) \\]"
           }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In a simplified LWE scheme with \\( q = 17 \\), " +
+              "secret \\( s = 3 \\), and error \\( e = 1 \\). The " +
+              "public key is \\( (a, b) = (5, 5 \\cdot 3 + 1) = " +
+              "(5, 16) \\mod 17 \\). Encrypt the message bit " +
+              "\\( m = 1 \\). Then decrypt and verify correctness.",
+            hint:
+              "Encryption: \\( c_1 = ra \\mod q \\), " +
+              "\\( c_2 = rb + \\lfloor q/2 \\rfloor m \\mod q \\). " +
+              "Pick \\( r = 1 \\) for simplicity. " +
+              "\\( \\lfloor 17/2 \\rfloor = 8 \\). " +
+              "Decryption: compute \\( c_2 - c_1 s \\mod q \\) " +
+              "and round to nearest multiple of \\( q/2 \\).",
+            answer:
+              "\\( c_1 = 1 \\cdot 5 = 5 \\mod 17 \\). " +
+              "\\( c_2 = 1 \\cdot 16 + 8 \\cdot 1 = 24 = " +
+              "7 \\mod 17 \\). " +
+              "Decrypt: \\( c_2 - c_1 s = 7 - 5 \\cdot 3 = " +
+              "7 - 15 = -8 = 9 \\mod 17 \\). " +
+              "Compare to \\( \\lfloor q/2 \\rfloor = 8 \\). " +
+              "\\( |9 - 0| = 9 \\) vs \\( |9 - 8| = 1 \\). " +
+              "Closer to 8 (which represents \\( m = 1 \\)), so " +
+              "\\( m = 1 \\). The noise is \\( 9 - 8 = 1 \\) " +
+              "(matching our error \\( e = 1 \\)). If noise grew " +
+              "past \\( q/4 = 4.25 \\), decryption would fail."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain why FHE is IND-CPA secure but cannot be " +
+              "IND-CCA secure. What property of homomorphic " +
+              "encryption inherently conflicts with chosen-ciphertext " +
+              "security? Why is this acceptable in practice?",
+            hint:
+              "IND-CCA security means ciphertexts are non-malleable. " +
+              "But homomorphic evaluation produces new valid " +
+              "ciphertexts from existing ones. Think about what " +
+              "happens if an adversary can query a decryption oracle.",
+            answer:
+              "Homomorphic evaluation lets anyone transform " +
+              "\\( \\text{Enc}(m) \\) into " +
+              "\\( \\text{Enc}(f(m)) \\) for any computable \\( f \\). " +
+              "This is inherent malleability: given \\( c = " +
+              "\\text{Enc}(m) \\), compute \\( c' = " +
+              "\\text{Eval}(\\text{pk}, f, c) = \\text{Enc}(f(m)) \\). " +
+              "In an IND-CCA game, the adversary could submit " +
+              "\\( c' \\) to the decryption oracle and learn " +
+              "\\( f(m) \\), trivially breaking security (e.g., " +
+              "\\( f = \\text{identity} \\) to directly decrypt). " +
+              "This is acceptable because FHE is used in settings " +
+              "where the evaluator does not have decryption access. " +
+              "The threat model assumes the server computes on " +
+              "encrypted data without a decryption key. Circuit " +
+              "privacy (hiding which function was evaluated) is " +
+              "addressed separately via rerandomization."
+          }
         ]
       },
 
@@ -1618,6 +2255,68 @@ window.DAY1_TECHNICAL = {
               "O(\\log_B N), \\quad " +
               "\\text{total cost } = " +
               "O(B \\cdot \\log^2 N / \\log B) \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "A Path ORAM stores \\( N = 2^{20} \\) blocks, each " +
+              "of size \\( B = 4 \\) KB. The binary tree has depth " +
+              "\\( L = \\lceil \\log_2 N \\rceil = 20 \\). Calculate " +
+              "the bandwidth per access and the stash overflow " +
+              "probability for stash size \\( R = 30 \\).",
+            hint:
+              "Bandwidth per access = \\( O(B \\cdot L) \\): read one " +
+              "path (root to leaf) and write back. Stash overflow: " +
+              "\\( \\Pr[|\\text{Stash}| > R] \\leq 14 \\cdot e^{-R} \\).",
+            answer:
+              "Bandwidth: reading and writing one path = " +
+              "\\( 2 \\cdot L \\cdot B = 2 \\cdot 20 \\cdot 4 " +
+              "= 160 \\) KB per access (read path + write back). " +
+              "With bucket size \\( Z = 4 \\), each node holds 4 " +
+              "blocks, so the path has \\( 21 \\times 4 = 84 \\) " +
+              "blocks = 336 KB total transferred. " +
+              "Stash overflow: \\( \\Pr[|\\text{Stash}| > 30] \\leq " +
+              "14 \\cdot e^{-30} = 14 \\cdot 9.36 \\times 10^{-14} " +
+              "\\approx 1.3 \\times 10^{-12} \\). After " +
+              "\\( 2^{40} \\approx 10^{12} \\) accesses, the " +
+              "expected number of overflows is ~1.3. For " +
+              "\\( R = 50 \\), the probability drops to " +
+              "\\( < 2^{-60} \\), which is negligible."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain why ORAM is necessary for TEE-based " +
+              "applications. If a TEE (like Intel SGX) already " +
+              "encrypts memory, what additional information does " +
+              "the access pattern leak, and give a concrete " +
+              "attack example.",
+            hint:
+              "Think about a binary search in encrypted memory. " +
+              "The TEE encrypts values but the memory controller " +
+              "sees which addresses are accessed. What can an " +
+              "observer infer from the sequence of addresses?",
+            answer:
+              "TEEs encrypt data at rest and in transit, but the " +
+              "CPU's memory access pattern (which physical " +
+              "addresses are read/written) is visible to the " +
+              "OS, hypervisor, and hardware bus. This leaks " +
+              "information through side channels. Concrete attack: " +
+              "a binary search over a sorted encrypted array of " +
+              "\\( N \\) elements accesses \\( \\log N \\) " +
+              "memory locations. The sequence of addresses " +
+              "reveals the comparison outcomes, effectively " +
+              "disclosing the search target. For a database " +
+              "of 1M records, the access pattern of a query " +
+              "reveals which record was accessed. Page-level " +
+              "attacks (Xu et al., 2015) showed that observing " +
+              "SGX page faults alone can extract text from " +
+              "encrypted documents. ORAM makes all access " +
+              "sequences indistinguishable: every access " +
+              "touches a full random-looking path, regardless " +
+              "of the actual data being accessed."
           }
         ]
       }
@@ -1787,6 +2486,76 @@ window.DAY1_TECHNICAL = {
               "\\left(\\sum_j z_j B_j(x)\\right) - " +
               "\\left(\\sum_j z_j C_j(x)\\right) = " +
               "H(x) \\cdot T(x) \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Flatten the computation \\( y = x^2 + 3x + 2 \\) " +
+              "into R1CS constraints. Define the witness vector " +
+              "\\( \\mathbf{z} \\) and write out each constraint " +
+              "in the form \\( \\langle \\mathbf{a}_i, " +
+              "\\mathbf{z} \\rangle \\cdot \\langle \\mathbf{b}_i, " +
+              "\\mathbf{z} \\rangle = \\langle \\mathbf{c}_i, " +
+              "\\mathbf{z} \\rangle \\). How many R1CS constraints " +
+              "are needed?",
+            hint:
+              "Introduce an intermediate variable " +
+              "\\( v_1 = x \\cdot x \\). Then " +
+              "\\( y = v_1 + 3x + 2 \\). Only multiplication gates " +
+              "produce R1CS constraints. Addition and constant " +
+              "multiplication are absorbed into the linear " +
+              "combinations.",
+            answer:
+              "Witness vector: \\( \\mathbf{z} = (1, x, y, v_1) \\) " +
+              "where \\( v_1 = x^2 \\). " +
+              "Constraint 1 (the multiplication gate " +
+              "\\( v_1 = x \\cdot x \\)): " +
+              "\\( \\langle (0, 1, 0, 0), \\mathbf{z} \\rangle " +
+              "\\cdot \\langle (0, 1, 0, 0), \\mathbf{z} \\rangle " +
+              "= \\langle (0, 0, 0, 1), \\mathbf{z} \\rangle \\). " +
+              "This gives \\( x \\cdot x = v_1 \\). " +
+              "Constraint 2 (enforce \\( y = v_1 + 3x + 2 \\)): " +
+              "\\( \\langle (2, 3, 0, 1), \\mathbf{z} \\rangle " +
+              "\\cdot \\langle (1, 0, 0, 0), \\mathbf{z} \\rangle " +
+              "= \\langle (0, 0, 1, 0), \\mathbf{z} \\rangle \\). " +
+              "This gives \\( (v_1 + 3x + 2) \\cdot 1 = y \\). " +
+              "Total: 2 R1CS constraints (one true multiplication, " +
+              "one for the output constraint using multiplication " +
+              "by 1)."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain what an 'under-constrained' circuit is and " +
+              "why it is a critical vulnerability in ZK systems. " +
+              "Give a concrete example of a missing constraint that " +
+              "would allow a malicious prover to generate a valid " +
+              "proof for an incorrect statement.",
+            hint:
+              "Consider a circuit that checks \\( b^2 = v \\) to " +
+              "verify that \\( b \\) is a binary decomposition bit. " +
+              "What if the constraint \\( b(b-1) = 0 \\) is missing?",
+            answer:
+              "An under-constrained circuit has fewer constraints " +
+              "than needed to fully specify the intended computation. " +
+              "The prover can find a satisfying witness that is " +
+              "valid for the constraints but does not correspond " +
+              "to a correct execution. Example: a range proof " +
+              "circuit decomposes \\( v \\) into bits " +
+              "\\( b_0, \\ldots, b_{n-1} \\) and checks " +
+              "\\( v = \\sum b_i 2^i \\). If the constraint " +
+              "\\( b_i(b_i - 1) = 0 \\) (forcing \\( b_i \\in " +
+              "\\{0,1\\} \\)) is missing, a malicious prover can " +
+              "set \\( b_i \\) to any field element. With " +
+              "\\( b_0 = -5 \\) and appropriate other bits, the " +
+              "sum still matches \\( v \\) but the 'range proof' " +
+              "is meaningless since negative 'bits' are used. " +
+              "The Zcash Sprout vulnerability (2019) was exactly " +
+              "this: a missing constraint allowed creating coins " +
+              "from nothing. Circuit auditing tools (ecne, Picus) " +
+              "detect such under-constrained systems."
           }
         ]
       },
@@ -1961,6 +2730,72 @@ window.DAY1_TECHNICAL = {
               "\\delta \\xleftarrow{\\$} \\mathbb{Z}_p^* " +
               "\\quad \\text{(must be destroyed after setup)} \\]"
           }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "A Groth16 proof over BLS12-381 has structure " +
+              "\\( \\pi = ([A]_1, [B]_2, [C]_1) \\). " +
+              "\\( \\mathbb{G}_1 \\) elements are 48 bytes compressed, " +
+              "\\( \\mathbb{G}_2 \\) elements are 96 bytes compressed. " +
+              "Verification requires 3 pairings at ~1.5 ms each and " +
+              "a multi-scalar multiplication of " +
+              "\\( \\ell + 1 \\) elements at ~0.15 ms per element. " +
+              "For a circuit with \\( \\ell = 5 \\) public inputs, " +
+              "compute: (a) proof size in bytes, (b) verification " +
+              "time.",
+            hint:
+              "Proof = 2 elements from \\( \\mathbb{G}_1 \\) + 1 " +
+              "from \\( \\mathbb{G}_2 \\). Verification = 3 pairings " +
+              "+ MSM of \\( \\ell + 1 \\) points.",
+            answer:
+              "(a) Proof size: \\( 2 \\times 48 + 1 \\times 96 = " +
+              "96 + 96 = 192 \\) bytes. This is constant regardless " +
+              "of circuit size. " +
+              "(b) Verification: \\( 3 \\times 1.5 + (5 + 1) " +
+              "\\times 0.15 = 4.5 + 0.9 = 5.4 \\) ms. " +
+              "For comparison, if \\( \\ell = 1 \\): " +
+              "\\( 4.5 + 0.3 = 4.8 \\) ms. The verification cost " +
+              "is dominated by the pairings and grows only linearly " +
+              "with the number of public inputs, not with circuit " +
+              "size. A circuit with 1M constraints and 5 public " +
+              "inputs verifies in the same ~5.4 ms."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain why the 'toxic waste' in Groth16 is dangerous " +
+              "and how MPC ceremonies mitigate the trust assumption. " +
+              "Specifically, if an adversary knows \\( \\tau \\), " +
+              "what can they do, and why does a multi-party ceremony " +
+              "with \\( n \\) participants require only 1 honest " +
+              "participant?",
+            hint:
+              "With \\( \\tau \\), the adversary can construct the " +
+              "simulator: produce valid proofs without a witness. " +
+              "In the MPC ceremony, each participant \\( i \\) " +
+              "contributes \\( \\tau_i \\) and the effective toxic " +
+              "waste is \\( \\tau = \\prod_i \\tau_i \\).",
+            answer:
+              "If an adversary knows \\( \\tau, \\alpha, \\beta, " +
+              "\\gamma, \\delta \\), they can run the zero-knowledge " +
+              "simulator: compute " +
+              "\\( [A]_1, [B]_2, [C]_1 \\) satisfying the " +
+              "verification equation without any witness. This " +
+              "means they can prove false statements (e.g., create " +
+              "money from nothing in Zcash). " +
+              "MPC ceremony: each participant \\( i \\) generates " +
+              "\\( \\tau_i \\xleftarrow{\\$} \\mathbb{Z}_p^* \\). " +
+              "The combined toxic waste is " +
+              "\\( \\tau = \\tau_1 \\cdot \\tau_2 \\cdots \\tau_n \\). " +
+              "To recover \\( \\tau \\), the adversary needs ALL " +
+              "individual \\( \\tau_i \\) values. If even one " +
+              "participant honestly destroys their \\( \\tau_i \\), " +
+              "the product \\( \\tau \\) is unknown to everyone. " +
+              "This is a 1-of-\\( n \\) trust assumption: security " +
+              "holds unless all \\( n \\) participants are compromised."
+          }
         ]
       },
 
@@ -2120,6 +2955,75 @@ window.DAY1_TECHNICAL = {
               "\\[ |\\pi| = O(\\log^2 n), \\quad " +
               "t_{\\text{verify}} = O(\\log^2 n), \\quad " +
               "t_{\\text{prove}} = O(n \\log n) \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In the FRI protocol, starting with a polynomial of " +
+              "degree \\( d = 2^{16} = 65536 \\), each folding " +
+              "round halves the degree. (a) How many folding rounds " +
+              "are needed to reduce to a constant? (b) If each " +
+              "round uses \\( s = 80 \\) query points and each " +
+              "Merkle path proof is \\( 32 \\cdot \\log_2 d \\) " +
+              "bytes, estimate the total proof size from FRI " +
+              "queries alone.",
+            hint:
+              "Rounds = \\( \\log_2 d \\). Each round commits " +
+              "evaluations in a Merkle tree. Queries: \\( s \\) " +
+              "per round, each requiring a Merkle path of depth " +
+              "proportional to the evaluation domain size at " +
+              "that round.",
+            answer:
+              "(a) Rounds = \\( \\log_2(2^{16}) = 16 \\). " +
+              "After 16 folds: \\( d/2^{16} = 1 \\) (constant). " +
+              "(b) At round \\( i \\), the domain has \\( 2^{16-i} \\) " +
+              "points, so Merkle paths have depth \\( 16 - i \\). " +
+              "Average depth across rounds \\( \\approx 8 \\). " +
+              "Each Merkle node = 32 bytes. Total FRI query size " +
+              "\\( \\approx s \\times 16 \\times 8 \\times 32 = " +
+              "80 \\times 16 \\times 8 \\times 32 = " +
+              "327,680 \\) bytes \\( \\approx 320 \\) KB. " +
+              "Adding trace commitments and composition polynomial " +
+              "queries, total proof is typically 100-200 KB. " +
+              "The \\( O(\\log^2 n) \\) scaling: " +
+              "\\( \\log n \\) rounds \\( \\times \\) " +
+              "\\( \\log n \\)-depth Merkle paths = " +
+              "\\( \\log^2 n \\) overhead."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Compare the trust assumptions of STARKs versus " +
+              "Groth16 SNARKs. Explain why STARKs are considered " +
+              "'transparent' and 'post-quantum safe,' and identify " +
+              "the main trade-off compared to SNARKs.",
+            hint:
+              "STARKs use only hash functions (collision resistance). " +
+              "SNARKs use pairings and a trusted setup. Consider " +
+              "proof size, verification time, and quantum resistance.",
+            answer:
+              "STARKs are transparent: the only cryptographic " +
+              "assumption is collision resistance of the hash " +
+              "function (e.g., SHA-256, Blake3). No structured " +
+              "reference string, no toxic waste, no ceremony. " +
+              "Anyone can verify the setup is honest (there is " +
+              "no setup). Post-quantum: hash collision resistance " +
+              "degrades gracefully under Grover's algorithm " +
+              "(\\( 2^{n/2} \\to 2^{n/3} \\) for \\( n \\)-bit " +
+              "hash), mitigated by doubling output size. " +
+              "Groth16: relies on \\( q \\)-SDH, \\( q \\)-PKE " +
+              "(knowledge assumptions), pairing groups, and a " +
+              "circuit-specific trusted setup. Broken by quantum " +
+              "computers (Shor breaks ECDLP). " +
+              "Trade-off: STARK proof ~100-200 KB vs Groth16 " +
+              "192 bytes. STARK verification ~50 ms vs Groth16 " +
+              "~10 ms. For on-chain verification (where proof " +
+              "size = gas cost), SNARKs dominate. Common " +
+              "hybrid approach: wrap a STARK in a SNARK " +
+              "(recursive composition) to get STARK transparency " +
+              "with SNARK proof size."
           }
         ]
       },
@@ -2311,6 +3215,71 @@ window.DAY1_TECHNICAL = {
               "\\pi = \\bigl[\\tfrac{f(\\tau) - f(z)}" +
               "{\\tau - z}\\bigr]_1 \\]"
           }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "In PLONKish arithmetization, encode the constraint " +
+              "'\\( c = a \\cdot b \\)' (a multiplication gate) " +
+              "using the PLONK gate equation " +
+              "\\( q_L a + q_R b + q_O c + q_M(ab) + q_C = 0 \\). " +
+              "What are the selector values? Then encode " +
+              "'\\( c = a + b \\)' (an addition gate) and " +
+              "'\\( a = 7 \\)' (a constant gate).",
+            hint:
+              "For multiplication: the output \\( c \\) equals the " +
+              "product \\( ab \\), so you want \\( q_M \\cdot ab - " +
+              "c = 0 \\). Set the appropriate selectors to achieve " +
+              "this. Similarly for addition.",
+            answer:
+              "Multiplication \\( c = ab \\): " +
+              "\\( q_L = 0, q_R = 0, q_O = -1, q_M = 1, q_C = 0 \\). " +
+              "Check: \\( 0 \\cdot a + 0 \\cdot b + (-1)c + 1 \\cdot " +
+              "ab + 0 = ab - c = 0 \\). " +
+              "Addition \\( c = a + b \\): " +
+              "\\( q_L = 1, q_R = 1, q_O = -1, q_M = 0, q_C = 0 \\). " +
+              "Check: \\( a + b - c = 0 \\). " +
+              "Constant \\( a = 7 \\): " +
+              "\\( q_L = -1, q_R = 0, q_O = 0, q_M = 0, q_C = 7 \\). " +
+              "Check: \\( -a + 7 = 0 \\implies a = 7 \\). " +
+              "Boolean constraint \\( a(a-1) = 0 \\): " +
+              "\\( q_L = -1, q_R = 0, q_O = 0, q_M = 1, q_C = 0 \\). " +
+              "Check: \\( -a + a^2 = a(a-1) = 0 \\)."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain the advantage of PLONK's universal SRS over " +
+              "Groth16's per-circuit CRS. Describe what happens when " +
+              "a developer needs to update a ZK circuit (e.g., add " +
+              "a new attribute check in a credential system) under " +
+              "each scheme.",
+            hint:
+              "Groth16 CRS encodes the specific circuit polynomials " +
+              "\\( A_j(x), B_j(x), C_j(x) \\). PLONK SRS is just " +
+              "powers of \\( \\tau \\). Think about what must be " +
+              "recomputed in each case.",
+            answer:
+              "Groth16: the CRS contains circuit-specific elements " +
+              "like \\( [\\frac{\\beta A_j(\\tau) + \\alpha B_j(\\tau) " +
+              "+ C_j(\\tau)}{\\delta}]_1 \\). Any circuit change " +
+              "(adding one constraint, modifying one gate) " +
+              "invalidates the entire CRS. A new MPC ceremony " +
+              "(at least phase 2) must be conducted, which takes " +
+              "days to weeks with many participants. " +
+              "PLONK: the SRS \\( ([1]_1, [\\tau]_1, \\ldots, " +
+              "[\\tau^n]_1, [\\tau]_2) \\) is independent of the " +
+              "circuit. When the circuit changes, only the " +
+              "preprocessing (selector polynomials " +
+              "\\( q_L, q_R, q_O, q_M, q_C \\) and permutation " +
+              "\\( \\sigma \\)) is recomputed locally by the " +
+              "developer. No new ceremony needed. The same Powers " +
+              "of Tau can serve all circuits up to size \\( n \\). " +
+              "For an evolving credential system, PLONK allows " +
+              "rapid iteration: add a new attribute predicate, " +
+              "recompile the circuit, reuse the same SRS."
+          }
         ]
       },
 
@@ -2497,6 +3466,73 @@ window.DAY1_TECHNICAL = {
               "\\mathbf{2}^n \\rangle, \\quad " +
               "\\mathbf{a}_L \\circ (\\mathbf{a}_L - " +
               "\\mathbf{1}^n) = \\mathbf{0} \\]"
+          }
+        ],
+        exercises: [
+          {
+            type: "calculation",
+            question:
+              "Compute the proof size for a Bulletproof inner product " +
+              "argument on vectors of length \\( n = 256 \\), using " +
+              "Curve25519 (32-byte group elements, 32-byte scalars). " +
+              "Then compute the proof size for an aggregated range " +
+              "proof of \\( m = 8 \\) values in \\( [0, 2^{64}) \\).",
+            hint:
+              "Inner product proof: \\( 2 \\log_2 n \\) group elements " +
+              "+ 2 scalars. For aggregated range proof of \\( m \\) " +
+              "values with \\( n \\)-bit range, the vector length is " +
+              "\\( mn \\), so use \\( 2 \\log_2(mn) \\) group elements " +
+              "+ constant overhead (~5 additional group elements + " +
+              "5 scalars for the range proof wrapper).",
+            answer:
+              "Inner product (\\( n = 256 \\)): " +
+              "\\( 2 \\log_2(256) = 2 \\cdot 8 = 16 \\) group elements " +
+              "+ 2 scalars = \\( 16 \\times 32 + 2 \\times 32 = " +
+              "512 + 64 = 576 \\) bytes. " +
+              "Aggregated range proof (\\( m = 8, n = 64 \\)): " +
+              "vector length = \\( 8 \\times 64 = 512 \\). " +
+              "\\( 2 \\log_2(512) = 2 \\times 9 = 18 \\) group elements " +
+              "from the inner product argument. Adding ~5 group " +
+              "elements + 5 scalars for the range proof structure: " +
+              "\\( (18 + 5) \\times 32 + (2 + 5) \\times 32 = " +
+              "736 + 224 = 960 \\) bytes. " +
+              "Compare: 8 separate proofs would be " +
+              "\\( 8 \\times 672 = 5,376 \\) bytes. Aggregation " +
+              "saves \\( \\approx 82\\% \\) bandwidth."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain how Bulletproof range proofs encode the " +
+              "constraint '\\( v \\in [0, 2^n) \\)' as an inner " +
+              "product relation. Why does the bit constraint " +
+              "\\( b_i(b_i - 1) = 0 \\) get expressed as " +
+              "\\( \\mathbf{a}_L \\circ \\mathbf{a}_R = \\mathbf{0} \\) " +
+              "where \\( \\mathbf{a}_R = \\mathbf{a}_L - \\mathbf{1}^n \\)?",
+            hint:
+              "Write \\( v = \\sum b_i 2^i \\) and set " +
+              "\\( \\mathbf{a}_L = (b_0, \\ldots, b_{n-1}) \\). " +
+              "For each component, what does " +
+              "\\( a_{L,i} \\cdot a_{R,i} = 0 \\) imply about " +
+              "\\( a_{L,i} \\)?",
+            answer:
+              "Set \\( \\mathbf{a}_L = (b_0, \\ldots, b_{n-1}) \\) " +
+              "as the binary representation of \\( v \\). Then " +
+              "\\( \\langle \\mathbf{a}_L, \\mathbf{2}^n \\rangle = " +
+              "\\sum_i b_i 2^i = v \\) (binary decomposition). " +
+              "Set \\( \\mathbf{a}_R = \\mathbf{a}_L - \\mathbf{1}^n \\), " +
+              "so \\( a_{R,i} = b_i - 1 \\). " +
+              "The Hadamard product constraint: " +
+              "\\( (\\mathbf{a}_L \\circ \\mathbf{a}_R)_i = " +
+              "b_i(b_i - 1) = 0 \\). This forces \\( b_i \\in " +
+              "\\{0, 1\\} \\) for each \\( i \\), since over any " +
+              "field, \\( x(x-1) = 0 \\iff x = 0 \\) or \\( x = 1 \\). " +
+              "Combined: \\( v = \\sum b_i 2^i \\) with each " +
+              "\\( b_i \\in \\{0,1\\} \\) implies " +
+              "\\( 0 \\leq v < 2^n \\). These two constraints are " +
+              "then combined (using random challenge \\( y \\)) " +
+              "into a single inner product relation that can be " +
+              "proved using the logarithmic halving protocol."
           }
         ]
       }

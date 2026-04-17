@@ -10,6 +10,8 @@ const STORAGE_KEYS = {
   ACTIVE_DAY: 'thesis-study-active-day',
 };
 
+const CHAPTER_KEYS = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'ch26', 'rust', 'method'];
+
 const POMODORO = {
   WORK_SECONDS: 25 * 60,
   BREAK_SECONDS: 5 * 60,
@@ -43,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProgress();
   restoreActiveDay();
   renderStudyGuides();
+  if (typeof renderPaperGuides === 'function') {
+    renderPaperGuides();
+  }
   if (typeof initConceptSearch === 'function') {
     initConceptSearch();
   }
@@ -107,7 +112,7 @@ function saveChecked(data) {
   }
 }
 
-/* === Day Tabs === */
+/* === Chapter Tabs === */
 
 function initDayTabs() {
   const tabs = $$('.day-tab');
@@ -117,44 +122,44 @@ function initDayTabs() {
       if (day === 'zk') {
         switchToZKDeepdive();
       } else {
-        switchDay(Number(day));
+        switchDay(day);
       }
     });
   });
 }
 
-function switchDay(dayNum) {
+function switchDay(chapterKey) {
   const tabs = $$('.day-tab');
   const sections = $$('.day-section');
   const zkSection = $('#zk-deepdive');
 
   tabs.forEach((tab) => {
-    const isActive = Number(tab.dataset.day) === dayNum;
+    const isActive = tab.dataset.day === chapterKey;
     tab.classList.toggle('active', isActive);
     tab.setAttribute('aria-selected', String(isActive));
   });
 
   sections.forEach((sec) => {
-    const isActive = Number(sec.dataset.day) === dayNum;
+    const isActive = sec.dataset.day === chapterKey;
     sec.classList.toggle('active', isActive);
     sec.hidden = !isActive;
   });
 
-  /* Hide ZK deep dive when switching to a day */
+  /* Hide ZK deep dive when switching to a chapter */
   if (zkSection) {
     zkSection.classList.remove('active');
     zkSection.hidden = true;
   }
 
   try {
-    localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, String(dayNum));
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, chapterKey);
   } catch {
     /* non-critical */
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  /* Update global view toggle color to match new active day */
+  /* Update global view toggle color to match new active chapter */
   if (typeof updateGlobalToggleColor === 'function') {
     updateGlobalToggleColor();
   }
@@ -165,7 +170,7 @@ function switchToZKDeepdive() {
   const sections = $$('.day-section');
   const zkSection = $('#zk-deepdive');
 
-  /* Deactivate all day tabs and sections */
+  /* Deactivate all chapter tabs and sections */
   tabs.forEach((tab) => {
     const isZK = tab.dataset.day === 'zk';
     tab.classList.toggle('active', isZK);
@@ -204,11 +209,11 @@ function restoreActiveDay() {
     if (saved) {
       if (saved === 'zk') {
         switchToZKDeepdive();
+      } else if (CHAPTER_KEYS.includes(saved)) {
+        switchDay(saved);
       } else {
-        const dayNum = Number(saved);
-        if (dayNum >= 1 && dayNum <= 3) {
-          switchDay(dayNum);
-        }
+        /* Backward compat: old numeric day values map to first chapter */
+        switchDay(CHAPTER_KEYS[0]);
       }
     }
   } catch {
@@ -334,7 +339,7 @@ function notifyTimerComplete(nextPhase) {
 
   document.title = msg;
   setTimeout(() => {
-    document.title = 'Thesis Deep Work Plan';
+    document.title = 'Thesis Study Plan';
   }, 5000);
 }
 
@@ -456,13 +461,22 @@ function initKeyboardShortcuts() {
 
     switch (e.key) {
       case '1':
-        switchDay(1);
+        switchDay(CHAPTER_KEYS[0]);
         break;
       case '2':
-        switchDay(2);
+        switchDay(CHAPTER_KEYS[1]);
         break;
       case '3':
-        switchDay(3);
+        switchDay(CHAPTER_KEYS[2]);
+        break;
+      case '4':
+        switchDay(CHAPTER_KEYS[3]);
+        break;
+      case '5':
+        switchDay(CHAPTER_KEYS[4]);
+        break;
+      case '6':
+        switchDay(CHAPTER_KEYS[5]);
         break;
       case 'z':
       case 'Z':
