@@ -54,6 +54,19 @@ const PAPER_TECH_DATA = {
 window.PAPER_GUIDE_DATA = PAPER_GUIDE_DATA;
 window.PAPER_TECH_DATA = PAPER_TECH_DATA;
 
+/* === Slugify paper name/title for anchor IDs === */
+
+function slugifyPaperName(str) {
+  if (!str) return '';
+  return String(str)
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
 /* === Find Paper by ID (cross-chapter lookup for prereq links) === */
 
 function findPaperById(paperId) {
@@ -309,9 +322,11 @@ function buildPaperCard(paper, techPaper, chapterKey, paperIdx, savedState, view
   card.style.setProperty('--day-color', dayColor);
   card.dataset.chapterKey = chapterKey;
   card.dataset.paperIdx = String(paperIdx);
-  /* Set paper id as data attribute for anchor targeting */
-  if (paper.id) {
-    card.id = 'paper-' + paper.id;
+  /* Set paper id as anchor target. Fallback to slugified name/title so every card is reachable. */
+  const anchorSlug = paper.id || slugifyPaperName(paper.name || paper.title || '');
+  if (anchorSlug) {
+    card.id = 'paper-' + anchorSlug;
+    card.dataset.slug = anchorSlug;
   }
 
   /* "What's New" badge — shown when paper id appears in recent research logs */

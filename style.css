@@ -299,29 +299,53 @@ body {
   border-radius: 3px;
 }
 
-/* === Mobile Menu Button === */
-.mobile-menu-btn {
-  display: none;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+/* === Sub-header (mode toggle row) === */
+.sub-header {
+  position: sticky;
+  top: var(--nav-height);
+  z-index: 99;
+  background: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.mobile-menu-btn span {
-  display: block;
-  width: 20px;
-  height: 2px;
-  background: var(--text-secondary);
-  border-radius: 1px;
-  transition: all var(--transition-fast);
+.sub-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
 }
+
+/* === Bottom bar (pomodoro compact + global progress) === */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 95;
+  background: rgba(15, 15, 15, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.bottom-bar-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bottom-bar .progress-bar-wrap { width: 200px; }
+
+body { padding-bottom: 56px; }
 
 /* === Main Content === */
 .main {
@@ -1113,9 +1137,6 @@ body {
     font-size: 12px;
   }
 
-  /* Hamburger button: always visible on mobile, 44px touch target */
-  .mobile-menu-btn { display: flex; min-width: 44px; min-height: 44px; justify-content: center; align-items: center; padding: 10px; }
-
   /* Touch-target minimums on mobile */
   .study-guide-toggle,
   .exercise-toggle,
@@ -1130,14 +1151,14 @@ body {
   }
   .checkbox-wrap input[type="checkbox"] { width: 22px; height: 22px; }
 
-  /* nav-right and search: hidden by default on mobile, shown when nav is expanded via hamburger */
-  .nav-right { display: none; width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-  .search-container { display: none; margin: 0; width: 100%; }
+  /* Everything visible on mobile — wrap nav rows instead of hiding */
+  .nav-right { display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
+  .search-container { display: flex; min-width: 140px; flex: 1 1 140px; }
+  .sub-header-inner { padding: 6px 12px; justify-content: center; }
+  .bottom-bar-inner { padding: 6px 12px; gap: 10px; }
+  .bottom-bar .progress-bar-wrap { width: 100px; }
 
-  .nav.expanded .nav-right { display: flex; }
-  .nav.expanded .search-container { display: flex; }
-
-  /* Misc layout fixes (kept from original) */
+  /* Misc layout fixes */
   .progress-bar-wrap { width: 80px; }
   .main { padding: 20px 16px 60px; }
   .day-title { font-size: 24px; }
@@ -1379,13 +1400,13 @@ body {
   font-family: var(--font-mono);
 }
 
-/* === T14: Pomodoro preset mode indicator === */
+/* === Pomodoro preset mode picker === */
 .pomodoro-preset-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 8px;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
   margin-bottom: 4px;
 }
 
@@ -1396,14 +1417,41 @@ body {
   letter-spacing: 0.05em;
 }
 
+.pomodoro-preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+}
+
+.pomodoro-preset-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pomodoro-preset-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); }
+.pomodoro-preset-btn.active {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: var(--color-ch25);
+  color: var(--text-primary);
+}
+
 .pomodoro-mode {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--text-secondary);
+  font-size: 11px;
+  color: var(--text-muted);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 2px 8px;
+  padding: 2px 6px;
 }
 
 /* === T14: Friday Weekly Review Modal === */

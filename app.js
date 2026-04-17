@@ -29,10 +29,13 @@ const POMODORO = {
   BREAK_SECONDS: 5 * 60,
 };
 
-// T14: Dual Pomodoro presets — chapters mode (25/5) vs Plan mode (50/10)
+// Pomodoro presets: multiple focus modes the user can pick from
 const POMODORO_PRESETS = {
-  chapters: { work: 25, break: 5 },
-  plan: { work: 50, break: 10 },
+  sprint:   { work: 15, break: 3,  label: '15/3' },
+  chapters: { work: 25, break: 5,  label: '25/5' },
+  plan:     { work: 50, break: 10, label: '50/10' },
+  ultra:    { work: 90, break: 15, label: '90/15' },
+  tabata:   { work: 4,  break: 1,  label: '4/1' },
 };
 
 // T14: Weekly review localStorage keys
@@ -381,6 +384,10 @@ function initPomodoro() {
   if (pauseBtn) pauseBtn.addEventListener('click', pauseTimer);
   if (resetBtn) resetBtn.addEventListener('click', resetTimer);
 
+  $$('.pomodoro-preset-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setPomodoroPreset(btn.dataset.preset));
+  });
+
   renderTimer();
 
   if (timerState.running) {
@@ -505,12 +512,13 @@ function renderTimer() {
   if (panelDisplay) panelDisplay.textContent = display;
   if (phaseLabel) phaseLabel.textContent = timerState.phase;
 
-  // T14: Update preset mode indicator
+  const preset = POMODORO_PRESETS[activePomodoroPreset] || POMODORO_PRESETS.chapters;
   const modeEl = $('#pomodoro-mode');
-  if (modeEl) {
-    const preset = POMODORO_PRESETS[activePomodoroPreset] || POMODORO_PRESETS.chapters;
-    modeEl.textContent = preset.work + '/' + preset.break;
-  }
+  if (modeEl) modeEl.textContent = preset.label;
+
+  $$('.pomodoro-preset-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.preset === activePomodoroPreset);
+  });
 }
 
 function updateTimerButtons() {
@@ -690,32 +698,7 @@ function isTyping(event) {
 /* === Mobile Menu === */
 
 function initMobileMenu() {
-  const btn = $('#mobile-menu-btn');
-  const nav = $('#nav');
-  if (!btn || !nav) return;
-
-  const setExpanded = (expanded) => {
-    nav.classList.toggle('expanded', expanded);
-    btn.setAttribute('aria-expanded', String(expanded));
-  };
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    setExpanded(!nav.classList.contains('expanded'));
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!nav.contains(e.target) && nav.classList.contains('expanded')) {
-      setExpanded(false);
-    }
-  });
-
-  const mediaQuery = window.matchMedia('(min-width: 901px)');
-  const handleResize = (mq) => {
-    if (mq.matches) setExpanded(false);
-  };
-  mediaQuery.addEventListener('change', handleResize);
-  handleResize(mediaQuery);
+  /* Hamburger removed — all nav items now always visible across viewports. */
 }
 
 /* === Global View Toggle (keyboard shortcut) === */

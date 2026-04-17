@@ -319,6 +319,40 @@ function getOrCreateModal() {
   return { modal, content: document.getElementById('plan-modal-content') };
 }
 
+function findPaperCard(chapterKey, paperSlug) {
+  const chapterRoot = document.getElementById('ch-' + chapterKey.replace(/^ch/, '')) || document;
+  const exact = chapterRoot.querySelector('#paper-' + CSS.escape(paperSlug));
+  if (exact) return exact;
+  const cards = chapterRoot.querySelectorAll('.paper-card[id^="paper-"]');
+  const needle = paperSlug.toLowerCase();
+  for (const c of cards) {
+    const slug = c.id.replace(/^paper-/, '');
+    if (slug === needle || slug.startsWith(needle + '-') || slug.endsWith('-' + needle) || slug.includes(needle)) {
+      return c;
+    }
+  }
+  return null;
+}
+
+function navigateToContent(chapterKey, paperSlug) {
+  closeModal();
+  const tabKey = CHAPTER_DATA_ATTR[chapterKey] || chapterKey;
+  const tabBtn = document.querySelector(`.day-tab[data-day="${tabKey}"]`);
+  if (tabBtn) tabBtn.click();
+  if (paperSlug) {
+    setTimeout(() => {
+      const card = findPaperCard(chapterKey, paperSlug);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('highlighted');
+        const header = card.querySelector('.paper-header');
+        if (header && !card.classList.contains('open')) header.click();
+        setTimeout(() => card.classList.remove('highlighted'), 2400);
+      }
+    }, 180);
+  }
+}
+
 function closeModal() {
   const modal = document.getElementById('plan-modal');
   if (modal) modal.classList.remove('open');
@@ -361,8 +395,13 @@ function populateModal(session) {
   // Header
   const header = el('div', 'plan-modal-header');
   const eyebrow = el('div', 'plan-modal-eyebrow');
+  const chapterLink = el('button', 'plan-modal-chapter-link', {
+    textContent: `${PLAN_CHAPTER_LABELS[session.chapter] || session.chapter} · ${session.id} →`,
+    title: 'Open chapter tab',
+  });
+  chapterLink.addEventListener('click', () => navigateToContent(session.chapter));
   eyebrow.append(
-    el('span', null, { textContent: `${PLAN_CHAPTER_LABELS[session.chapter] || session.chapter} · ${session.id}` }),
+    chapterLink,
     el('span', 'plan-modal-phase-tag', { textContent: session.phase }),
   );
   header.append(
@@ -380,12 +419,16 @@ function populateModal(session) {
   const ex = renderModalList('Exercises', session.exercises);
   if (ex) content.appendChild(ex);
 
-  // Paper refs
+  // Paper refs — clickable, deeplink to the paper card in its chapter tab
   if (session.paper_refs && session.paper_refs.length > 0) {
     const refSec = el('div', 'plan-modal-section');
     refSec.appendChild(el('div', 'plan-modal-section-title', { textContent: 'Paper References' }));
     const links = el('div', 'plan-modal-links');
-    session.paper_refs.forEach((ref) => links.appendChild(el('span', 'plan-modal-link', { textContent: `→ ${ref}` })));
+    session.paper_refs.forEach((ref) => {
+      const link = el('button', 'plan-modal-link', { textContent: `→ ${ref}`, title: 'Open paper' });
+      link.addEventListener('click', () => navigateToContent(session.chapter, ref));
+      links.appendChild(link);
+    });
     refSec.appendChild(links);
     content.appendChild(refSec);
   }

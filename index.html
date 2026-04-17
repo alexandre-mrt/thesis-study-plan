@@ -81,29 +81,21 @@
         <div class="search-results" id="search-results"></div>
       </div>
       <div class="nav-right">
-        <div class="global-view-toggle" id="global-view-toggle">
-          <span class="global-view-label">Mode</span>
-          <button class="global-view-btn active" data-view="intuitive">Intuitive</button>
-          <button class="global-view-btn" data-view="technical">Technical</button>
-        </div>
         <button class="lexicon-toggle" id="lexicon-toggle-btn" title="Open Lexicon (L)">ABC</button>
-        <div class="pomodoro-compact" id="pomodoro-toggle" title="Toggle Pomodoro Timer">
-          <span class="pomodoro-icon">&#9201;</span>
-          <span class="pomodoro-time" id="pomodoro-display">25:00</span>
-        </div>
-        <div class="progress-indicator">
-          <span class="progress-text" id="progress-text">0%</span>
-          <div class="progress-bar-wrap">
-            <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
-          </div>
-        </div>
       </div>
     </div>
-    <!-- Mobile menu toggle -->
-    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav">
-      <span></span><span></span><span></span>
-    </button>
   </nav>
+
+  <!-- Sub-header: mode toggle just below nav -->
+  <div class="sub-header">
+    <div class="sub-header-inner">
+      <div class="global-view-toggle" id="global-view-toggle">
+        <span class="global-view-label">Mode</span>
+        <button class="global-view-btn active" data-view="intuitive">Intuitive</button>
+        <button class="global-view-btn" data-view="technical">Technical</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Pomodoro Timer Panel -->
   <div class="pomodoro-panel" id="pomodoro-panel" hidden>
@@ -115,12 +107,34 @@
         <button class="pomo-btn" id="pomo-pause" disabled>Pause</button>
         <button class="pomo-btn pomo-btn-secondary" id="pomo-reset">Reset</button>
       </div>
-      <!-- T14: Preset mode indicator -->
       <div class="pomodoro-preset-row">
         <span class="pomodoro-preset-label">Mode</span>
-        <span class="pomodoro-mode" id="pomodoro-mode">25/5</span>
+        <div class="pomodoro-preset-buttons" id="pomodoro-preset-buttons">
+          <button class="pomodoro-preset-btn" data-preset="sprint" title="15 min focus / 3 min break">15/3</button>
+          <button class="pomodoro-preset-btn active" data-preset="chapters" title="25 min focus / 5 min break">25/5</button>
+          <button class="pomodoro-preset-btn" data-preset="plan" title="50 min focus / 10 min break">50/10</button>
+          <button class="pomodoro-preset-btn" data-preset="ultra" title="90 min focus / 15 min break">90/15</button>
+          <button class="pomodoro-preset-btn" data-preset="tabata" title="4 min focus / 1 min break">4/1</button>
+        </div>
       </div>
       <div class="pomodoro-hint">Press <kbd>Space</kbd> to toggle</div>
+    </div>
+  </div>
+
+  <!-- Bottom bar: Pomodoro compact + global progress -->
+  <div class="bottom-bar" id="bottom-bar">
+    <div class="bottom-bar-inner">
+      <div class="pomodoro-compact" id="pomodoro-toggle" title="Toggle Pomodoro Timer">
+        <span class="pomodoro-icon">&#9201;</span>
+        <span class="pomodoro-time" id="pomodoro-display">25:00</span>
+        <span class="pomodoro-mode" id="pomodoro-mode">25/5</span>
+      </div>
+      <div class="progress-indicator">
+        <span class="progress-text" id="progress-text">0%</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1402,7 +1416,7 @@
   <script src="ch25-papers-technical.js"></script>
   <script src="ch26-papers-guide.js"></script>
   <script src="ch26-papers-technical.js"></script>
-  <script src="paper-guide.js"></script>
+  <script src="paper-guide.js?v=6"></script>
   <!-- SOTA data files -->
   <script src="sota-ch21.js"></script>
   <script src="sota-ch22.js"></script>
@@ -1420,6 +1434,6 @@
   <script src="flashcard-data.js"></script>
   <script src="flashcards.js"></script>
   <script src="app.js"></script>
-  <script src="plan.js"></script>
+  <script src="plan.js?v=6"></script>
 </body>
 </html>
