@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thesis Study Plan — Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: #020617;
+      min-height: 100vh;
+      padding: 2rem;
+      color: white;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot {
+      width: 12px; height: 12px;
+      background: #22d3ee;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 1rem;
+      border: 1px solid #1e293b;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    svg { width: 100%; min-width: 1100px; display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 0.75rem;
+      border: 1px solid #1e293b;
+      padding: 1.25rem;
+    }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>Thesis Study Plan — Architecture</h1>
+      </div>
+      <p class="subtitle">Static single-page study site · 6 chapters · 80+ papers · Pomodoro + progress tracking</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1200 860">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- ======================= USER ======================= -->
+        <rect x="30" y="400" width="120" height="60" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="90" y="424" fill="white" font-size="11" font-weight="600" text-anchor="middle">User</text>
+        <text x="90" y="440" fill="#94a3b8" font-size="9" text-anchor="middle">Browser</text>
+        <text x="90" y="453" fill="#94a3b8" font-size="9" text-anchor="middle">(no build)</text>
+
+        <!-- ======================= ARROWS (drawn first, behind components) ======================= -->
+        <!-- User → Vercel → index.html -->
+        <line x1="150" y1="430" x2="198" y2="430" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="174" y="424" fill="#94a3b8" font-size="8" text-anchor="middle">HTTPS</text>
+
+        <line x1="310" y1="430" x2="358" y2="430" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="334" y="424" fill="#94a3b8" font-size="8" text-anchor="middle">CDN</text>
+
+        <!-- index.html → app.js (core) -->
+        <line x1="470" y1="430" x2="518" y2="430" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="494" y="424" fill="#94a3b8" font-size="8" text-anchor="middle">load</text>
+
+        <!-- app.js fans out to renderers (vertical stack on right) -->
+        <line x1="630" y1="410" x2="700" y2="130" stroke="#34d399" stroke-width="1" opacity="0.55"/>
+        <line x1="630" y1="420" x2="700" y2="205" stroke="#34d399" stroke-width="1" opacity="0.55"/>
+        <line x1="630" y1="430" x2="700" y2="280" stroke="#34d399" stroke-width="1" opacity="0.55"/>
+        <line x1="630" y1="440" x2="700" y2="355" stroke="#34d399" stroke-width="1" opacity="0.55"/>
+        <line x1="630" y1="450" x2="700" y2="430" stroke="#34d399" stroke-width="1" opacity="0.55"/>
+        <line x1="630" y1="455" x2="700" y2="505" stroke="#34d399" stroke-width="1" opacity="0.55"/>
+        <line x1="630" y1="460" x2="700" y2="580" stroke="#34d399" stroke-width="1" opacity="0.55"/>
+        <line x1="630" y1="465" x2="700" y2="655" stroke="#34d399" stroke-width="1" opacity="0.55"/>
+
+        <!-- renderers → data layer (horizontal to the far right) -->
+        <line x1="860" y1="155" x2="930" y2="155" stroke="#a78bfa" stroke-width="1" opacity="0.6" marker-end="url(#arrowhead)"/>
+        <line x1="860" y1="230" x2="930" y2="230" stroke="#a78bfa" stroke-width="1" opacity="0.6" marker-end="url(#arrowhead)"/>
+        <line x1="860" y1="305" x2="930" y2="305" stroke="#a78bfa" stroke-width="1" opacity="0.6" marker-end="url(#arrowhead)"/>
+        <line x1="860" y1="380" x2="930" y2="380" stroke="#a78bfa" stroke-width="1" opacity="0.6" marker-end="url(#arrowhead)"/>
+        <line x1="860" y1="455" x2="930" y2="455" stroke="#a78bfa" stroke-width="1" opacity="0.6" marker-end="url(#arrowhead)"/>
+        <line x1="860" y1="530" x2="930" y2="530" stroke="#a78bfa" stroke-width="1" opacity="0.6" marker-end="url(#arrowhead)"/>
+        <line x1="860" y1="605" x2="930" y2="605" stroke="#a78bfa" stroke-width="1" opacity="0.6" marker-end="url(#arrowhead)"/>
+        <line x1="860" y1="680" x2="930" y2="680" stroke="#a78bfa" stroke-width="1" opacity="0.6" marker-end="url(#arrowhead)"/>
+
+        <!-- External libs (top) -->
+        <line x1="420" y1="395" x2="420" y2="60" stroke="#fb923c" stroke-width="1" opacity="0.65" marker-end="url(#arrowhead)"/>
+        <text x="430" y="200" fill="#fb923c" font-size="8">CDN load</text>
+
+        <!-- localStorage (bottom) -->
+        <line x1="570" y1="475" x2="570" y2="780" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+        <text x="580" y="620" fill="#fb7185" font-size="8">persist</text>
+
+        <!-- ======================= EXTERNAL SERVICES ======================= -->
+        <!-- Vercel -->
+        <rect x="200" y="395" width="110" height="70" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="255" y="418" fill="white" font-size="11" font-weight="600" text-anchor="middle">Vercel</text>
+        <text x="255" y="434" fill="#94a3b8" font-size="9" text-anchor="middle">Static hosting</text>
+        <text x="255" y="448" fill="#94a3b8" font-size="9" text-anchor="middle">GitHub CI/CD</text>
+        <text x="255" y="462" fill="#fbbf24" font-size="7" text-anchor="middle">auto-deploy</text>
+
+        <!-- External libs cluster (top center) -->
+        <rect x="340" y="40" width="400" height="80" rx="12" fill="transparent" stroke="#fb923c" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="352" y="58" fill="#fb923c" font-size="10" font-weight="600">External CDN Libraries</text>
+
+        <rect x="355" y="70" width="110" height="40" rx="6" fill="rgba(251, 146, 60, 0.2)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="410" y="88" fill="white" font-size="10" font-weight="600" text-anchor="middle">KaTeX 0.16</text>
+        <text x="410" y="102" fill="#94a3b8" font-size="8" text-anchor="middle">math rendering</text>
+
+        <rect x="475" y="70" width="110" height="40" rx="6" fill="rgba(251, 146, 60, 0.2)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="530" y="88" fill="white" font-size="10" font-weight="600" text-anchor="middle">Mermaid 10</text>
+        <text x="530" y="102" fill="#94a3b8" font-size="8" text-anchor="middle">disabled / kept</text>
+
+        <rect x="595" y="70" width="130" height="40" rx="6" fill="rgba(251, 146, 60, 0.2)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="660" y="88" fill="white" font-size="10" font-weight="600" text-anchor="middle">Google Fonts</text>
+        <text x="660" y="102" fill="#94a3b8" font-size="8" text-anchor="middle">Inter + JB Mono</text>
+
+        <!-- ======================= ENTRY POINT ======================= -->
+        <rect x="360" y="395" width="110" height="70" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="415" y="418" fill="white" font-size="11" font-weight="600" text-anchor="middle">index.html</text>
+        <text x="415" y="434" fill="#94a3b8" font-size="9" text-anchor="middle">SPA shell</text>
+        <text x="415" y="448" fill="#94a3b8" font-size="9" text-anchor="middle">nav + tabs</text>
+        <text x="415" y="462" fill="#22d3ee" font-size="7" text-anchor="middle">no framework</text>
+
+        <!-- ======================= CORE APP ======================= -->
+        <rect x="520" y="395" width="110" height="70" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="575" y="418" fill="white" font-size="11" font-weight="600" text-anchor="middle">app.js</text>
+        <text x="575" y="432" fill="#94a3b8" font-size="9" text-anchor="middle">core</text>
+        <text x="575" y="446" fill="#94a3b8" font-size="8" text-anchor="middle">tabs · timer · nav</text>
+        <text x="575" y="460" fill="#34d399" font-size="7" text-anchor="middle">keyboard shortcuts</text>
+
+        <!-- ======================= RENDERERS (green column) ======================= -->
+        <rect x="700" y="130" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="780" y="150" fill="white" font-size="10" font-weight="600" text-anchor="middle">study-guide.js</text>
+        <text x="780" y="166" fill="#94a3b8" font-size="8" text-anchor="middle">concept cards · KaTeX</text>
+
+        <rect x="700" y="205" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="780" y="225" fill="white" font-size="10" font-weight="600" text-anchor="middle">paper-guide.js</text>
+        <text x="780" y="241" fill="#94a3b8" font-size="8" text-anchor="middle">paper recap cards</text>
+
+        <rect x="700" y="280" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="780" y="300" fill="white" font-size="10" font-weight="600" text-anchor="middle">chapter-subnav.js</text>
+        <text x="780" y="316" fill="#94a3b8" font-size="8" text-anchor="middle">per-chapter tabs</text>
+
+        <rect x="700" y="355" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="780" y="375" fill="white" font-size="10" font-weight="600" text-anchor="middle">zk-deepdive.js</text>
+        <text x="780" y="391" fill="#94a3b8" font-size="8" text-anchor="middle">ZK deep dive section</text>
+
+        <rect x="700" y="430" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="780" y="450" fill="white" font-size="10" font-weight="600" text-anchor="middle">sota-renderer.js</text>
+        <text x="780" y="466" fill="#94a3b8" font-size="8" text-anchor="middle">SOTA cards (2024-2026)</text>
+
+        <rect x="700" y="505" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="780" y="525" fill="white" font-size="10" font-weight="600" text-anchor="middle">flashcards.js</text>
+        <text x="780" y="541" fill="#94a3b8" font-size="8" text-anchor="middle">spaced repetition</text>
+
+        <rect x="700" y="580" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="780" y="600" fill="white" font-size="10" font-weight="600" text-anchor="middle">plan.js</text>
+        <text x="780" y="616" fill="#94a3b8" font-size="8" text-anchor="middle">calendar + deep-links</text>
+
+        <rect x="700" y="655" width="160" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="780" y="675" fill="white" font-size="10" font-weight="600" text-anchor="middle">search + lexicon</text>
+        <text x="780" y="691" fill="#94a3b8" font-size="8" text-anchor="middle">global concept search</text>
+
+        <!-- ======================= DATA LAYER (violet column, far right) ======================= -->
+        <rect x="930" y="40" width="220" height="720" rx="12" fill="rgba(76, 29, 149, 0.05)" stroke="#a78bfa" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="942" y="58" fill="#a78bfa" font-size="10" font-weight="600">Data Layer (window globals)</text>
+
+        <rect x="945" y="130" width="190" height="50" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1040" y="150" fill="white" font-size="10" font-weight="600" text-anchor="middle">day{1,2,3}-guide/tech.js</text>
+        <text x="1040" y="166" fill="#94a3b8" font-size="8" text-anchor="middle">concept data + KaTeX</text>
+
+        <rect x="945" y="205" width="190" height="50" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1040" y="225" fill="white" font-size="10" font-weight="600" text-anchor="middle">ch{21-26}-papers-*.js</text>
+        <text x="1040" y="241" fill="#94a3b8" font-size="8" text-anchor="middle">80+ paper recaps</text>
+
+        <rect x="945" y="280" width="190" height="50" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1040" y="300" fill="white" font-size="10" font-weight="600" text-anchor="middle">rust-guide/technical.js</text>
+        <text x="1040" y="316" fill="#94a3b8" font-size="8" text-anchor="middle">Rust chapter data</text>
+
+        <rect x="945" y="355" width="190" height="50" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1040" y="375" fill="white" font-size="10" font-weight="600" text-anchor="middle">zk-deepdive-data*.js</text>
+        <text x="1040" y="391" fill="#94a3b8" font-size="8" text-anchor="middle">ZK sections</text>
+
+        <rect x="945" y="430" width="190" height="50" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1040" y="450" fill="white" font-size="10" font-weight="600" text-anchor="middle">sota-ch{21-26}.js</text>
+        <text x="1040" y="466" fill="#94a3b8" font-size="8" text-anchor="middle">state-of-the-art</text>
+
+        <rect x="945" y="505" width="190" height="50" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1040" y="525" fill="white" font-size="10" font-weight="600" text-anchor="middle">flashcard-data.js</text>
+        <text x="1040" y="541" fill="#94a3b8" font-size="8" text-anchor="middle">global deck</text>
+
+        <rect x="945" y="580" width="190" height="50" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1040" y="600" fill="white" font-size="10" font-weight="600" text-anchor="middle">ch22-guide.js</text>
+        <text x="1040" y="616" fill="#94a3b8" font-size="8" text-anchor="middle">chapter 22 concepts</text>
+
+        <rect x="945" y="655" width="190" height="50" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1040" y="675" fill="white" font-size="10" font-weight="600" text-anchor="middle">lexicon.js</text>
+        <text x="1040" y="691" fill="#94a3b8" font-size="8" text-anchor="middle">definitions</text>
+
+        <!-- ======================= STORAGE ======================= -->
+        <rect x="470" y="780" width="200" height="50" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="570" y="800" fill="white" font-size="11" font-weight="600" text-anchor="middle">localStorage</text>
+        <text x="570" y="816" fill="#94a3b8" font-size="9" text-anchor="middle">progress · view · subnav state</text>
+
+        <!-- ======================= LEGEND ======================= -->
+        <rect x="30" y="550" width="160" height="160" rx="6" fill="rgba(15,23,42,0.7)" stroke="#1e293b" stroke-width="1"/>
+        <text x="40" y="570" fill="white" font-size="10" font-weight="600">Legend</text>
+
+        <rect x="40" y="580" width="14" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="60" y="589" fill="#94a3b8" font-size="8">Frontend shell</text>
+
+        <rect x="40" y="598" width="14" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
+        <text x="60" y="607" fill="#94a3b8" font-size="8">Renderer / core JS</text>
+
+        <rect x="40" y="616" width="14" height="10" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="60" y="625" fill="#94a3b8" font-size="8">Data module</text>
+
+        <rect x="40" y="634" width="14" height="10" rx="2" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1"/>
+        <text x="60" y="643" fill="#94a3b8" font-size="8">Cloud / CDN</text>
+
+        <rect x="40" y="652" width="14" height="10" rx="2" fill="rgba(251, 146, 60, 0.2)" stroke="#fb923c" stroke-width="1"/>
+        <text x="60" y="661" fill="#94a3b8" font-size="8">External library</text>
+
+        <rect x="40" y="670" width="14" height="10" rx="2" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1"/>
+        <text x="60" y="679" fill="#94a3b8" font-size="8">Browser storage</text>
+
+        <line x1="40" y1="695" x2="54" y2="695" stroke="#fb7185" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="60" y="698" fill="#94a3b8" font-size="8">Persist flow</text>
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>Frontend Stack</h3>
+        </div>
+        <ul>
+          <li>• Pure HTML / CSS / vanilla JS</li>
+          <li>• No build step · no framework</li>
+          <li>• Google Fonts (Inter, JB Mono)</li>
+          <li>• KaTeX for LaTeX math</li>
+          <li>• Mermaid v10 loaded but disabled</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>Rendering Pipeline</h3>
+        </div>
+        <ul>
+          <li>• app.js: tabs · timer · shortcuts</li>
+          <li>• Per-chapter sub-tabs (chapter-subnav.js)</li>
+          <li>• Global LaTeX pass on chapter switch</li>
+          <li>• Concept search + lexicon overlay</li>
+          <li>• Plan modal with paper deep-links</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot violet"></div>
+          <h3>Data Modules</h3>
+        </div>
+        <ul>
+          <li>• ch{21-26}-papers-guide/technical.js</li>
+          <li>• day{1-3}-guide/technical.js</li>
+          <li>• zk-deepdive-data{,2}.js</li>
+          <li>• sota-ch{21-26}.js · sota-rust.js</li>
+          <li>• flashcard-data.js · lexicon.js</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Hosting</h3>
+        </div>
+        <ul>
+          <li>• Vercel static hosting</li>
+          <li>• Auto-deploy on main push</li>
+          <li>• GitHub: alexandre-mrt/thesis-study-plan</li>
+          <li>• No server · no API · no build</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot rose"></div>
+          <h3>State &amp; Persistence</h3>
+        </div>
+        <ul>
+          <li>• localStorage keys:</li>
+          <li>&nbsp;&nbsp;— progress:* (checklist)</li>
+          <li>&nbsp;&nbsp;— view:* (intuitive/technical)</li>
+          <li>&nbsp;&nbsp;— chapter:subnav:active</li>
+          <li>&nbsp;&nbsp;— pomodoro:preset</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer">
+      Thesis Study Plan · static SPA · ~25 JS modules, ~50 data files · commit 0372726
+    </p>
+  </div>
+</body>
+</html>
