@@ -175,3 +175,22 @@ Categories: UNCERTAINTY · ASSUMPTION · BLOCKED · UNFIXED · TEST GAP · DEPEN
   # ~/.claude/skills/morning-thesis-addon/skill.md
   ```
   The complete skill.md content is in the T17 night-shift agent final message.
+
+---
+
+## Problems — 2026-04-17 (T19 Flashcards)
+
+### ASSUMPTION: Flashcards tab not restored on page reload
+- **Iteration**: 1
+- **File**: app.js `restoreActiveDay()`
+- **What I needed**: Decision on whether to persist the flashcard tab across page reloads.
+- **What I did**: Intentionally do NOT restore 'flashcards' tab on page load — restores ch21 instead. Rationale: flashcards is a session tool, not a primary study view. User opens it via nav or `F` key.
+- **Confidence**: MEDIUM
+- **User action needed**: If you want flashcards to restore on reload, remove the `saved !== 'flashcards'` guard in `restoreActiveDay()` in app.js.
+
+### ASSUMPTION: No --color-ch26 CSS variable used in flashcards
+- **Iteration**: 1
+- **File**: flashcards.js (renderCard), flashcards.css
+- **What I needed**: ch26 color from CSS variable (undefined in style.css per prior agent note).
+- **What I did**: Used hardcoded `#8B5CF6` (purple) for ch26 accent in the `chapterColors` map, consistent with prior agent decision. Marked inline comment NIGHT-SHIFT-REVIEW in flashcards.js renderCard function.
+- **Confidence**: HIGH (same fallback color the prior agent chose)

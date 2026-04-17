@@ -221,6 +221,14 @@ function buildPaperHeader(paper, cardKey, card, savedState) {
   const badges = document.createElement('div');
   badges.className = 'paper-badges';
 
+  /* Reading-time pill — only rendered when readingMinutes is present */
+  if (typeof paper.readingMinutes === 'number') {
+    const readingPill = document.createElement('span');
+    readingPill.className = 'reading-time';
+    readingPill.textContent = paper.readingMinutes + ' min read';
+    badges.appendChild(readingPill);
+  }
+
   const statusBadge = document.createElement('span');
   statusBadge.className = 'paper-status-badge status-' + (paper.status || 'queued');
   statusBadge.textContent = STATUS_LABELS[paper.status] || paper.status || 'Queued';
