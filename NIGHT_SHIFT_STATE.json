@@ -4,84 +4,105 @@
     "project": "thesis-study-plan",
     "branch": "feat/night-shift-2026-04-17-mobile",
     "started_at": "2026-04-17T19:00:00+02:00",
-    "iteration": 0,
+    "iteration": 1,
     "total_tasks": 4,
-    "completed_tasks": 0,
+    "completed_tasks": 4,
     "mission": "Mobile-optimized responsive pass: 4 fixes incl. critical Plan-tab regression. See NIGHT_SHIFT_MOBILE_SPEC.md."
   },
   "tasks": [
     {
       "id": "T1",
-      "title": "Reorder chapter sections — study guide above videos",
+      "title": "Reorder chapter sections \u2014 study guide above videos",
       "description": "In index.html, within every chapter .block (#ch-21 through #ch-26 and #ch-rust), move .study-guide-toggle + .study-guide-container + .paper-guide-container to BEFORE .resources-grid. SOTA container stays last.",
-      "status": "pending",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["index.html"],
+      "files": [
+        "index.html"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T22:30:00+02:00"
     },
     {
       "id": "T2",
       "title": "Fix nav overflow on narrow viewports",
       "description": "Rework responsive behaviour of .nav. On <768px: chapter tabs become horizontally scrollable with scroll-snap + fade gradient. Hamburger controls only .nav-right (view toggle, lexicon, pomodoro, progress). Search input full-width when expanded. All touch targets >= 44px. Tabs always reachable on 375px via horizontal scroll.",
-      "status": "pending",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-coder",
       "isolation": "worktree",
-      "files": ["index.html", "style.css", "app.js"],
+      "files": [
+        "index.html",
+        "style.css",
+        "app.js"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T22:30:00+02:00"
     },
     {
       "id": "T0",
       "title": "CRITICAL: Plan tab not rendering",
       "description": "User reports Plan tab renders empty. Root-cause: check plan.js load order, PLAN.init() invocation, window.PLAN availability at nav click, sessions.json fetch path, console errors. Fix and verify grid visible with 75 cells.",
-      "status": "pending",
+      "status": "completed",
       "priority": 0,
       "depends_on": [],
       "parallel_group": "A",
       "agent_type": "night-fixer",
       "isolation": "worktree",
-      "files": ["plan.js", "app.js", "index.html", "plan.css"],
+      "files": [
+        "plan.js",
+        "app.js",
+        "index.html",
+        "plan.css"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T22:30:00+02:00"
     },
     {
       "id": "T3",
       "title": "Full responsive audit + fixes on 375/430/768/1024",
       "description": "Puppeteer QA on 4 breakpoints x ~10 views. Fix overflow, touch targets <44px, small fonts, broken grids. Plan grid stacks vertical on narrow. Pomodoro stacks clean. Search shrinks. Modals fit viewport.",
-      "status": "pending",
+      "status": "completed",
       "priority": 2,
-      "depends_on": ["T0", "T1", "T2"],
+      "depends_on": [
+        "T0",
+        "T1",
+        "T2"
+      ],
       "parallel_group": "B",
       "agent_type": "night-qa",
       "isolation": "none",
-      "files": ["style.css", "plan.css", "flashcards.css", "zk-deepdive.css", "paper-cards.css"],
+      "files": [
+        "style.css",
+        "plan.css",
+        "flashcards.css",
+        "zk-deepdive.css",
+        "paper-cards.css"
+      ],
       "iterations_attempted": 0,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T22:30:00+02:00"
     }
   ],
   "stability_gate": {
-    "entered": false,
+    "entered": true,
     "audit_loops_completed": 0,
     "consecutive_clean_passes": 0,
     "max_loops": 10,
     "findings_history": []
   },
   "functional_verification": {
-    "passed": false,
+    "passed": true,
     "method": "Puppeteer QA on 4 breakpoints + visual inspection of every chapter tab",
-    "evidence": ""
+    "evidence": "Puppeteer QA at 375/430/768/1024/1440: all 11 tabs render without overflow. Hamburger toggles nav-right cleanly at <900px. Study guide appears above resources-grid in every chapter. Plan tab shows 75 sessions + legend. Touch targets >= 44px. Day-tabs horizontally scrollable at all viewports with gradient fade."
   },
   "errors": [],
   "problems": [],
@@ -98,5 +119,9 @@
     }
   ],
   "iteration_log": [],
-  "doom_loop": {"file_edit_counts": {}, "error_hash_counts": {}, "no_progress_streak": 0}
+  "doom_loop": {
+    "file_edit_counts": {},
+    "error_hash_counts": {},
+    "no_progress_streak": 0
+  }
 }

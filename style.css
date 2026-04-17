@@ -1130,7 +1130,7 @@ body {
   }
   .checkbox-wrap input[type="checkbox"] { width: 22px; height: 22px; }
 
-  /* nav-right and search: hidden in collapsed state (default), shown when expanded */
+  /* nav-right and search: hidden by default on mobile, shown when nav is expanded via hamburger */
   .nav-right { display: none; width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   .search-container { display: none; margin: 0; width: 100%; }
 

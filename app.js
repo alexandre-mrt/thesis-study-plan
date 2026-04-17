@@ -694,20 +694,25 @@ function initMobileMenu() {
   const nav = $('#nav');
   if (!btn || !nav) return;
 
+  const setExpanded = (expanded) => {
+    nav.classList.toggle('expanded', expanded);
+    btn.setAttribute('aria-expanded', String(expanded));
+  };
+
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
-    nav.classList.toggle('expanded');
+    setExpanded(!nav.classList.contains('expanded'));
   });
 
   document.addEventListener('click', (e) => {
     if (!nav.contains(e.target) && nav.classList.contains('expanded')) {
-      nav.classList.remove('expanded');
+      setExpanded(false);
     }
   });
 
-  const mediaQuery = window.matchMedia('(min-width: 769px)');
+  const mediaQuery = window.matchMedia('(min-width: 901px)');
   const handleResize = (mq) => {
-    if (mq.matches) nav.classList.remove('expanded');
+    if (mq.matches) setExpanded(false);
   };
   mediaQuery.addEventListener('change', handleResize);
   handleResize(mediaQuery);
