@@ -208,6 +208,15 @@ function activateSubsection(section, key) {
       sg.classList.add('open');
     });
   }
+
+  /* Render any LaTeX math now that the subsection is visible. */
+  if (typeof window !== 'undefined' && typeof window.waitForKaTeX === 'function') {
+    window.waitForKaTeX(() => {
+      if (typeof window.renderMathIn === 'function') {
+        section.querySelectorAll('.chapter-section.active').forEach(window.renderMathIn);
+      }
+    });
+  }
 }
 
 function mountAll() {

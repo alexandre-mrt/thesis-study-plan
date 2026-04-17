@@ -169,6 +169,19 @@ function renderAllMath() {
   document.querySelectorAll('.technical-content').forEach(renderMathIn);
 }
 
+/* Render LaTeX math across every content area, not just technical tabs.
+   Covers: intuitive content, paper cards, SOTA, ZK deep dive, flashcards,
+   method section, lexicon. Safe to call multiple times. */
+function renderMathEverywhere() {
+  if (typeof renderMathInElement !== 'function') return;
+  const roots = document.querySelectorAll(
+    '.intuitive-content, .technical-content, .paper-card, .sota-card, ' +
+    '.zk-dd-section, .method-section, .lexicon-panel, .flashcard, ' +
+    '.chapter-flashcard, .concept-card, .plan-modal'
+  );
+  roots.forEach(renderMathIn);
+}
+
 function waitForKaTeX(callback) {
   if (typeof renderMathInElement === 'function') {
     callback();
@@ -854,7 +867,14 @@ function renderStudyGuides() {
   /* Render KaTeX for any technical views that are already active */
   waitForKaTeX(() => {
     renderAllMath();
+    renderMathEverywhere();
   });
+}
+
+if (typeof window !== 'undefined') {
+  window.renderMathEverywhere = renderMathEverywhere;
+  window.renderMathIn = renderMathIn;
+  window.waitForKaTeX = waitForKaTeX;
 }
 
 /* === Study Guide Section Toggles === */

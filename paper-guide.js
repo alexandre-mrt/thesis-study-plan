@@ -457,7 +457,9 @@ function buildPaperCard(paper, techPaper, chapterKey, paperIdx, savedState, view
     const updatedVs = { ...vs, [cardKey]: view };
     saveViewToggleState(updatedVs);
 
-    if (!isIntuitive) {
+    if (isIntuitive) {
+      renderMathIn(intuitiveContent);
+    } else {
       renderMathIn(technicalContent);
     }
   };
@@ -564,8 +566,8 @@ function renderPaperGuides(recentLogIds) {
     container.appendChild(section);
   });
 
-  /* Render KaTeX for any technical views that are already active */
+  /* Render KaTeX across every paper card (both intuitive + technical). */
   waitForKaTeX(() => {
-    document.querySelectorAll('.paper-card .technical-content.active').forEach(renderMathIn);
+    document.querySelectorAll('.paper-card').forEach(renderMathIn);
   });
 }
