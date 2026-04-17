@@ -51,6 +51,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initConceptSearch === 'function') {
     initConceptSearch();
   }
+  /* Render SOTA for the initially active chapter (may be set by restoreActiveDay or default to ch21) */
+  if (typeof window.SOTA !== 'undefined') {
+    const activeSection = document.querySelector('.day-section.active');
+    if (activeSection) {
+      const activeKey = activeSection.dataset.day;
+      if (activeKey && !sotaRendered[activeKey]) {
+        sotaRendered[activeKey] = true;
+        window.SOTA.renderChapter(activeKey, '#' + activeKey + '-sota-container');
+      }
+    }
+  }
 });
 
 /* === Checkbox / Progress === */
@@ -112,6 +123,10 @@ function saveChecked(data) {
   }
 }
 
+/* === SOTA Lazy Render Cache === */
+/* Tracks which chapter SOTA sections have already been rendered (first-activation only) */
+const sotaRendered = {};
+
 /* === Chapter Tabs === */
 
 function initDayTabs() {
@@ -155,6 +170,12 @@ function switchDay(chapterKey) {
     localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, chapterKey);
   } catch {
     /* non-critical */
+  }
+
+  /* Lazily render SOTA section on first activation of this chapter */
+  if (!sotaRendered[chapterKey] && typeof window.SOTA !== 'undefined') {
+    sotaRendered[chapterKey] = true;
+    window.SOTA.renderChapter(chapterKey, '#' + chapterKey + '-sota-container');
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });

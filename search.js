@@ -50,6 +50,17 @@ const CHAPTER_LABELS = {
   'rust': 'RS',
 };
 
+/* SOTA data accessors (matches SOTA_DATA_ACCESSORS in sota-renderer.js) */
+const SOTA_SEARCH_ACCESSORS = {
+  'ch21': () => window.SOTA_CH21,
+  'ch22': () => window.SOTA_CH22,
+  'ch23': () => window.SOTA_CH23,
+  'ch24': () => window.SOTA_CH24,
+  'ch25': () => window.SOTA_CH25,
+  'ch26': () => window.SOTA_CH26,
+  'rust': () => window.SOTA_RUST,
+};
+
 /* Paper data accessors */
 const PAPER_GUIDE_ACCESSORS = {
   'ch21': () => window.CH21_PAPERS,
@@ -171,6 +182,40 @@ function buildSearchIndex() {
     });
   });
 
+  /* Add SOTA entries to the search index */
+  const sotaChapterKeys = Object.keys(SOTA_SEARCH_ACCESSORS);
+  sotaChapterKeys.forEach((chKey) => {
+    const getter = SOTA_SEARCH_ACCESSORS[chKey];
+    const data = getter ? getter() : null;
+    if (!data || !data.items) return;
+
+    data.items.forEach((item, itemIdx) => {
+      const searchParts = [
+        item.name || '',
+        item.authors || '',
+        item.venue || '',
+        item.recap_short || '',
+        item.recap_long || '',
+        item.why_for_thesis || '',
+        (item.tags || []).join(' '),
+      ];
+      const searchText = searchParts.join(' ').toLowerCase();
+
+      index.push({
+        name: item.name || '',
+        nameLower: (item.name || '').toLowerCase(),
+        isSota: true,
+        kind: 'sota',
+        chapterKey: chKey,
+        sotaIdx: itemIdx,
+        blockTitle: 'SOTA \u2014 Ch ' + (CHAPTER_LABELS[chKey] || chKey),
+        searchText: searchText,
+        link: item.link || '',
+        year: item.year || null,
+      });
+    });
+  });
+
   return index;
 }
 
@@ -228,10 +273,19 @@ function renderSearchResults(results, query) {
     const dayBadge = document.createElement('span');
     dayBadge.className = 'search-result-day';
     const isPaper = result.isPaper === true;
+    const isSota = result.isSota === true;
     const isDeepDive = result.isDeepDive === true;
-    const chapterKey = isPaper ? result.chapterKey : (isDeepDive ? 'zk' : (DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || 'ch25'));
+    const chapterKey = (isPaper || isSota) ? result.chapterKey : (isDeepDive ? 'zk' : (DAY_BLOCK_TO_CHAPTER[result.day + '-' + result.block] || 'ch25'));
     dayBadge.dataset.day = chapterKey;
-    dayBadge.textContent = isPaper ? ('\uD83D\uDCC4 ' + (CHAPTER_LABELS[chapterKey] || chapterKey)) : (isDeepDive ? 'ZK' : (CHAPTER_LABELS[chapterKey] || result.day));
+    if (isSota) {
+      dayBadge.textContent = '\u2728 ' + (CHAPTER_LABELS[chapterKey] || chapterKey);
+    } else if (isPaper) {
+      dayBadge.textContent = '\uD83D\uDCC4 ' + (CHAPTER_LABELS[chapterKey] || chapterKey);
+    } else if (isDeepDive) {
+      dayBadge.textContent = 'ZK';
+    } else {
+      dayBadge.textContent = CHAPTER_LABELS[chapterKey] || result.day;
+    }
 
     const name = document.createElement('span');
     name.className = 'search-result-name';
@@ -241,8 +295,18 @@ function renderSearchResults(results, query) {
     blockLabel.className = 'search-result-block';
     blockLabel.textContent = result.blockTitle;
 
+    /* Kind tag chip for SOTA results */
+    const kindChip = isSota ? (() => {
+      const chip = document.createElement('span');
+      chip.className = 'search-result-kind-chip';
+      chip.textContent = 'SOTA';
+      chip.style.cssText = 'font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:999px;background:#10B981;color:#000;margin-left:6px;vertical-align:middle;text-transform:uppercase;letter-spacing:0.04em;';
+      return chip;
+    })() : null;
+
     item.appendChild(dayBadge);
     item.appendChild(name);
+    if (kindChip) item.appendChild(kindChip);
     item.appendChild(blockLabel);
 
     item.addEventListener('click', () => {
@@ -331,6 +395,12 @@ function handleSearchKeydown(e) {
 /* === Navigation to Concept === */
 
 function navigateToConcept(result) {
+  /* Handle SOTA results */
+  if (result.isSota) {
+    navigateToSota(result);
+    return;
+  }
+
   /* Handle paper results */
   if (result.isPaper) {
     navigateToPaper(result);
@@ -410,6 +480,39 @@ function navigateToZKDeepdive(result) {
     setTimeout(() => {
       targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+      targetCard.classList.add('highlighted');
+      setTimeout(() => {
+        targetCard.classList.remove('highlighted');
+      }, HIGHLIGHT_DURATION_MS);
+    }, SCROLL_DELAY_MS);
+  }, EXPAND_DELAY_MS);
+}
+
+/* === Navigate to SOTA item === */
+
+function navigateToSota(result) {
+  /* 1. Switch to the correct chapter tab (triggers lazy SOTA render if needed) */
+  if (typeof switchDay === 'function') {
+    switchDay(result.chapterKey);
+  }
+
+  /* 2. Find the SOTA card by index and expand it */
+  setTimeout(() => {
+    const containerSelector = '#' + result.chapterKey + '-sota-container';
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    const sotaCards = container.querySelectorAll('.sota-card');
+    const targetCard = sotaCards[result.sotaIdx];
+    if (!targetCard) return;
+
+    if (!targetCard.classList.contains('open')) {
+      const header = targetCard.querySelector('.paper-header');
+      if (header) header.click();
+    }
+
+    setTimeout(() => {
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       targetCard.classList.add('highlighted');
       setTimeout(() => {
         targetCard.classList.remove('highlighted');

@@ -1152,3 +1152,76 @@ body {
   .exercise-toggle { display: none !important; }
   .exercise-hint, .exercise-answer { display: block !important; color: #333; background: #f5f5f5; border-left-color: #333; }
 }
+
+/* === SOTA Section Styles === */
+.sota-container {
+  margin-top: 2rem;
+}
+
+.sota-card__badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.sota-card__badge--new {
+  background: #10B981;
+  color: #000;
+}
+
+.sota-card__math {
+  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.sota-card__section-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.sota-card__recap-long {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+
+.sota-card__why-thesis {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--day-color, var(--color-day1));
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: 0.75rem;
+}
+
+.sota-card__link-row {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sota-card__updated {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}

@@ -1,4 +1,4 @@
-# Night Shift Problems — 2026-04-14
+# Night Shift Problems — 2026-04-14 (updated 2026-04-17 T12)
 
 > Items that need your attention. Run `grep -r "NIGHT-SHIFT-REVIEW" .` to find marked code.
 
@@ -45,6 +45,22 @@
 - **What I did**: Used `#8B5CF6` (purple) as hardcoded fallback in CHAPTER_COLORS. Marked with `NIGHT-SHIFT-REVIEW` comment.
 - **Confidence**: MEDIUM
 - **User action needed**: Add `--color-ch26` to `:root` in style.css when Ch 2.6 tab is added to index.html, then replace the hardcoded fallback with `var(--color-ch26)`.
+
+### ASSUMPTION: T12 — SOTA render on initial page load (no saved day)
+- **Iteration**: 1
+- **File**: app.js (DOMContentLoaded handler)
+- **What I needed**: Reliable detection of which chapter is initially visible when no localStorage state exists (default is ch21 via `class="day-section active"` in HTML)
+- **What I did**: After `restoreActiveDay()`, query `.day-section.active` to find the current active chapter and call `SOTA.renderChapter` for it if not already rendered. This covers both the default-active case and the case where `restoreActiveDay` called `switchDay` (which also triggers SOTA render via the `sotaRendered` cache guard).
+- **Confidence**: HIGH
+- **User action needed**: None expected; verify first-load behavior in browser.
+
+### ASSUMPTION: T12 — KaTeX math rendering in SOTA cards
+- **Iteration**: 1
+- **File**: sota-renderer.js (renderSotaCardMath)
+- **What I needed**: Confirm `renderMathInElement` is globally available when SOTA cards expand
+- **What I did**: Deferred math rendering to card open event. Used `waitForKaTeX` (from study-guide.js) when available, otherwise polled directly. KaTeX is loaded via defer in index.html so it may not be ready at DOMContentLoaded; the on-expand trigger ensures it is loaded.
+- **Confidence**: HIGH
+- **User action needed**: None; same pattern as paper-guide.js.
 
 ### DEPENDENCY: app.js CHAPTER_KEYS not updated for Ch 2.6 keyboard shortcut
 - **Iteration**: 1
