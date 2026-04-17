@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="technical.css">
   <link rel="stylesheet" href="zk-deepdive.css">
   <link rel="stylesheet" href="paper-cards.css">
+  <link rel="stylesheet" href="plan.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
@@ -55,6 +56,10 @@
           <button class="day-tab" data-day="method" role="tab" aria-selected="false" aria-controls="method-section">
             <span class="day-tab-dot" style="background: #F43F5E"></span>
             Method
+          </button>
+          <button class="day-tab" data-day="plan" role="tab" aria-selected="false" aria-controls="plan-section-wrap">
+            <span class="day-tab-dot" style="background: #6366F1"></span>
+            &#128197; Plan
           </button>
           <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
             <span class="day-tab-dot" style="background: #8B5CF6"></span>
@@ -1272,6 +1277,11 @@
 
     </section>
 
+    <!-- PLAN — 15-week session grid -->
+    <section class="day-section" id="plan-section-wrap" data-day="plan" role="tabpanel" hidden>
+      <div id="plan-section"></div>
+    </section>
+
     <!-- ZK DEEP DIVE -->
     <section id="zk-deepdive" role="tabpanel" hidden>
       <div id="zk-deepdive-content"></div>
@@ -1281,7 +1291,7 @@
 
   <!-- Keyboard Shortcuts Help -->
   <div class="shortcuts-hint" id="shortcuts-hint">
-    <kbd>1</kbd>-<kbd>6</kbd> Switch chapters &middot; <kbd>Z</kbd> ZK Deep Dive &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
+    <kbd>1</kbd>-<kbd>6</kbd> Switch chapters &middot; <kbd>Z</kbd> ZK Deep Dive &middot; <kbd>P</kbd> Plan &middot; <kbd>N</kbd> Next session &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
   </div>
 
   <script src="lexicon.js"></script>
@@ -1314,6 +1324,7 @@
   <script src="zk-deepdive.js"></script>
   <script src="study-guide.js"></script>
   <script src="search.js"></script>
+  <script src="plan.js" defer></script>
   <script src="app.js"></script>
 </body>
 </html>
