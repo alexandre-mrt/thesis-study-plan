@@ -1301,4 +1301,173 @@ body {
   z-index: 2;
   pointer-events: none;
   text-transform: uppercase;
+/* === T14: Search result chapter tag === */
+.result-chapter {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-align: right;
+  margin-left: auto;
+  padding-left: 0.5rem;
+  font-family: var(--font-mono);
+}
+
+/* === T14: Pomodoro preset mode indicator === */
+.pomodoro-preset-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.pomodoro-preset-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pomodoro-mode {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+/* === T14: Friday Weekly Review Modal === */
+.weekly-review-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 1rem;
+}
+
+.weekly-review-modal[hidden] {
+  display: none;
+}
+
+.weekly-review-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 28px 28px 24px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-card);
+}
+
+.weekly-review-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
+
+.weekly-review-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.weekly-review-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.weekly-review-item input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--color-ch25);
+  cursor: pointer;
+}
+
+.weekly-review-item:hover {
+  color: var(--text-primary);
+}
+
+.weekly-review-notes {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0.6rem 0.75rem;
+  resize: vertical;
+  outline: none;
+  margin-bottom: 1.25rem;
+}
+
+.weekly-review-notes:focus {
+  border-color: var(--color-ch25);
+}
+
+.weekly-review-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.weekly-review-btn {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.weekly-review-btn:hover {
+  opacity: 0.85;
+}
+
+.weekly-review-btn-primary {
+  background: var(--color-ch25);
+  color: #fff;
+}
+
+.weekly-review-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 540px) {
+  .weekly-review-card {
+    padding: 20px 16px 16px;
+  }
+  .weekly-review-actions {
+    flex-direction: column-reverse;
+  }
+  .weekly-review-btn {
+    width: 100%;
+    text-align: center;
+  }
 }

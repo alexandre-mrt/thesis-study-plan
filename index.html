@@ -113,6 +113,11 @@
         <button class="pomo-btn" id="pomo-pause" disabled>Pause</button>
         <button class="pomo-btn pomo-btn-secondary" id="pomo-reset">Reset</button>
       </div>
+      <!-- T14: Preset mode indicator -->
+      <div class="pomodoro-preset-row">
+        <span class="pomodoro-preset-label">Mode</span>
+        <span class="pomodoro-mode" id="pomodoro-mode">25/5</span>
+      </div>
       <div class="pomodoro-hint">Press <kbd>Space</kbd> to toggle</div>
     </div>
   </div>
@@ -1315,6 +1320,60 @@
   <!-- Keyboard Shortcuts Help -->
   <div class="shortcuts-hint" id="shortcuts-hint">
     <kbd>1</kbd>-<kbd>6</kbd> Switch chapters &middot; <kbd>Z</kbd> ZK Deep Dive &middot; <kbd>P</kbd> Plan &middot; <kbd>N</kbd> Next session &middot; <kbd>/</kbd> Search &middot; <kbd>Space</kbd> Timer &middot; <kbd>T</kbd> Toggle mode &middot; <kbd>L</kbd> Lexicon
+  </div>
+
+  <!-- T14: Friday Weekly Review Modal -->
+  <div class="weekly-review-modal" id="weekly-review-modal" role="dialog" aria-modal="true" aria-labelledby="weekly-review-title" hidden>
+    <div class="weekly-review-card">
+      <h2 class="weekly-review-title" id="weekly-review-title">Friday review &mdash; 10 min</h2>
+      <div class="weekly-review-checklist">
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="deep-understanding">
+          <span>What did I understand deeply this week?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="still-fuzzy">
+          <span>What still feels fuzzy?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="reread-paper">
+          <span>Which paper would I re-read first?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="advisor-question">
+          <span>One open question for the advisor?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="plan-sessions">
+          <span>Did I finish this week&rsquo;s plan sessions?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="research-queue">
+          <span>Any research-queue item promoted to P0?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="lexicon-entry">
+          <span>Lexicon entry to add?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="sota-update">
+          <span>SOTA update to schedule?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="rust-exercise">
+          <span>Rust exercise that compiled first try?</span>
+        </label>
+        <label class="weekly-review-item">
+          <input type="checkbox" class="weekly-review-check" data-item="energy-reading">
+          <span>Emotion / energy reading this week?</span>
+        </label>
+      </div>
+      <textarea class="weekly-review-notes" id="weekly-review-notes" placeholder="Notes (optional)..." rows="3"></textarea>
+      <div class="weekly-review-actions">
+        <button class="weekly-review-btn weekly-review-btn-primary" id="weekly-review-save">Save notes</button>
+        <button class="weekly-review-btn weekly-review-btn-secondary" id="weekly-review-skip">Skip today</button>
+      </div>
+    </div>
   </div>
 
   <script src="lexicon.js"></script>

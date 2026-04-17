@@ -100,6 +100,28 @@ Categories: UNCERTAINTY · ASSUMPTION · BLOCKED · UNFIXED · TEST GAP · DEPEN
 - **Confidence**: HIGH
 - **User action needed**: None; same pattern as paper-guide.js.
 
+### [T14 UNCERTAINTY] Plan tab does not exist in the current codebase
+- **Iteration**: 1
+- **File**: app.js, index.html
+- **What I needed**: A "Plan" tab (`data-day="plan"`) to hook dual Pomodoro preset switching onto
+- **What I did**: Implemented `switchPlan()` in app.js that sets the plan preset and handles
+  `data-day="plan"` in initDayTabs. The function is globally accessible for T13 to call.
+  No Plan tab HTML was added to index.html since T13 owns that nav tab.
+- **Confidence**: MEDIUM
+- **User action needed**: T13 must add `<button class="day-tab" data-day="plan">Plan</button>`
+  to the nav for the preset switch to trigger. Or call `switchPlan()` directly from plan tab code.
+
+### [T14 UNCERTAINTY] ZK Deep Dive entries lack timestamp field
+- **Iteration**: 1
+- **File**: search.js
+- **What I needed**: Year/timestamp data for ZK Deep Dive entries to benefit from recency boost
+- **What I did**: ZK Deep Dive entries come from `getZKDeepdiveSearchEntries()` and are pushed
+  as-is into the index; their `timestamp` field will be `undefined` which `yearBoost()` treats
+  as 0 (no boost). This is safe and correct behavior — no boost applied to entries without year.
+- **Confidence**: HIGH
+- **User action needed**: If ZK Deep Dive data has a year field, update zk-deepdive.js to include
+  `timestamp: year` in entries returned by `getZKDeepdiveSearchEntries()`.
+
 ### DEPENDENCY: app.js CHAPTER_KEYS not updated for Ch 2.6 keyboard shortcut
 - **Iteration**: 1
 - **File**: app.js:13 (CHAPTER_KEYS array), app.js:476 (case '6' handler)

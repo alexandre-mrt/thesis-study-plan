@@ -29,6 +29,16 @@ const POMODORO = {
   BREAK_SECONDS: 5 * 60,
 };
 
+// T14: Dual Pomodoro presets — chapters mode (25/5) vs Plan mode (50/10)
+const POMODORO_PRESETS = {
+  chapters: { work: 25, break: 5 },
+  plan: { work: 50, break: 10 },
+};
+
+// T14: Weekly review localStorage keys
+const WEEKLY_REVIEW_KEY = 'weeklyReviewSeen';
+const WEEKLY_REVIEW_NOTES_PREFIX = 'weeklyReview:';
+
 const PHASE = {
   WORK: 'Work',
   BREAK: 'Break',
@@ -44,6 +54,9 @@ let timerState = {
   running: false,
   intervalId: null,
 };
+
+// T14: Active Pomodoro preset key ('chapters' or 'plan')
+let activePomodoroPreset = 'chapters';
 
 /* === DOM References === */
 const $ = (sel) => document.querySelector(sel);
@@ -85,6 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+
+  // T14: Weekly review modal — shown on Fridays after 3 s if not dismissed today
+  initWeeklyReview();
 });
 
 /* === Checkbox / Progress === */
@@ -159,6 +175,9 @@ function initDayTabs() {
       const day = tab.dataset.day;
       if (day === 'zk') {
         switchToZKDeepdive();
+      } else if (day === 'plan') {
+        // T14: Plan tab handled by switchPlan
+        switchPlan();
       } else {
         switchDay(day);
       }
@@ -255,6 +274,9 @@ function switchDay(chapterKey) {
   if (typeof updateGlobalToggleColor === 'function') {
     updateGlobalToggleColor();
   }
+
+  // T14: Restore chapters Pomodoro preset when switching to any chapter
+  setPomodoroPreset('chapters');
 }
 
 function switchToZKDeepdive() {
@@ -293,6 +315,9 @@ function switchToZKDeepdive() {
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // T14: ZK Deep Dive is a chapter view — use chapters preset
+  setPomodoroPreset('chapters');
 }
 
 function restoreActiveDay() {
@@ -316,6 +341,59 @@ function restoreActiveDay() {
   } catch {
     /* non-critical */
   }
+}
+
+// T14: Switch to Plan tab and apply plan Pomodoro preset.
+// Called by initDayTabs when data-day="plan" tab is clicked,
+// or directly by T13 agent code once the Plan tab is implemented.
+function switchPlan() {
+  const tabs = $$('.day-tab');
+  const sections = $$('.day-section');
+  const zkSection = $('#zk-deepdive');
+  const planSection = $('#plan-section');
+
+  tabs.forEach((tab) => {
+    const isActive = tab.dataset.day === 'plan';
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
+  });
+
+  sections.forEach((sec) => {
+    const isActive = sec.dataset.day === 'plan';
+    sec.classList.toggle('active', isActive);
+    sec.hidden = !isActive;
+  });
+
+  if (zkSection) {
+    zkSection.classList.remove('active');
+    zkSection.hidden = true;
+  }
+
+  if (planSection) {
+    planSection.classList.add('active');
+    planSection.hidden = false;
+  }
+
+  try {
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, 'plan');
+  } catch {
+    /* non-critical */
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // T14: Switch to plan Pomodoro preset
+  setPomodoroPreset('plan');
+}
+
+// T14: Apply a Pomodoro preset. Does NOT reset a running timer —
+// the new durations take effect on the next cycle only.
+function setPomodoroPreset(presetKey) {
+  const preset = POMODORO_PRESETS[presetKey];
+  if (!preset) return;
+  activePomodoroPreset = presetKey;
+  // Only update the mode indicator; do not interrupt a running timer
+  renderTimer();
 }
 
 /* === Pomodoro Timer === */
@@ -364,9 +442,12 @@ function pauseTimer() {
 
 function resetTimer() {
   clearTimerInterval();
+  // T14: use active preset for reset duration
+  const preset = POMODORO_PRESETS[activePomodoroPreset] || POMODORO_PRESETS.chapters;
+  const seconds = timerState.phase === PHASE.WORK ? preset.work * 60 : preset.break * 60;
   timerState = {
     ...timerState,
-    seconds: timerState.phase === PHASE.WORK ? POMODORO.WORK_SECONDS : POMODORO.BREAK_SECONDS,
+    seconds: seconds,
     running: false,
   };
   renderTimer();
@@ -408,7 +489,11 @@ function onTimerComplete() {
   clearTimerInterval();
 
   const nextPhase = timerState.phase === PHASE.WORK ? PHASE.BREAK : PHASE.WORK;
-  const nextSeconds = nextPhase === PHASE.WORK ? POMODORO.WORK_SECONDS : POMODORO.BREAK_SECONDS;
+  // T14: use active preset durations for the next cycle
+  const preset = POMODORO_PRESETS[activePomodoroPreset] || POMODORO_PRESETS.chapters;
+  const nextSeconds = nextPhase === PHASE.WORK
+    ? preset.work * 60
+    : preset.break * 60;
 
   timerState = {
     ...timerState,
@@ -455,6 +540,13 @@ function renderTimer() {
 
   if (panelDisplay) panelDisplay.textContent = display;
   if (phaseLabel) phaseLabel.textContent = timerState.phase;
+
+  // T14: Update preset mode indicator
+  const modeEl = $('#pomodoro-mode');
+  if (modeEl) {
+    const preset = POMODORO_PRESETS[activePomodoroPreset] || POMODORO_PRESETS.chapters;
+    modeEl.textContent = preset.work + '/' + preset.break;
+  }
 }
 
 function updateTimerButtons() {
@@ -666,6 +758,98 @@ function toggleGlobalView() {
   const targetBtn = document.querySelector('.global-view-btn[data-view="' + targetView + '"]');
   if (targetBtn) {
     targetBtn.click();
+  }
+}
+
+/* === T14: Friday Weekly Review Modal === */
+
+// Returns today's date as YYYY-MM-DD string.
+function getTodayString() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return year + '-' + month + '-' + day;
+}
+
+function initWeeklyReview() {
+  const isFriday = new Date().getDay() === 5;
+  if (!isFriday) return;
+
+  const today = getTodayString();
+  let alreadySeen = false;
+  try {
+    alreadySeen = localStorage.getItem(WEEKLY_REVIEW_KEY) === today;
+  } catch {
+    /* non-critical */
+  }
+
+  if (alreadySeen) return;
+
+  setTimeout(() => {
+    openWeeklyReviewModal(today);
+  }, 3000);
+}
+
+function openWeeklyReviewModal(today) {
+  const modal = $('#weekly-review-modal');
+  if (!modal) return;
+  modal.removeAttribute('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+
+  const saveBtn = modal.querySelector('#weekly-review-save');
+  const skipBtn = modal.querySelector('#weekly-review-skip');
+
+  if (skipBtn) {
+    skipBtn.addEventListener('click', () => {
+      closeWeeklyReviewModal(today);
+    }, { once: true });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      saveWeeklyReviewNotes(today, modal);
+      closeWeeklyReviewModal(today);
+    }, { once: true });
+  }
+
+  // Close on backdrop click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeWeeklyReviewModal(today);
+    }
+  }, { once: true });
+}
+
+function closeWeeklyReviewModal(today) {
+  const modal = $('#weekly-review-modal');
+  if (!modal) return;
+  modal.setAttribute('hidden', '');
+  modal.setAttribute('aria-hidden', 'true');
+  try {
+    localStorage.setItem(WEEKLY_REVIEW_KEY, today);
+  } catch {
+    /* non-critical */
+  }
+}
+
+function saveWeeklyReviewNotes(today, modal) {
+  const checkboxes = modal.querySelectorAll('.weekly-review-check');
+  const textArea = modal.querySelector('#weekly-review-notes');
+  const notes = {
+    date: today,
+    checks: {},
+    freeText: textArea ? textArea.value : '',
+  };
+
+  checkboxes.forEach((cb) => {
+    notes.checks[cb.dataset.item] = cb.checked;
+  });
+
+  try {
+    localStorage.setItem(WEEKLY_REVIEW_NOTES_PREFIX + today, JSON.stringify(notes));
+  } catch {
+    /* non-critical */
   }
 }
 
