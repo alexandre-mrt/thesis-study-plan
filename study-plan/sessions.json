@@ -1,0 +1,3107 @@
+[
+  {
+    "id": "S01",
+    "date": "2026-04-20",
+    "weekday": "Mon",
+    "week": 1,
+    "phase": "P1",
+    "chapter": "rust",
+    "title": "Rust crypto refresher: ownership, borrow, lifetimes",
+    "objectives": [
+      "Recall move/borrow/lifetime rules on crypto types",
+      "Practice &[u8] vs Vec<u8> APIs for keys and signatures",
+      "Use Result<T, E> with thiserror for a toy KDF",
+      "Zeroize secrets on drop (zeroize crate)"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Rust Book ch 4 + 10",
+        "time_min": 45
+      },
+      {
+        "type": "code",
+        "ref": "rust-guide.js block1 fastcrypto section",
+        "time_min": 45
+      },
+      {
+        "type": "exercise",
+        "ref": "Write toy HKDF wrapper",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Rewrite a naive clone()-heavy snippet without clones",
+      "Add zeroize to a struct holding a secret key",
+      "Implement From/TryFrom for a wrapper type over [u8; 32]"
+    ],
+    "sota_note": "Check arkworks 0.5 migration notes vs 0.4 API.",
+    "duration_min": 120
+  },
+  {
+    "id": "S02",
+    "date": "2026-04-21",
+    "weekday": "Tue",
+    "week": 1,
+    "phase": "P1",
+    "chapter": "rust",
+    "title": "Rust crypto refresher: traits, generics, constant-time",
+    "objectives": [
+      "Read the subtle crate API and constant-time idioms",
+      "Trait objects vs generics on crypto primitives (fastcrypto)",
+      "Write a ct_eq comparison for two scalars",
+      "Understand why branching on secret data is a bug"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "subtle crate docs",
+        "time_min": 30
+      },
+      {
+        "type": "code",
+        "ref": "fastcrypto Signer/Verifier traits",
+        "time_min": 45
+      },
+      {
+        "type": "video",
+        "ref": "Jon Gjengset: crust of Rust generics",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Implement ConstantTimeEq for a 32-byte struct",
+      "Design a Signer trait that cannot leak key material",
+      "Write a benchmark comparing Vec<u8> vs [u8; 32] dispatch"
+    ],
+    "sota_note": "Review fastcrypto MSRV + recent breaking changes (2025).",
+    "duration_min": 120
+  },
+  {
+    "id": "S03",
+    "date": "2026-04-22",
+    "weekday": "Wed",
+    "week": 1,
+    "phase": "P1",
+    "chapter": "rust",
+    "title": "Rust + arkworks: groups, fields, pairings",
+    "objectives": [
+      "Navigate ark-bls12-381 and ark-ec APIs",
+      "Build a G1/G2 element, hash-to-curve, serialize",
+      "Do a pairing e(P, Q) and verify bilinearity",
+      "Read ark-serialize canonical (de)serialize"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "arkworks book + README",
+        "time_min": 40
+      },
+      {
+        "type": "code",
+        "ref": "ark-bls12-381 examples",
+        "time_min": 50
+      },
+      {
+        "type": "exercise",
+        "ref": "Schnorr sig over G1",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Implement Schnorr sign/verify on BLS12-381 G1",
+      "Verify e(aP, bQ) == e(P, Q)^{ab} experimentally",
+      "Measure pairing cost vs scalar mul on BLS12-381"
+    ],
+    "sota_note": "arkworks 0.5 renamed several traits; confirm against latest release.",
+    "duration_min": 120
+  },
+  {
+    "id": "S04",
+    "date": "2026-04-23",
+    "weekday": "Thu",
+    "week": 1,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "BBS+ signatures: core construction",
+    "objectives": [
+      "State the BBS+ signing equation and key layout",
+      "Understand EUF-CMA security intuition",
+      "Map (A, e, s) triple to bilinear group elements",
+      "Derive verify: e(A, X + eG2) == e(B, G2)"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Tessaro-Zhu — Revisiting BBS Signatures (ePrint 2023/275)",
+        "time_min": 60
+      },
+      {
+        "type": "video",
+        "ref": "Dan Boneh pairing-based signatures lecture",
+        "time_min": 25
+      },
+      {
+        "type": "notes",
+        "ref": "ch21-papers-guide.js — Revisiting BBS Signatures",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [
+      "tessaro-zhu-bbs-2023"
+    ],
+    "exercises": [
+      "Reproduce Sign/Verify equations from scratch",
+      "Argue why the e term cannot be 0 mod q",
+      "Sketch a BBS+ unforgeability reduction to q-SDH"
+    ],
+    "sota_note": "Track draft-irtf-cfrg-bbs-signatures latest rev + Rust impl status.",
+    "duration_min": 120
+  },
+  {
+    "id": "S05",
+    "date": "2026-04-24",
+    "weekday": "Fri",
+    "week": 1,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "BBS+ selective disclosure + ZKPoK",
+    "objectives": [
+      "Describe the prover's randomization of (A, e, s)",
+      "Write the Fiat-Shamir protocol for disclosed attrs",
+      "Split messages into disclosed vs hidden sets",
+      "Understand why rerandomization preserves soundness"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Tessaro-Zhu ePrint 2023/275 §4",
+        "time_min": 45
+      },
+      {
+        "type": "paper",
+        "ref": "Camenisch-Lysyanskaya 2004 (CL sigs)",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch21-papers-guide.js",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [
+      "tessaro-zhu-bbs-2023",
+      "cl-sigs-2004"
+    ],
+    "exercises": [
+      "Derive the Sigma protocol for disclosing attr i",
+      "Add Fiat-Shamir hash and output a proof transcript",
+      "Show soundness by extractor rewinding sketch"
+    ],
+    "sota_note": "Compare BBS+ proof size vs CL signatures on BLS12-381.",
+    "duration_min": 120
+  },
+  {
+    "id": "S06",
+    "date": "2026-04-27",
+    "weekday": "Mon",
+    "week": 2,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "BBS+ issuance + blind signing",
+    "objectives": [
+      "Understand blind issuance for hidden attributes",
+      "Follow the commitment + proof of knowledge step",
+      "Describe nonce/challenge exchange",
+      "Compare blind BBS+ with U-Prove and CL"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Sign. Schemes & Anon Creds from Bilinear Maps (Camenisch-Lysyanskaya)",
+        "time_min": 45
+      },
+      {
+        "type": "paper",
+        "ref": "draft-irtf-cfrg-bbs-signatures latest",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch21-papers-guide.js — Bilinear Maps paper",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [
+      "camenisch-lysyanskaya-bilinear-2004"
+    ],
+    "exercises": [
+      "Write pseudocode for BlindSign and UnblindProof",
+      "Identify where the holder could cheat and how Sign prevents it",
+      "Design an attribute schema (age, country, KYC level)"
+    ],
+    "sota_note": "Check PrivacyPass / IETF anon-creds WG drafts for blind BBS+.",
+    "duration_min": 120
+  },
+  {
+    "id": "S07",
+    "date": "2026-04-28",
+    "weekday": "Tue",
+    "week": 2,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "Pointcheval-Sanders signatures",
+    "objectives": [
+      "State PS key gen, sign, verify equations",
+      "Prove rerandomizability of PS signatures",
+      "Compare PS vs BBS+ proof size and verify cost",
+      "Map PS onto Coconut threshold issuance"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Pointcheval-Sanders 2016 Short Randomizable Sigs",
+        "time_min": 50
+      },
+      {
+        "type": "paper",
+        "ref": "Coconut (Sonnino et al.)",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch21-papers-guide.js — Coconut",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [
+      "pointcheval-sanders-2016",
+      "coconut-2019"
+    ],
+    "exercises": [
+      "Verify PS rerandomization formulas on paper",
+      "Sketch a Coconut threshold issuance flow with t-of-n issuers",
+      "Argue why Coconut suits distributed trust on Sui"
+    ],
+    "sota_note": "Look up PS2 (refreshable) variants from 2024 IACR.",
+    "duration_min": 120
+  },
+  {
+    "id": "S08",
+    "date": "2026-04-29",
+    "weekday": "Wed",
+    "week": 2,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "Threshold BBS+ and distributed issuance",
+    "objectives": [
+      "Map Shamir + BBS+ into threshold issuer roles",
+      "Understand DKG vs trusted setup for issuers",
+      "Describe share reconstruction during sign",
+      "Reason about proactive re-sharing"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Threshold BBS+ (IACR 2023/602)",
+        "time_min": 50
+      },
+      {
+        "type": "paper",
+        "ref": "Revocable Threshold Anon Creds for Blockchains",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch21-papers-guide.js — Revocable Threshold",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [
+      "threshold-bbs-2023",
+      "revocable-threshold-anon-creds"
+    ],
+    "exercises": [
+      "Design a (2,3) threshold BBS+ setup diagram",
+      "List attack scenarios if one issuer colludes",
+      "Contrast with ACM CCS '22 threshold schemes"
+    ],
+    "sota_note": "Track follow-ups to IACR 2023/602 (2024-2025 refinements).",
+    "duration_min": 120
+  },
+  {
+    "id": "S09",
+    "date": "2026-04-30",
+    "weekday": "Thu",
+    "week": 2,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "zk-creds and snark-based anon creds",
+    "objectives": [
+      "Understand zk-creds universal credential framework",
+      "Compare snark-based vs BBS+-based creds",
+      "Assess proving cost on mobile / in browser",
+      "Argue for BBS+ for our thesis given TEE option"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "zk-creds: Flexible Anon Creds from zkSNARKs",
+        "time_min": 60
+      },
+      {
+        "type": "notes",
+        "ref": "ch21-papers-guide.js — zk-creds",
+        "time_min": 20
+      },
+      {
+        "type": "doc",
+        "ref": "PrivacyPass spec overview",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [
+      "zk-creds"
+    ],
+    "exercises": [
+      "List attributes where zk-creds beats BBS+",
+      "Estimate Groth16 prover time for a 64-attr credential",
+      "Design a fallback path from BBS+ to zk-creds"
+    ],
+    "sota_note": "PrivacyPass 3.0 (Apple PAT) — check latest deployment status.",
+    "duration_min": 120
+  },
+  {
+    "id": "S10",
+    "date": "2026-05-01",
+    "weekday": "Fri",
+    "week": 2,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "Revocation: accumulators and status lists",
+    "objectives": [
+      "Compare cryptographic accumulators (RSA, pairing, merkle)",
+      "Describe status list 2021 and BitStringStatusList",
+      "Understand witness update cost per revocation",
+      "Trade off privacy vs update frequency"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Revocable Threshold Anon Creds for Blockchains",
+        "time_min": 45
+      },
+      {
+        "type": "paper",
+        "ref": "Nguyen pairing accumulator 2005",
+        "time_min": 35
+      },
+      {
+        "type": "doc",
+        "ref": "W3C StatusList2021 spec",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "revocable-threshold-anon-creds"
+    ],
+    "exercises": [
+      "Draw a timeline: issue, revoke, verify with accumulator",
+      "Estimate witness update cost for 10M credentials",
+      "Decide: status list vs accumulator for our thesis"
+    ],
+    "sota_note": "W3C VCDM 2.0 status list semantics (2024 CR).",
+    "duration_min": 120
+  },
+  {
+    "id": "S11",
+    "date": "2026-05-04",
+    "weekday": "Mon",
+    "week": 3,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "eIDAS 2.0 and BBS anon creds",
+    "objectives": [
+      "Summarize eIDAS 2.0 architecture (ARF)",
+      "Map BBS to the PID / EAA flow",
+      "Understand relying party + wallet + issuer roles",
+      "Identify where selective disclosure sits"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Making BBS Anon Creds eIDAS 2.0 Compliant",
+        "time_min": 55
+      },
+      {
+        "type": "doc",
+        "ref": "eIDAS 2.0 ARF latest version",
+        "time_min": 35
+      },
+      {
+        "type": "notes",
+        "ref": "ch25-papers-guide.js — eIDAS ARF",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [
+      "bbs-eidas-2024",
+      "eidas-arf"
+    ],
+    "exercises": [
+      "Diagram a PID issuance using BBS+",
+      "List eIDAS 2.0 requirements our thesis must address",
+      "Argue for Sui as the target chain for EUDIW payments"
+    ],
+    "sota_note": "Track ARF 1.8+ and IETF SD-JWT VC vs BBS debate.",
+    "duration_min": 120
+  },
+  {
+    "id": "S12",
+    "date": "2026-05-05",
+    "weekday": "Tue",
+    "week": 3,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "Post-quantum anon creds (lattice)",
+    "objectives": [
+      "Overview of lattice-based signatures (Falcon, Dilithium)",
+      "Understand module-lattice anon creds",
+      "Compare PQ proof size vs BBS+",
+      "Identify a PQ migration path for our design"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Post-Quantum Traceable Anon Creds from Module Lattices",
+        "time_min": 60
+      },
+      {
+        "type": "notes",
+        "ref": "ch21-papers-guide.js — PQ anon creds",
+        "time_min": 20
+      },
+      {
+        "type": "doc",
+        "ref": "NIST PQC status",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [
+      "pq-traceable-anon-creds"
+    ],
+    "exercises": [
+      "Sketch a hybrid BBS+/lattice credential",
+      "List what would break if BLS12-381 were deprecated",
+      "Read 1 recent PQ anon creds paper (2024-2025)"
+    ],
+    "sota_note": "Check IRTF CFRG on PQ signatures for credentials.",
+    "duration_min": 120
+  },
+  {
+    "id": "S13",
+    "date": "2026-05-06",
+    "weekday": "Wed",
+    "week": 3,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "Server-aided anon creds + mobile UX",
+    "objectives": [
+      "Understand server-aided signing for constrained clients",
+      "Identify trust assumptions on the aid server",
+      "Compare with TEE-assisted signing",
+      "Map to our TEE fast path idea"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Server-Aided Anon Creds",
+        "time_min": 55
+      },
+      {
+        "type": "notes",
+        "ref": "ch21-papers-guide.js — Server-Aided",
+        "time_min": 20
+      },
+      {
+        "type": "doc",
+        "ref": "Mysten Seal architecture notes",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "server-aided-anon-creds"
+    ],
+    "exercises": [
+      "List the aid server's capabilities and bounds",
+      "Diagram our TEE fast path vs server-aided model",
+      "Identify attacks if the aid server is malicious"
+    ],
+    "sota_note": "Mysten Seal public design docs — extract primitives.",
+    "duration_min": 120
+  },
+  {
+    "id": "S14",
+    "date": "2026-05-07",
+    "weekday": "Thu",
+    "week": 3,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "Chain-native identity: blockchain anon creds papers",
+    "objectives": [
+      "Survey blockchain-based anon creds papers",
+      "Extract reusable design patterns",
+      "Identify pitfalls (public issuer lists, replay, MEV)",
+      "Compare GrAC and AccCred designs"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Blockchain-Based Privacy-Preserving Mobile Payment (Anon Creds)",
+        "time_min": 40
+      },
+      {
+        "type": "paper",
+        "ref": "GrAC: Graph-Based Anon Creds on Blockchain",
+        "time_min": 35
+      },
+      {
+        "type": "paper",
+        "ref": "AccCred: Accountable Anon Creds",
+        "time_min": 35
+      }
+    ],
+    "paper_refs": [
+      "blockchain-mobile-anon-creds",
+      "grac-graph-anon-creds",
+      "acccred-accountable"
+    ],
+    "exercises": [
+      "Map each paper's primitives onto Sui Move",
+      "Extract a 1-page design doc for our credential module",
+      "Identify which ideas we keep and which we drop"
+    ],
+    "sota_note": "Check 2025 extensions of AccCred on ePrint.",
+    "duration_min": 120
+  },
+  {
+    "id": "S15",
+    "date": "2026-05-08",
+    "weekday": "Fri",
+    "week": 3,
+    "phase": "P1",
+    "chapter": "ch21",
+    "title": "P1 review + write-up",
+    "objectives": [
+      "Consolidate P1 into research-log.md",
+      "Summarize BBS+, PS, threshold, revocation, eIDAS",
+      "Draft 2 pages on credentials design choice",
+      "Open questions list for advisor"
+    ],
+    "materials": [
+      {
+        "type": "notes",
+        "ref": "P1 session notes (S01-S14)",
+        "time_min": 40
+      },
+      {
+        "type": "doc",
+        "ref": "advisor-summary.md",
+        "time_min": 25
+      },
+      {
+        "type": "writing",
+        "ref": "research-log draft",
+        "time_min": 55
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write a 2-page BBS+ vs PS trade-off memo",
+      "List 5 open questions for the next advisor meeting",
+      "Commit notes to research-log/YYYY-MM-DD.md"
+    ],
+    "sota_note": "Check IETF 121 BBS / SD-JWT VC updates.",
+    "duration_min": 120
+  },
+  {
+    "id": "S16",
+    "date": "2026-05-11",
+    "weekday": "Mon",
+    "week": 4,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "Confidential Transactions: Pedersen commitments",
+    "objectives": [
+      "State Pedersen commit = vG + rH with hiding + binding",
+      "Understand homomorphic addition of commitments",
+      "Explain why G and H must be nothing-up-my-sleeve",
+      "Connect Pedersen to UTT coin hiding"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Maxwell — Confidential Transactions",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch22-papers-guide.js — Confidential TX",
+        "time_min": 25
+      },
+      {
+        "type": "code",
+        "ref": "curve25519-dalek Pedersen example",
+        "time_min": 50
+      }
+    ],
+    "paper_refs": [
+      "maxwell-ct",
+      "utt-2022"
+    ],
+    "exercises": [
+      "Implement Pedersen commit/open in Rust over Ristretto",
+      "Verify homomorphism: commit(a)+commit(b) == commit(a+b)",
+      "Explain binding breakdown if H = kG"
+    ],
+    "sota_note": "Check pasta-curves / curve25519-dalek 5.0 releases.",
+    "duration_min": 120
+  },
+  {
+    "id": "S17",
+    "date": "2026-05-12",
+    "weekday": "Tue",
+    "week": 4,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "Range proofs: inner product + Bulletproofs",
+    "objectives": [
+      "Trace the inner-product argument reduction",
+      "Understand range proof reduction to IP argument",
+      "Proof size: 2 log n + constants",
+      "Aggregated range proofs"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Bulletproofs: Short Proofs for Confidential Transactions",
+        "time_min": 60
+      },
+      {
+        "type": "notes",
+        "ref": "ch22-papers-guide.js — Bulletproofs",
+        "time_min": 25
+      },
+      {
+        "type": "video",
+        "ref": "Dan Boneh Bulletproofs lecture",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "bulletproofs"
+    ],
+    "exercises": [
+      "Derive the 2-round IP argument on paper",
+      "Prove the range-proof dimension reduction step",
+      "Estimate proof size for 64-bit ranges aggregated x16"
+    ],
+    "sota_note": "dalek bulletproofs crate: current maintenance status.",
+    "duration_min": 120
+  },
+  {
+    "id": "S18",
+    "date": "2026-05-13",
+    "weekday": "Wed",
+    "week": 4,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "Bulletproofs+ shorter proofs",
+    "objectives": [
+      "Identify the protocol change from BP to BP+",
+      "Quantify proof size reduction",
+      "Understand weighted inner product",
+      "Map BP+ onto Monero mainnet"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Bulletproofs+ (BP+)",
+        "time_min": 55
+      },
+      {
+        "type": "notes",
+        "ref": "ch22-papers-guide.js — BP+",
+        "time_min": 25
+      },
+      {
+        "type": "doc",
+        "ref": "Monero BP+ release notes",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [
+      "bulletproofs-plus"
+    ],
+    "exercises": [
+      "Compare BP vs BP+ on paper for n=64",
+      "Trace the weighted IP reduction",
+      "Design a BP+ aggregated proof for 8 outputs"
+    ],
+    "sota_note": "Track Monero BP+ post-2022 deployment analytics.",
+    "duration_min": 120
+  },
+  {
+    "id": "S19",
+    "date": "2026-05-14",
+    "weekday": "Thu",
+    "week": 4,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "Bulletproofs++ and reciprocal set membership",
+    "objectives": [
+      "Understand reciprocal set membership technique",
+      "Explain shorter range + arithmetic proofs",
+      "Compare BP++ to BP+ on proving time",
+      "Identify implementation libraries (Rust)"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Bulletproofs++ — Next Gen Conf TX",
+        "time_min": 60
+      },
+      {
+        "type": "notes",
+        "ref": "ch22-papers-guide.js — BP++",
+        "time_min": 25
+      },
+      {
+        "type": "doc",
+        "ref": "BP++ reference impl",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "bulletproofs-plus-plus"
+    ],
+    "exercises": [
+      "Derive the reciprocal set membership check",
+      "Estimate proof size for n=64 with BP++",
+      "List production blockchains that could adopt BP++"
+    ],
+    "sota_note": "Latest BP++ IACR revision (2025) — new optimizations.",
+    "duration_min": 120
+  },
+  {
+    "id": "S20",
+    "date": "2026-05-15",
+    "weekday": "Fri",
+    "week": 4,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "Mimblewimble and cut-through",
+    "objectives": [
+      "State Mimblewimble's aggregation property",
+      "Understand cut-through + kernel offsets",
+      "Identify weaknesses: no scripts, flashlight attacks",
+      "Compare Grin vs Beam deployments"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Mimblewimble (Jedusor)",
+        "time_min": 50
+      },
+      {
+        "type": "notes",
+        "ref": "ch22-papers-guide.js — Mimblewimble",
+        "time_min": 25
+      },
+      {
+        "type": "doc",
+        "ref": "Grin MW spec",
+        "time_min": 35
+      }
+    ],
+    "paper_refs": [
+      "mimblewimble"
+    ],
+    "exercises": [
+      "Walk through a cut-through example with 4 TXs",
+      "List 3 privacy flaws of Mimblewimble (flashlight)",
+      "Sketch a Mimblewimble + BBS+ auditability layer"
+    ],
+    "sota_note": "Grin/Beam 2024-2025 activity — is it dead or alive?",
+    "duration_min": 120
+  },
+  {
+    "id": "S21",
+    "date": "2026-05-18",
+    "weekday": "Mon",
+    "week": 5,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "ElGamal veiled transactions (Aptos style)",
+    "objectives": [
+      "Understand ElGamal additively-homomorphic variant",
+      "Contrast with Pedersen for CT",
+      "Review Aptos confidential asset module",
+      "Identify sigma proofs used for balance integrity"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Aptos veiled transactions whitepaper",
+        "time_min": 45
+      },
+      {
+        "type": "doc",
+        "ref": "Aptos confidential-asset module docs",
+        "time_min": 30
+      },
+      {
+        "type": "notes",
+        "ref": "advisor-summary.md — ElGamal note",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Implement additively-homomorphic ElGamal in Rust",
+      "Prove balance in sigma protocol (commit + challenge + response)",
+      "Compare Pedersen vs ElGamal for Sui Move"
+    ],
+    "sota_note": "Aptos 2024-2025 confidential asset standard updates.",
+    "duration_min": 120
+  },
+  {
+    "id": "S22",
+    "date": "2026-05-19",
+    "weekday": "Tue",
+    "week": 5,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "Flashproofs and alternate range proofs",
+    "objectives": [
+      "Understand flashproofs' approach",
+      "Compare with BP/BP+/BP++ and Groth16 range",
+      "Map latency/size/proving-cost trade-offs",
+      "Identify when short-range proofs win"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Flashproofs (IEEE S&P 2022)",
+        "time_min": 55
+      },
+      {
+        "type": "notes",
+        "ref": "ch22 notes",
+        "time_min": 25
+      },
+      {
+        "type": "doc",
+        "ref": "Survey of range proofs (2024)",
+        "time_min": 35
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Tabulate range-proof variants on 4 metrics",
+      "Pick one variant best fit for Sui Move gas budget",
+      "Draft a range-proof benchmark plan"
+    ],
+    "sota_note": "2024 refinements of Flashproofs on ePrint.",
+    "duration_min": 120
+  },
+  {
+    "id": "S23",
+    "date": "2026-05-20",
+    "weekday": "Wed",
+    "week": 5,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "Binius small-field proofs for CT",
+    "objectives": [
+      "Understand binary-field arithmetization",
+      "Compare Binius with Plonky3 for range proofs",
+      "Assess hardware-friendly SNARKs for CT",
+      "Project feasibility in 2026-2027 timeframe"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Binius (Diamond-Posen)",
+        "time_min": 60
+      },
+      {
+        "type": "doc",
+        "ref": "Ulvetanna Binius release notes",
+        "time_min": 30
+      },
+      {
+        "type": "notes",
+        "ref": "ch22 sota",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Explain why binary fields aid hashing proofs",
+      "List primitives Binius accelerates (Keccak, AES)",
+      "Sketch a Binius-based range proof plan"
+    ],
+    "sota_note": "Binius 2025 implementation status (Irreducible).",
+    "duration_min": 120
+  },
+  {
+    "id": "S24",
+    "date": "2026-05-21",
+    "weekday": "Thu",
+    "week": 5,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "UTT paper deep dive: CT layer",
+    "objectives": [
+      "Trace UTT coin minting / transfer / burn",
+      "Understand budget accounting via Pedersen",
+      "Map UTT Schnorr proofs to Sigma protocols",
+      "Connect UTT to threshold IBE"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "UTT: Decentralized Ecash with Accountable Privacy",
+        "time_min": 70
+      },
+      {
+        "type": "notes",
+        "ref": "advisor-summary.md",
+        "time_min": 25
+      },
+      {
+        "type": "code",
+        "ref": "utt-rs utt-protocol crate scan",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "utt-2022"
+    ],
+    "exercises": [
+      "Draw UTT transfer flow with Pedersen + Schnorr",
+      "Locate the budget proof in the UTT protocol",
+      "List 3 UTT design choices we can reuse"
+    ],
+    "sota_note": "Track utt-rs progress + latest Tomescu talks (2025).",
+    "duration_min": 120
+  },
+  {
+    "id": "S25",
+    "date": "2026-05-22",
+    "weekday": "Fri",
+    "week": 5,
+    "phase": "P2",
+    "chapter": "ch22",
+    "title": "P2 review + CT design memo",
+    "objectives": [
+      "Pick Pedersen vs ElGamal for the thesis PoC",
+      "Pick a range proof (BP+ or BP++)",
+      "Write a 2-page CT layer memo",
+      "Update research-queue with open CT questions"
+    ],
+    "materials": [
+      {
+        "type": "notes",
+        "ref": "P2 session notes (S16-S24)",
+        "time_min": 40
+      },
+      {
+        "type": "writing",
+        "ref": "CT layer memo",
+        "time_min": 50
+      },
+      {
+        "type": "doc",
+        "ref": "advisor-summary §2",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write a 2-page CT design memo",
+      "Append open questions to research-queue.md",
+      "Commit notes to research-log/"
+    ],
+    "sota_note": "Watch for 2026 IACR preprints on short CT range proofs.",
+    "duration_min": 120
+  },
+  {
+    "id": "S26",
+    "date": "2026-05-25",
+    "weekday": "Mon",
+    "week": 6,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "TEE landscape: SGX, TDX, SEV, Nitro, ARM CCA",
+    "objectives": [
+      "Map vendor TEEs to threat models",
+      "State enclave memory encryption properties",
+      "Understand VM-level vs process-level TEEs",
+      "Identify relevant primitives for our thesis"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Intel TDX Architecture",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "ARM CCA (Confidential Compute Architecture)",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch23-papers-guide.js",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "intel-tdx",
+      "arm-cca"
+    ],
+    "exercises": [
+      "Draw 5-column table: SGX/TDX/SEV/Nitro/CCA",
+      "Identify what each TEE does and does NOT protect",
+      "Argue which TEE fits our credential fast path"
+    ],
+    "sota_note": "Intel TDX 2025 production deployments (GCP, Azure).",
+    "duration_min": 120
+  },
+  {
+    "id": "S27",
+    "date": "2026-05-26",
+    "weekday": "Tue",
+    "week": 6,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "Remote attestation protocols",
+    "objectives": [
+      "DCAP / ECDSA attestation flow for Intel",
+      "Understand measurement (MRENCLAVE / MRTD)",
+      "Map to Nitro attestation docs + PKI",
+      "Reason about TCB recovery after CVEs"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "WireTap: SGX DCAP Key Extraction",
+        "time_min": 50
+      },
+      {
+        "type": "paper",
+        "ref": "Trusted Compute Units (TCU)",
+        "time_min": 40
+      },
+      {
+        "type": "doc",
+        "ref": "AWS Nitro Enclaves attestation spec",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [
+      "wiretap-sgx-dcap",
+      "tcu"
+    ],
+    "exercises": [
+      "Write pseudocode for DCAP quote verification",
+      "List 3 attack vectors on attestation",
+      "Design a thesis attestation verifier on Sui Move"
+    ],
+    "sota_note": "AWS Nitro Enclaves v2 + KMS integration patterns.",
+    "duration_min": 120
+  },
+  {
+    "id": "S28",
+    "date": "2026-05-27",
+    "weekday": "Wed",
+    "week": 6,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "Side-channel attacks on TEE (part 1)",
+    "objectives": [
+      "Cache side channels (Prime+Probe, Flush+Reload)",
+      "Speculative execution classes (Spectre, Meltdown)",
+      "Understand Downfall and Inception",
+      "Identify mitigations per CPU generation"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "TEE.Fail",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "TDXdown",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch23-papers-guide.js",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [
+      "tee-fail",
+      "tdxdown"
+    ],
+    "exercises": [
+      "Summarize TEE.Fail attack chain in 5 bullets",
+      "List CPUs vulnerable to Downfall with patches",
+      "Decide: use TEE as fallback vs primary trust"
+    ],
+    "sota_note": "2024-2025 SGX/TDX CVE list + patch timelines.",
+    "duration_min": 120
+  },
+  {
+    "id": "S29",
+    "date": "2026-05-28",
+    "weekday": "Thu",
+    "week": 6,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "Side-channel attacks on TEE (part 2)",
+    "objectives": [
+      "Memory bus attacks (Membuster)",
+      "Micro-architectural data sampling",
+      "Understand constant-time enclave design",
+      "Plan formal verification strategies"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "WireTap SGX DCAP Key Extraction",
+        "time_min": 50
+      },
+      {
+        "type": "notes",
+        "ref": "ch23 side-channels section",
+        "time_min": 25
+      },
+      {
+        "type": "doc",
+        "ref": "Intel SA advisory list (2024-2025)",
+        "time_min": 35
+      }
+    ],
+    "paper_refs": [
+      "wiretap-sgx-dcap"
+    ],
+    "exercises": [
+      "Draft a threat model for our TEE fast path",
+      "List 5 constant-time coding rules for enclaves",
+      "Identify attestation freshness requirements"
+    ],
+    "sota_note": "Inception and related transient attacks follow-up (2024).",
+    "duration_min": 120
+  },
+  {
+    "id": "S30",
+    "date": "2026-05-29",
+    "weekday": "Fri",
+    "week": 6,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "NVIDIA H100/H200 confidential computing",
+    "objectives": [
+      "GPU CC model: trusted execution on accelerator",
+      "Understand SPDM / CCM attestation",
+      "Assess ZK prover acceleration inside GPU TEE",
+      "Map to Mysten Seal / TEE VM architectures"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Intel TDX Architecture (TDX Connect)",
+        "time_min": 35
+      },
+      {
+        "type": "doc",
+        "ref": "NVIDIA Confidential Computing whitepaper",
+        "time_min": 50
+      },
+      {
+        "type": "notes",
+        "ref": "ch23 TEE landscape",
+        "time_min": 35
+      }
+    ],
+    "paper_refs": [
+      "intel-tdx"
+    ],
+    "exercises": [
+      "Diagram a CPU+GPU attestation chain",
+      "Estimate ZK prover speedup with H100 CC on/off",
+      "Identify open questions for Mysten advisors"
+    ],
+    "sota_note": "NVIDIA 2025 CC announcements + SPDM 1.3 spec.",
+    "duration_min": 120
+  },
+  {
+    "id": "S31",
+    "date": "2026-06-01",
+    "weekday": "Mon",
+    "week": 7,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "TEE + blockchain: TeeRollup and zkTLS",
+    "objectives": [
+      "Understand TeeRollup architecture",
+      "Compare zk rollup vs TEE rollup security",
+      "Read zkTLS + lightning hot/cold proofs",
+      "Map to credential issuance over TEE"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "TeeRollup",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "TEE + zkTLS for Lightning Network",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch23 Blockchain+TEE",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "teerollup",
+      "tee-zktls-lightning"
+    ],
+    "exercises": [
+      "List TeeRollup trust assumptions",
+      "Compare latency: TEE rollup vs zk rollup",
+      "Sketch a credential-issuance TEE rollup on Sui"
+    ],
+    "sota_note": "2025 TEE rollup deployments on Ethereum L2s.",
+    "duration_min": 120
+  },
+  {
+    "id": "S32",
+    "date": "2026-06-02",
+    "weekday": "Tue",
+    "week": 7,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "TEE + Zcash / FL + ZK: ZLiTE, zkFL-Health",
+    "objectives": [
+      "Understand ZLiTE light-client TEE",
+      "Read zkFL-Health: ZK + TEE federated learning",
+      "Assess TEE + ZK hybrid architectures",
+      "Identify our hybrid design inspiration"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "ZLiTE: Lightweight TEE for Zcash",
+        "time_min": 45
+      },
+      {
+        "type": "paper",
+        "ref": "zkFL-Health: ZKP + TEE Verifiable Privacy",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch23 papers",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "zlite-zcash",
+      "zkfl-health"
+    ],
+    "exercises": [
+      "Compare ZLiTE vs FlyClient",
+      "Draft a TEE+ZK hybrid credential protocol",
+      "List what ZK guarantees vs what TEE guarantees"
+    ],
+    "sota_note": "Check 2025 TEE+ZK hybrid constructions on ePrint.",
+    "duration_min": 120
+  },
+  {
+    "id": "S33",
+    "date": "2026-06-03",
+    "weekday": "Wed",
+    "week": 7,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "Mysten Seal + Sui-native TEE",
+    "objectives": [
+      "Read Mysten Seal architecture notes",
+      "Understand Sui's native TEE integration plan",
+      "Map Seal to our credential fast path",
+      "Identify what is public vs NDA"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Mysten Seal blog + whitepaper",
+        "time_min": 55
+      },
+      {
+        "type": "notes",
+        "ref": "ch23 TEE + Sui",
+        "time_min": 25
+      },
+      {
+        "type": "paper",
+        "ref": "Intel TDX Architecture (for comparison)",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [
+      "intel-tdx"
+    ],
+    "exercises": [
+      "Draw Seal integration with Move runtime",
+      "List 3 primitives Seal provides we can use",
+      "Open questions to ask Mysten advisors"
+    ],
+    "sota_note": "Mysten Seal roadmap updates 2025-2026.",
+    "duration_min": 120
+  },
+  {
+    "id": "S34",
+    "date": "2026-06-04",
+    "weekday": "Thu",
+    "week": 7,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "TEE deep research notes consolidation",
+    "objectives": [
+      "Synthesize tee-deep-research.md main findings",
+      "Map each finding to a thesis decision",
+      "Identify required mitigations",
+      "List TEE assumptions to document formally"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "tee-deep-research.md",
+        "time_min": 70
+      },
+      {
+        "type": "notes",
+        "ref": "ch23 side-channel + attestation sessions",
+        "time_min": 25
+      },
+      {
+        "type": "writing",
+        "ref": "TEE threat model draft",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write a 2-page TEE threat model",
+      "List 5 assumptions we must state in the thesis",
+      "Pick TEE vendor stack for the PoC"
+    ],
+    "sota_note": "2026 side-channel advisories — stay current.",
+    "duration_min": 120
+  },
+  {
+    "id": "S35",
+    "date": "2026-06-05",
+    "weekday": "Fri",
+    "week": 7,
+    "phase": "P3",
+    "chapter": "ch23",
+    "title": "P3 review + TEE design memo",
+    "objectives": [
+      "Consolidate P3 learnings",
+      "Pick TEE stack + attestation flow",
+      "Finalize TEE threat model",
+      "Prepare advisor Q&A"
+    ],
+    "materials": [
+      {
+        "type": "notes",
+        "ref": "P3 session notes (S26-S34)",
+        "time_min": 40
+      },
+      {
+        "type": "writing",
+        "ref": "TEE design memo",
+        "time_min": 50
+      },
+      {
+        "type": "doc",
+        "ref": "advisor-summary + tee-deep-research",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write 2-page TEE design memo",
+      "List 5 advisor questions on TEE",
+      "Commit to research-log/"
+    ],
+    "sota_note": "Upcoming CCS 2026 accepted papers on TEE.",
+    "duration_min": 120
+  },
+  {
+    "id": "S36",
+    "date": "2026-06-08",
+    "weekday": "Mon",
+    "week": 8,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "SoK Privacy-Preserving Transactions",
+    "objectives": [
+      "Taxonomy: UTXO vs account privacy models",
+      "Compare anonymity sets + unlinkability",
+      "Identify compliance hooks per design",
+      "Map each system to underlying primitives"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "SoK: Privacy-Preserving Transactions in Blockchains",
+        "time_min": 60
+      },
+      {
+        "type": "paper",
+        "ref": "Hitchhiker's Guide to Privacy-Preserving Digital Payment Systems",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch24-papers-guide.js",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "sok-privacy-tx",
+      "hitchhiker-privacy-payment"
+    ],
+    "exercises": [
+      "Build a comparison table across 6 systems",
+      "Mark which systems support compliance",
+      "List design choices we inherit for our thesis"
+    ],
+    "sota_note": "Any 2025 privacy-tx SoK follow-up surveys.",
+    "duration_min": 120
+  },
+  {
+    "id": "S37",
+    "date": "2026-06-09",
+    "weekday": "Tue",
+    "week": 8,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "Zcash architecture and Sapling/Orchard",
+    "objectives": [
+      "Zcash protocol overview (transparent, shielded)",
+      "Sapling: Groth16 + note commitments",
+      "Orchard: Halo 2 + action transfers",
+      "Understand viewing keys and NU5+"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Zcash protocol spec (NU5+)",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "Halo 2 (for Orchard)",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch22 Halo 2 paper",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "halo2"
+    ],
+    "exercises": [
+      "Diagram a Sapling note lifecycle",
+      "Contrast Orchard vs Sapling for UX + size",
+      "Explain viewing key structure"
+    ],
+    "sota_note": "Zcash NU6 + proof system migration status.",
+    "duration_min": 120
+  },
+  {
+    "id": "S38",
+    "date": "2026-06-10",
+    "weekday": "Wed",
+    "week": 8,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "Monero ring signatures + RingCT",
+    "objectives": [
+      "Understand ring signatures vs CLSAG",
+      "RingCT: commitments + range proof (BP+)",
+      "Stealth addresses and key images",
+      "Assess anonymity set sizing"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Bulletproofs+ (BP+ in Monero)",
+        "time_min": 40
+      },
+      {
+        "type": "doc",
+        "ref": "Monero CLSAG + RingCT docs",
+        "time_min": 50
+      },
+      {
+        "type": "notes",
+        "ref": "ch22 BP+ notes",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [
+      "bulletproofs-plus"
+    ],
+    "exercises": [
+      "Trace a CLSAG signature flow",
+      "Compute anonymity set impact of ring size 16",
+      "List known deanonymization heuristics"
+    ],
+    "sota_note": "Monero Jamtis / Seraphis roadmap (2025-2026).",
+    "duration_min": 120
+  },
+  {
+    "id": "S39",
+    "date": "2026-06-11",
+    "weekday": "Thu",
+    "week": 8,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "Penumbra shielded pool + chain-native privacy",
+    "objectives": [
+      "Penumbra note/action architecture",
+      "Understand DEX privacy via batched auctions",
+      "Governance + staking privacy",
+      "Assess production adoption"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Penumbra protocol docs v0.80+",
+        "time_min": 60
+      },
+      {
+        "type": "paper",
+        "ref": "SoK Privacy-Preserving TX",
+        "time_min": 30
+      },
+      {
+        "type": "notes",
+        "ref": "research-log notes",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [
+      "sok-privacy-tx"
+    ],
+    "exercises": [
+      "Diagram a Penumbra shielded swap",
+      "Compare Penumbra vs Namada on primitives",
+      "List what we can port to Sui Move"
+    ],
+    "sota_note": "Penumbra mainnet 2025 activity + governance outcomes.",
+    "duration_min": 120
+  },
+  {
+    "id": "S40",
+    "date": "2026-06-12",
+    "weekday": "Fri",
+    "week": 8,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "Aztec 3.0 + Noir client-side proving",
+    "objectives": [
+      "Aztec state tree + notes model",
+      "Noir DSL for private smart contracts",
+      "Client-side proving UX patterns",
+      "Compare with Sui client-side ZK ideas"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Aztec protocol spec (2025)",
+        "time_min": 50
+      },
+      {
+        "type": "doc",
+        "ref": "Noir docs (aztec.nr)",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch24 private payment notes",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write a minimal Noir private coin contract",
+      "Estimate client-side proof size + time",
+      "Draft a Sui analog using Move + ZK"
+    ],
+    "sota_note": "Aztec 3.0 mainnet launch readiness 2025-2026.",
+    "duration_min": 120
+  },
+  {
+    "id": "S41",
+    "date": "2026-06-15",
+    "weekday": "Mon",
+    "week": 9,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "Namada multichain private transfers",
+    "objectives": [
+      "Namada MASP construction",
+      "IBC-based shielded transfers",
+      "Accounting for privacy budget across chains",
+      "Map to our Sui cross-chain thoughts"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Namada v0.30+ spec",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "SoK privacy-preserving TX",
+        "time_min": 25
+      },
+      {
+        "type": "notes",
+        "ref": "ch24 notes",
+        "time_min": 40
+      }
+    ],
+    "paper_refs": [
+      "sok-privacy-tx"
+    ],
+    "exercises": [
+      "Diagram a Namada shielded IBC hop",
+      "Identify leak vectors on IBC-shielded TX",
+      "Sketch a Sui-IBC shielded path"
+    ],
+    "sota_note": "Namada mainnet metrics (shielded volumes 2025).",
+    "duration_min": 120
+  },
+  {
+    "id": "S42",
+    "date": "2026-06-16",
+    "weekday": "Tue",
+    "week": 9,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "Railway + Bitcoin silent payments",
+    "objectives": [
+      "BIP-352 silent payments flow",
+      "Railway / Railgun privacy on Ethereum",
+      "Assess UX + address hygiene",
+      "Identify gaps for merchants"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "BIP-352 silent payments",
+        "time_min": 45
+      },
+      {
+        "type": "doc",
+        "ref": "Railgun (0xPARC) docs",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch24 notes",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Implement silent payment address derivation in Rust",
+      "Compare Railgun vs Aztec for EVM privacy",
+      "Draft merchant UX for silent payments"
+    ],
+    "sota_note": "BIP-352 wallet adoption 2025-2026.",
+    "duration_min": 120
+  },
+  {
+    "id": "S43",
+    "date": "2026-06-17",
+    "weekday": "Wed",
+    "week": 9,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "UTT deep dive: accountable privacy",
+    "objectives": [
+      "UTT budget enforcement + accountability",
+      "Nullifier design vs Zcash",
+      "Threshold IBE registration",
+      "Map UTT to our Sui thesis"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "UTT: Decentralized Ecash with Accountable Privacy",
+        "time_min": 60
+      },
+      {
+        "type": "notes",
+        "ref": "advisor-summary.md",
+        "time_min": 35
+      },
+      {
+        "type": "code",
+        "ref": "utt-rs utt-protocol scan",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "utt-2022"
+    ],
+    "exercises": [
+      "Trace a UTT transfer transaction byte by byte",
+      "Compare UTT budget vs Zcash viewing keys",
+      "List 5 UTT ideas we port to Sui"
+    ],
+    "sota_note": "Track UTT follow-up papers from VMware + Mysten 2025.",
+    "duration_min": 120
+  },
+  {
+    "id": "S44",
+    "date": "2026-06-18",
+    "weekday": "Thu",
+    "week": 9,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "Compliance: viewing keys, audit, regulatory hooks",
+    "objectives": [
+      "Viewing key design (Zcash, Penumbra, Aztec)",
+      "Regulatory requirements (MiCA, FATF travel rule)",
+      "Balance privacy vs auditability",
+      "Draft compliance design for our thesis"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Chainalysis MiCA compliance brief",
+        "time_min": 30
+      },
+      {
+        "type": "paper",
+        "ref": "SoK Privacy-Preserving TX",
+        "time_min": 35
+      },
+      {
+        "type": "notes",
+        "ref": "advisor-summary.md",
+        "time_min": 25
+      },
+      {
+        "type": "doc",
+        "ref": "FATF travel rule guidance",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [
+      "sok-privacy-tx"
+    ],
+    "exercises": [
+      "Compare 3 viewing key models",
+      "Design our thesis compliance layer (2 pages)",
+      "Identify 3 regulators we must satisfy"
+    ],
+    "sota_note": "MiCA implementing technical standards (2025-2026).",
+    "duration_min": 120
+  },
+  {
+    "id": "S45",
+    "date": "2026-06-19",
+    "weekday": "Fri",
+    "week": 9,
+    "phase": "P4",
+    "chapter": "ch24",
+    "title": "P4 review + private payment memo",
+    "objectives": [
+      "Synthesize private payment designs",
+      "Pick base architecture for our PoC",
+      "Decide compliance model",
+      "Advisor questions"
+    ],
+    "materials": [
+      {
+        "type": "notes",
+        "ref": "P4 session notes (S36-S44)",
+        "time_min": 40
+      },
+      {
+        "type": "writing",
+        "ref": "Private payment memo",
+        "time_min": 55
+      },
+      {
+        "type": "doc",
+        "ref": "advisor-summary.md",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write 2-page private payment memo",
+      "List 5 advisor questions",
+      "Commit to research-log/"
+    ],
+    "sota_note": "Upcoming EC / USENIX Security 2026 private payment papers.",
+    "duration_min": 120
+  },
+  {
+    "id": "S46",
+    "date": "2026-06-22",
+    "weekday": "Mon",
+    "week": 10,
+    "phase": "P5",
+    "chapter": "ch22",
+    "title": "Groth16 in depth",
+    "objectives": [
+      "CRS structure + per-circuit trusted setup",
+      "R1CS → QAP transformation",
+      "Verifier pairing equation",
+      "Known pitfalls (malleability, aggregation)"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Groth16 — Size of Pairing-Based NIZK",
+        "time_min": 55
+      },
+      {
+        "type": "notes",
+        "ref": "ch22-papers-guide.js — Groth16",
+        "time_min": 25
+      },
+      {
+        "type": "code",
+        "ref": "arkworks Groth16 example",
+        "time_min": 40
+      }
+    ],
+    "paper_refs": [
+      "groth16"
+    ],
+    "exercises": [
+      "Compile a toy R1CS circuit with ark-relations",
+      "Generate a Groth16 proof and verify",
+      "Argue why Groth16 setup must be MPC'd"
+    ],
+    "sota_note": "Groth16 subversion-resistance updates (2024-2025).",
+    "duration_min": 120
+  },
+  {
+    "id": "S47",
+    "date": "2026-06-23",
+    "weekday": "Tue",
+    "week": 10,
+    "phase": "P5",
+    "chapter": "ch22",
+    "title": "Plonk + lookups (Plookup, Plonkup, Halo 2)",
+    "objectives": [
+      "Universal trusted setup (KZG)",
+      "Plonk gates + copy constraints",
+      "Plookup arguments and Halo 2 table layout",
+      "Assess Plonkish vs AIR trade-offs"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "PLONK: Permutations over Lagrange-bases",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "Halo 2",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch22 PLONK + Halo 2",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [
+      "plonk",
+      "halo2"
+    ],
+    "exercises": [
+      "Write a toy Plonkish gate for range proof",
+      "Trace Halo 2 table lookup syntax",
+      "Compare Plonk vs Groth16 on UX"
+    ],
+    "sota_note": "PSE Halo 2 fork vs zcash/halo2 divergence (2025).",
+    "duration_min": 120
+  },
+  {
+    "id": "S48",
+    "date": "2026-06-24",
+    "weekday": "Wed",
+    "week": 10,
+    "phase": "P5",
+    "chapter": "ch25",
+    "title": "Folding schemes: Nova + SuperNova",
+    "objectives": [
+      "Understand R1CS folding idea",
+      "Nova prover/verifier structure",
+      "SuperNova multi-instance folding",
+      "Map to IVC + recursive workflows"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Nova (Kothapalli-Setty-Tzialla)",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "SuperNova (Kothapalli-Setty)",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch25 notes + zk-deepdive-data",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Derive the Nova folding equation",
+      "List SuperNova applications (VMs, zkEVM)",
+      "Sketch a Nova + Sui integration"
+    ],
+    "sota_note": "Sonobe + Nova production releases 2025.",
+    "duration_min": 120
+  },
+  {
+    "id": "S49",
+    "date": "2026-06-25",
+    "weekday": "Thu",
+    "week": 10,
+    "phase": "P5",
+    "chapter": "ch25",
+    "title": "HyperNova + ProtoStar",
+    "objectives": [
+      "HyperNova high-degree custom gates",
+      "ProtoStar uniform folding",
+      "Trade-off between gate count and folding cost",
+      "Map to practical projects"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "HyperNova",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "ProtoStar",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "zk-deepdive-data",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Compare Nova/SuperNova/HyperNova/ProtoStar",
+      "List which folding scheme fits our thesis",
+      "Sketch BBS+ revocation via folding"
+    ],
+    "sota_note": "2025 folding papers — NeutronNova, etc.",
+    "duration_min": 120
+  },
+  {
+    "id": "S50",
+    "date": "2026-06-26",
+    "weekday": "Fri",
+    "week": 10,
+    "phase": "P5",
+    "chapter": "ch25",
+    "title": "Plonky3 and binary-friendly arithmetization",
+    "objectives": [
+      "Plonky3 production architecture",
+      "Mersenne31 field + AIRs",
+      "FRI low-degree tests",
+      "Compare to STARK + Brakedown"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Plonky3 GitHub + design doc",
+        "time_min": 60
+      },
+      {
+        "type": "paper",
+        "ref": "STARK (Ben-Sasson) for comparison",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch25 notes",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write a toy Plonky3 AIR",
+      "Trace FRI reduction with 2 layers",
+      "Compare Plonky3 vs Binius for our use case"
+    ],
+    "sota_note": "Plonky3 1.0 release + RISC-V zkVM integrations.",
+    "duration_min": 120
+  },
+  {
+    "id": "S51",
+    "date": "2026-06-29",
+    "weekday": "Mon",
+    "week": 11,
+    "phase": "P5",
+    "chapter": "ch25",
+    "title": "Binius and binary-field proofs",
+    "objectives": [
+      "Binary-field arithmetization",
+      "Compare to Mersenne31 / Goldilocks",
+      "Hardware-friendly hashing proofs",
+      "Identify production readiness"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Binius (Diamond-Posen)",
+        "time_min": 60
+      },
+      {
+        "type": "doc",
+        "ref": "Ulvetanna / Irreducible blog",
+        "time_min": 30
+      },
+      {
+        "type": "notes",
+        "ref": "ch22 Binius + ch25",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Derive Binius field tower reasoning",
+      "Estimate proof cost for Keccak-f",
+      "Decide Binius role in our PoC"
+    ],
+    "sota_note": "Binius 2025 benchmarks + open-source releases.",
+    "duration_min": 120
+  },
+  {
+    "id": "S52",
+    "date": "2026-06-30",
+    "weekday": "Tue",
+    "week": 11,
+    "phase": "P5",
+    "chapter": "ch25",
+    "title": "STARKs and Ligero/Brakedown",
+    "objectives": [
+      "STARK arithmetization (AIR)",
+      "FRI commitment scheme",
+      "Ligero + Brakedown hash-based SNARKs",
+      "Compare on prover/verifier cost"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "STARK (Ben-Sasson et al.)",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "Ligero / Brakedown",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch25 notes",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Trace a FRI check with 3 layers",
+      "Compare Ligero vs Brakedown",
+      "Map hash-based SNARK to BBS+ verify"
+    ],
+    "sota_note": "RISC Zero + zkVM STARK updates 2025.",
+    "duration_min": 120
+  },
+  {
+    "id": "S53",
+    "date": "2026-07-01",
+    "weekday": "Wed",
+    "week": 11,
+    "phase": "P5",
+    "chapter": "ch25",
+    "title": "GKR + sumcheck revival",
+    "objectives": [
+      "Sumcheck protocol",
+      "GKR for layered circuits",
+      "Virgo, Libra, Hyrax legacy",
+      "Modern usage: Lasso, Spartan"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Spartan (Setty)",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "Lasso (lookup argument)",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "zk-deepdive-data",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Trace a sumcheck round",
+      "Compare Spartan vs Plonk for our use case",
+      "List where Lasso helps our circuits"
+    ],
+    "sota_note": "Lasso + Jolt (a16z) progress 2025-2026.",
+    "duration_min": 120
+  },
+  {
+    "id": "S54",
+    "date": "2026-07-02",
+    "weekday": "Thu",
+    "week": 11,
+    "phase": "P5",
+    "chapter": "ch25",
+    "title": "Recursion + proof aggregation",
+    "objectives": [
+      "Cycle of curves (Halo / Pasta)",
+      "Recursive proof composition",
+      "Proof aggregation via folding",
+      "Map to credential batch verification"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "Halo 2 (recursion)",
+        "time_min": 50
+      },
+      {
+        "type": "paper",
+        "ref": "Nova (for comparison)",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "zk-deepdive notes",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [
+      "halo2"
+    ],
+    "exercises": [
+      "Sketch a batched BBS+ verification via folding",
+      "Compare Halo 2 recursion vs Nova folding",
+      "Argue for one approach in our PoC"
+    ],
+    "sota_note": "Proof aggregation tooling 2025 (Nebra, others).",
+    "duration_min": 120
+  },
+  {
+    "id": "S55",
+    "date": "2026-07-03",
+    "weekday": "Fri",
+    "week": 11,
+    "phase": "P5",
+    "chapter": "ch25",
+    "title": "P5 review + ZK memo",
+    "objectives": [
+      "Pick ZK backbone for PoC (Groth16? Halo 2? Nova?)",
+      "Pick lookup / range proof strategy",
+      "Draft 2-page ZK stack memo",
+      "Open questions list"
+    ],
+    "materials": [
+      {
+        "type": "notes",
+        "ref": "P5 session notes (S46-S54)",
+        "time_min": 40
+      },
+      {
+        "type": "writing",
+        "ref": "ZK stack memo",
+        "time_min": 55
+      },
+      {
+        "type": "doc",
+        "ref": "advisor-summary + research-queue",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write 2-page ZK stack memo",
+      "List 5 advisor questions on ZK",
+      "Commit to research-log/"
+    ],
+    "sota_note": "Upcoming CRYPTO 2026 folding / lookup papers.",
+    "duration_min": 120
+  },
+  {
+    "id": "S56",
+    "date": "2026-07-06",
+    "weekday": "Mon",
+    "week": 12,
+    "phase": "P6",
+    "chapter": "ch26",
+    "title": "MPC fundamentals: GMW, BGW, SPDZ",
+    "objectives": [
+      "Secret sharing + secure computation",
+      "Honest-majority vs dishonest-majority",
+      "SPDZ offline/online phases",
+      "Map to threshold BBS+ signing"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "SPDZ (Damgard et al.)",
+        "time_min": 55
+      },
+      {
+        "type": "paper",
+        "ref": "BDOZ / SPDZ2k overview",
+        "time_min": 35
+      },
+      {
+        "type": "notes",
+        "ref": "ch26 + advisor-summary",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Trace SPDZ multiplication triple usage",
+      "Estimate round complexity for 10 parties",
+      "Map to threshold BBS+ signing"
+    ],
+    "sota_note": "Silent MPC (Pianissimo 2024) follow-ups.",
+    "duration_min": 120
+  },
+  {
+    "id": "S57",
+    "date": "2026-07-07",
+    "weekday": "Tue",
+    "week": 12,
+    "phase": "P6",
+    "chapter": "ch26",
+    "title": "Threshold cryptography + BLS / FROST",
+    "objectives": [
+      "Threshold BLS signatures",
+      "FROST threshold Schnorr",
+      "DKG protocols (Pedersen, GG18, GG20)",
+      "Bias attacks + proactive refresh"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "FROST: Flexible Round-Optimized Schnorr Threshold",
+        "time_min": 50
+      },
+      {
+        "type": "paper",
+        "ref": "GG20 / threshold BBS+ refs",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch26 + rust-guide",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [
+      "threshold-bbs-2023"
+    ],
+    "exercises": [
+      "Write pseudocode for FROST sign",
+      "List DKG attack scenarios",
+      "Compare FROST vs threshold BBS+ for our thesis"
+    ],
+    "sota_note": "IRTF CFRG FROST standardization status 2025.",
+    "duration_min": 120
+  },
+  {
+    "id": "S58",
+    "date": "2026-07-08",
+    "weekday": "Wed",
+    "week": 12,
+    "phase": "P6",
+    "chapter": "ch26",
+    "title": "FHE fundamentals: BGV, BFV, CKKS, TFHE",
+    "objectives": [
+      "LWE + ring-LWE basics",
+      "BGV / BFV exact arithmetic",
+      "CKKS approximate arithmetic",
+      "TFHE bootstrap + programmable bootstrap"
+    ],
+    "materials": [
+      {
+        "type": "paper",
+        "ref": "TFHE (Chillotti et al.)",
+        "time_min": 55
+      },
+      {
+        "type": "doc",
+        "ref": "OpenFHE 2025 docs",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "ch26 notes",
+        "time_min": 25
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Derive LWE decryption eq",
+      "Trace a TFHE bootstrap abstractly",
+      "List where FHE might help our thesis"
+    ],
+    "sota_note": "OpenFHE 2025 release + Zama Concrete updates.",
+    "duration_min": 120
+  },
+  {
+    "id": "S59",
+    "date": "2026-07-09",
+    "weekday": "Thu",
+    "week": 12,
+    "phase": "P6",
+    "chapter": "ch26",
+    "title": "PSI + private set operations",
+    "objectives": [
+      "PSI protocols (OPRF, OT-based, FHE-based)",
+      "Unbalanced PSI for client-server",
+      "Apple PSI design",
+      "Identify thesis applicability"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "Apple PSI whitepaper",
+        "time_min": 40
+      },
+      {
+        "type": "paper",
+        "ref": "Unbalanced PSI (Chen et al.)",
+        "time_min": 45
+      },
+      {
+        "type": "notes",
+        "ref": "ch26 notes",
+        "time_min": 35
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Compare OPRF vs OT-based PSI",
+      "Estimate PSI cost for 10k x 1M sets",
+      "List PSI use cases for anon creds"
+    ],
+    "sota_note": "PSI 2024-2025 improvements (DiffPSI etc).",
+    "duration_min": 120
+  },
+  {
+    "id": "S60",
+    "date": "2026-07-10",
+    "weekday": "Fri",
+    "week": 12,
+    "phase": "P6",
+    "chapter": "ch26",
+    "title": "P6 review + advanced memo",
+    "objectives": [
+      "Pick MPC primitives for threshold BBS+",
+      "Decide if FHE is in scope",
+      "Decide if PSI is in scope",
+      "Advisor questions"
+    ],
+    "materials": [
+      {
+        "type": "notes",
+        "ref": "P6 session notes (S56-S59)",
+        "time_min": 35
+      },
+      {
+        "type": "writing",
+        "ref": "Advanced primitives memo",
+        "time_min": 55
+      },
+      {
+        "type": "doc",
+        "ref": "advisor-summary.md",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write 2-page advanced primitives memo",
+      "List 3 advisor questions",
+      "Commit to research-log/"
+    ],
+    "sota_note": "Eurocrypt 2026 accepted MPC/FHE papers.",
+    "duration_min": 120
+  },
+  {
+    "id": "S61",
+    "date": "2026-07-13",
+    "weekday": "Mon",
+    "week": 13,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "utt-rs: crate map + architecture",
+    "objectives": [
+      "Navigate utt-crypto / utt-protocol / utt-node",
+      "Identify public API surface",
+      "Map Rust types to UTT paper primitives",
+      "Set up cargo workspace locally"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "~/projects/thesis/Master Thesis/utt-rs — cargo metadata",
+        "time_min": 40
+      },
+      {
+        "type": "doc",
+        "ref": "utt-rs README + docs/",
+        "time_min": 40
+      },
+      {
+        "type": "paper",
+        "ref": "UTT 2022/452",
+        "time_min": 40
+      }
+    ],
+    "paper_refs": [
+      "utt-2022"
+    ],
+    "exercises": [
+      "Run cargo build + cargo test on utt-rs",
+      "Generate cargo doc and navigate",
+      "Draw the crate dependency graph"
+    ],
+    "sota_note": "Latest Tomescu commits to utt-rs (2025-2026).",
+    "duration_min": 120
+  },
+  {
+    "id": "S62",
+    "date": "2026-07-14",
+    "weekday": "Tue",
+    "week": 13,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "utt-crypto: Pedersen + Schnorr internals",
+    "objectives": [
+      "Walk Pedersen commit code",
+      "Walk Schnorr sigma protocols code",
+      "Identify constant-time issues",
+      "Benchmark critical paths"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "utt-rs/utt-crypto src/",
+        "time_min": 70
+      },
+      {
+        "type": "doc",
+        "ref": "curve25519-dalek / arkworks APIs",
+        "time_min": 30
+      },
+      {
+        "type": "exercise",
+        "ref": "Add cargo bench for Pedersen",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [
+      "utt-2022"
+    ],
+    "exercises": [
+      "Measure Pedersen commit perf for 1k ops",
+      "Document any non-constant-time code",
+      "Write a unit test for edge cases"
+    ],
+    "sota_note": "Check arkworks 0.5 breakage relevance.",
+    "duration_min": 120
+  },
+  {
+    "id": "S63",
+    "date": "2026-07-15",
+    "weekday": "Wed",
+    "week": 13,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "utt-protocol: coin / nullifier flow",
+    "objectives": [
+      "Read mint / transfer / burn code paths",
+      "Map to UTT paper equations",
+      "Identify where budget proofs live",
+      "Trace nullifier derivation"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "utt-rs/utt-protocol src/",
+        "time_min": 70
+      },
+      {
+        "type": "paper",
+        "ref": "UTT 2022/452 §3 + §4",
+        "time_min": 30
+      },
+      {
+        "type": "exercise",
+        "ref": "Write an integration test for transfer",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [
+      "utt-2022"
+    ],
+    "exercises": [
+      "Add a property test for nullifier uniqueness",
+      "Document coin struct invariants",
+      "Sketch how to port to Sui Move"
+    ],
+    "sota_note": "utt-rs protocol layer evolution 2025.",
+    "duration_min": 120
+  },
+  {
+    "id": "S64",
+    "date": "2026-07-16",
+    "weekday": "Thu",
+    "week": 13,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "utt-node: networking + BFT glue",
+    "objectives": [
+      "Walk utt-node main loop",
+      "Identify BFT abstractions",
+      "Map to Sui consensus (Mysticeti)",
+      "Assess what we reuse vs rewrite"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "utt-rs/utt-node src/",
+        "time_min": 60
+      },
+      {
+        "type": "doc",
+        "ref": "Sui Mysticeti whitepaper",
+        "time_min": 40
+      },
+      {
+        "type": "notes",
+        "ref": "advisor-summary.md",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "List what utt-node abstractions map cleanly to Sui",
+      "Identify 3 items to rewrite natively on Sui",
+      "Draft migration plan"
+    ],
+    "sota_note": "Mysticeti v2 updates (2025-2026).",
+    "duration_min": 120
+  },
+  {
+    "id": "S65",
+    "date": "2026-07-17",
+    "weekday": "Fri",
+    "week": 13,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "PoC scaffold: new crate credential-coin",
+    "objectives": [
+      "Create new Cargo workspace credential-coin",
+      "Wire fastcrypto + BLS12-381",
+      "Define Credential, Coin, Policy types",
+      "Add thiserror + zeroize + subtle"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "cargo new --lib credential-coin",
+        "time_min": 60
+      },
+      {
+        "type": "doc",
+        "ref": "fastcrypto README",
+        "time_min": 30
+      },
+      {
+        "type": "exercise",
+        "ref": "Write a skeleton lib.rs + tests",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "cargo build + cargo test on skeleton",
+      "Add CI stub (.github/workflows)",
+      "Commit scaffold"
+    ],
+    "sota_note": "fastcrypto 2025 API changes.",
+    "duration_min": 120
+  },
+  {
+    "id": "S66",
+    "date": "2026-07-20",
+    "weekday": "Mon",
+    "week": 14,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "PoC impl: BBS+ key gen + sign",
+    "objectives": [
+      "Implement BBS+ KeyGen on BLS12-381",
+      "Implement Sign for n attributes",
+      "Implement Verify",
+      "Unit tests + negative tests"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "credential-coin/bbs_plus.rs",
+        "time_min": 80
+      },
+      {
+        "type": "paper",
+        "ref": "Tessaro-Zhu 2023/275 (ref equations)",
+        "time_min": 25
+      },
+      {
+        "type": "exercise",
+        "ref": "Write 5 unit tests",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [
+      "tessaro-zhu-bbs-2023"
+    ],
+    "exercises": [
+      "cargo test passes on BBS+",
+      "Add test for signature forgery attempt",
+      "Benchmark sign/verify for 16 attrs"
+    ],
+    "sota_note": "draft-irtf-cfrg-bbs-signatures latest changes.",
+    "duration_min": 120
+  },
+  {
+    "id": "S67",
+    "date": "2026-07-21",
+    "weekday": "Tue",
+    "week": 14,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "PoC impl: BBS+ ZKPoK (selective disclosure)",
+    "objectives": [
+      "Implement prover ZKPoK",
+      "Implement verifier",
+      "Test disclosure of any subset",
+      "Measure proof size"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "credential-coin/bbs_plus_proof.rs",
+        "time_min": 85
+      },
+      {
+        "type": "paper",
+        "ref": "Tessaro-Zhu §4",
+        "time_min": 25
+      },
+      {
+        "type": "exercise",
+        "ref": "Fuzz proof verifier",
+        "time_min": 10
+      }
+    ],
+    "paper_refs": [
+      "tessaro-zhu-bbs-2023"
+    ],
+    "exercises": [
+      "Prove disclosure of attr 0 out of 16",
+      "Measure proof size vs disclosed count",
+      "Add property test for soundness"
+    ],
+    "sota_note": "Compare proof size against ref impl (Hyperledger AnonCreds v2).",
+    "duration_min": 120
+  },
+  {
+    "id": "S68",
+    "date": "2026-07-22",
+    "weekday": "Wed",
+    "week": 14,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "PoC impl: Pedersen + range proof bridge",
+    "objectives": [
+      "Add Pedersen commitments over BLS12-381",
+      "Bridge BBS+ signed value to Pedersen",
+      "Integrate a range proof library",
+      "Link coin value to credential attr"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "credential-coin/pedersen.rs",
+        "time_min": 70
+      },
+      {
+        "type": "doc",
+        "ref": "bulletproofs crate docs",
+        "time_min": 30
+      },
+      {
+        "type": "exercise",
+        "ref": "End-to-end integration test",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "End-to-end integration test: credential → committed coin",
+      "Range proof on coin value",
+      "Benchmark end-to-end path"
+    ],
+    "sota_note": "Evaluate bulletproofs crate vs arkworks bulletproofs.",
+    "duration_min": 120
+  },
+  {
+    "id": "S69",
+    "date": "2026-07-23",
+    "weekday": "Thu",
+    "week": 14,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "PoC impl: nullifier + spend proof",
+    "objectives": [
+      "Design nullifier derivation (hash + secret)",
+      "Implement spend proof (Schnorr-based)",
+      "Prevent double-spend logic",
+      "Test against known UTT patterns"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "credential-coin/spend.rs",
+        "time_min": 75
+      },
+      {
+        "type": "paper",
+        "ref": "UTT 2022/452 nullifier flow",
+        "time_min": 25
+      },
+      {
+        "type": "exercise",
+        "ref": "Double-spend test",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [
+      "utt-2022"
+    ],
+    "exercises": [
+      "Cargo test passes double-spend detection",
+      "Bench spend proof gen/verify",
+      "Document coin lifecycle state machine"
+    ],
+    "sota_note": "Sui Move object-model implications for nullifiers.",
+    "duration_min": 120
+  },
+  {
+    "id": "S70",
+    "date": "2026-07-24",
+    "weekday": "Fri",
+    "week": 14,
+    "phase": "P7",
+    "chapter": "rust",
+    "title": "PoC wrap-up: docs, bench, CI",
+    "objectives": [
+      "Write crate README + rustdoc",
+      "Finalize cargo bench baselines",
+      "Set up GitHub Actions CI",
+      "Tag v0.1.0"
+    ],
+    "materials": [
+      {
+        "type": "code",
+        "ref": "credential-coin README + docs",
+        "time_min": 50
+      },
+      {
+        "type": "exercise",
+        "ref": "cargo bench + tarpaulin coverage",
+        "time_min": 40
+      },
+      {
+        "type": "doc",
+        "ref": "GitHub Actions Rust template",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "README renders cleanly",
+      "CI is green",
+      "git tag v0.1.0 + commit"
+    ],
+    "sota_note": "rust-audit tooling (cargo-audit, cargo-deny) latest.",
+    "duration_min": 120
+  },
+  {
+    "id": "S71",
+    "date": "2026-07-27",
+    "weekday": "Mon",
+    "week": 15,
+    "phase": "P8",
+    "chapter": "synthesis",
+    "title": "Synthesis S1: advisor constraints + reread",
+    "objectives": [
+      "Reread advisor-summary.md end to end",
+      "List advisor's no-go zones (TEE lock-in, etc.)",
+      "Extract thesis scope boundaries",
+      "List 10 open questions"
+    ],
+    "materials": [
+      {
+        "type": "doc",
+        "ref": "advisor-summary.md (full)",
+        "time_min": 60
+      },
+      {
+        "type": "doc",
+        "ref": "project_advisor_insights memory",
+        "time_min": 30
+      },
+      {
+        "type": "notes",
+        "ref": "All prior research-log entries",
+        "time_min": 30
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Write a 1-page 'constraints' sheet",
+      "Mark each P1-P7 memo against constraints",
+      "List 10 open questions for advisor"
+    ],
+    "sota_note": "Check if advisor published new notes since 2026-03.",
+    "duration_min": 120
+  },
+  {
+    "id": "S72",
+    "date": "2026-07-28",
+    "weekday": "Tue",
+    "week": 15,
+    "phase": "P8",
+    "chapter": "synthesis",
+    "title": "Synthesis S2: thesis proposal outline",
+    "objectives": [
+      "Draft 3-page thesis proposal outline",
+      "Title + abstract + contributions",
+      "Background + related work",
+      "Approach + timeline"
+    ],
+    "materials": [
+      {
+        "type": "writing",
+        "ref": "thesis-proposal-outline.md",
+        "time_min": 80
+      },
+      {
+        "type": "doc",
+        "ref": "All P1-P7 memos",
+        "time_min": 25
+      },
+      {
+        "type": "notes",
+        "ref": "advisor constraints sheet",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Commit thesis-proposal-outline.md v0.1",
+      "Identify 5 risk items",
+      "Share to advisor for async feedback"
+    ],
+    "sota_note": "Mysten Labs ongoing thesis topics (public blog).",
+    "duration_min": 120
+  },
+  {
+    "id": "S73",
+    "date": "2026-07-29",
+    "weekday": "Wed",
+    "week": 15,
+    "phase": "P8",
+    "chapter": "synthesis",
+    "title": "Synthesis S3: threat model + security analysis",
+    "objectives": [
+      "Write thesis threat model",
+      "Assumptions (TEE, issuer, network)",
+      "Formal security goals",
+      "Sketch proofs per goal"
+    ],
+    "materials": [
+      {
+        "type": "writing",
+        "ref": "threat-model.md",
+        "time_min": 75
+      },
+      {
+        "type": "notes",
+        "ref": "P3 TEE memo + P1 credential memo",
+        "time_min": 30
+      },
+      {
+        "type": "paper",
+        "ref": "SoK Privacy-Preserving TX — attack taxonomy",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [
+      "sok-privacy-tx"
+    ],
+    "exercises": [
+      "Commit threat-model.md v0.1",
+      "List proof obligations",
+      "List simulator strategies"
+    ],
+    "sota_note": "Any new formal methods results for anon creds (2025-2026).",
+    "duration_min": 120
+  },
+  {
+    "id": "S74",
+    "date": "2026-07-30",
+    "weekday": "Thu",
+    "week": 15,
+    "phase": "P8",
+    "chapter": "synthesis",
+    "title": "Synthesis S4: experiment plan + roadmap",
+    "objectives": [
+      "Define evaluation metrics",
+      "Design benchmarks (proof size, time, TPS)",
+      "Define baseline systems",
+      "Draft 6-month implementation roadmap"
+    ],
+    "materials": [
+      {
+        "type": "writing",
+        "ref": "experiment-plan.md",
+        "time_min": 75
+      },
+      {
+        "type": "notes",
+        "ref": "P7 PoC notes",
+        "time_min": 25
+      },
+      {
+        "type": "doc",
+        "ref": "Sui testnet specs",
+        "time_min": 20
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Commit experiment-plan.md v0.1",
+      "Identify 3 risk-reduction experiments",
+      "Draft Gantt for Sept 2026 - Mar 2027"
+    ],
+    "sota_note": "Mysticeti / Walrus benchmarks (2025-2026).",
+    "duration_min": 120
+  },
+  {
+    "id": "S75",
+    "date": "2026-07-31",
+    "weekday": "Fri",
+    "week": 15,
+    "phase": "P8",
+    "chapter": "synthesis",
+    "title": "Synthesis S5: final package + advisor packet",
+    "objectives": [
+      "Merge all memos into thesis proposal v1",
+      "Write 1-page executive summary",
+      "Prepare slide deck outline",
+      "Schedule advisor meeting"
+    ],
+    "materials": [
+      {
+        "type": "writing",
+        "ref": "thesis-proposal-v1.md",
+        "time_min": 75
+      },
+      {
+        "type": "writing",
+        "ref": "executive-summary.md + slides outline",
+        "time_min": 30
+      },
+      {
+        "type": "doc",
+        "ref": "All prior memos + research-log",
+        "time_min": 15
+      }
+    ],
+    "paper_refs": [],
+    "exercises": [
+      "Commit thesis-proposal-v1.md",
+      "Push everything to GitHub",
+      "Email advisor a packet link"
+    ],
+    "sota_note": "Plan the first Mysten onboarding meeting agenda.",
+    "duration_min": 120
+  }
+]
