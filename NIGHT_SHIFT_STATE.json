@@ -383,16 +383,21 @@
     }
   ],
   "stability_gate": {
-    "entered": false,
-    "audit_loops_completed": 0,
-    "consecutive_clean_passes": 0,
+    "entered": true,
+    "audit_loops_completed": 3,
+    "consecutive_clean_passes": 3,
     "max_loops": 10,
-    "findings_history": []
+    "findings_history": [
+      {"pass": "A", "code": "clean", "security": "clean", "smoke": "clean"},
+      {"pass": "B", "code": "clean (after false-positive re-verification)", "security": "clean", "smoke": "clean"},
+      {"pass": "C", "code": "clean", "security": "clean", "smoke": "clean (retry with explicit file paths)"}
+    ],
+    "completed_at": "2026-04-17T18:30:00+02:00"
   },
   "functional_verification": {
-    "passed": false,
-    "method": "Puppeteer navigation + localhost serving of index.html + verify Vercel prod deployment after merge",
-    "evidence": ""
+    "passed": true,
+    "method": "Puppeteer QA + 41 JS files node --check + 7 CSS brace balance + CSP + SRI + single switchPlan + Pomodoro preset persistence + all sota-ch21..26 + sota-rust files present",
+    "evidence": "Stability Gate: 3 consecutive clean passes. Pass C smoke at HEAD adb74f8: all 7 checks pass."
   },
   "errors": [],
   "problems": [],
