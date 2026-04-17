@@ -90,3 +90,17 @@ Categories: UNCERTAINTY · ASSUMPTION · BLOCKED · UNFIXED · TEST GAP · DEPEN
 - **What I did**: Used short slugs derived from the `name:` fields in ch*-papers-guide.js (e.g. `tessaro-zhu-bbs-2023`, `utt-2022`, `bulletproofs-plus-plus`). These are internal refs; the site's paper cards use the full `name:` string. No external BibTeX DB is referenced.
 - **Confidence**: HIGH
 - **User action needed**: If you want these slugs to map to a formal BibTeX db or a paper-refs lookup, extend with a second pass.
+
+### BLOCKED: skill.md write outside worktree sandbox (T17)
+- **Iteration**: 1
+- **File**: `~/.claude/skills/morning-thesis-addon/skill.md`
+- **What I needed**: Write access to `~/.claude/skills/morning-thesis-addon/` (outside the git worktree)
+- **What I did**: The agent sandbox denies Write tool calls to paths outside the worktree root. The full skill.md content is included in the T17 task output — copy it manually.
+- **Confidence**: HIGH
+- **User action needed**: Run the following to install the skill:
+  ```
+  mkdir -p ~/.claude/skills/morning-thesis-addon
+  # Then paste the content from the T17 agent output into:
+  # ~/.claude/skills/morning-thesis-addon/skill.md
+  ```
+  The complete skill.md content is in the T17 night-shift agent final message.
