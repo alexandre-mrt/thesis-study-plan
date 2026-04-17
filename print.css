@@ -1,0 +1,185 @@
+/**
+ * print.css — Clean print stylesheet for the Thesis Study Plan.
+ *
+ * Two activation modes:
+ *   1. @media print  — browser Cmd+P / print dialog (always active)
+ *   2. html.print-only — activated programmatically when ?print=session-<id>
+ *      is processed by JS (sets document.documentElement.classList.add('print-only'))
+ *
+ * Goal: A4, 1.5cm margins, black on white, no UI chrome.
+ */
+
+/* ── Shared rules (applied in both print media and .print-only class) ── */
+
+@media print {
+  /* A4 page setup */
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+
+  /* Force white background and black text throughout */
+  *,
+  *::before,
+  *::after {
+    background: #fff !important;
+    color: #111 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide all interactive and navigation chrome */
+  .nav,
+  .day-tabs,
+  .progress-indicator,
+  .pomodoro-compact,
+  .pomodoro-panel,
+  .search-container,
+  .mobile-menu-btn,
+  .lexicon-toggle,
+  .global-view-toggle,
+  footer,
+  button,
+  video,
+  .yt-thumbnail,
+  .youtube-lite,
+  .yt-play-btn,
+  .view-toggle,
+  .paper-check-row,
+  .paper-chevron,
+  .whats-new-badge {
+    display: none !important;
+  }
+
+  /* Show only the currently-active section */
+  .day-section {
+    display: none !important;
+  }
+
+  .day-section.active {
+    display: block !important;
+  }
+
+  /* Expand paper cards and resource cards for print */
+  .paper-card {
+    border: 1px solid #ccc !important;
+    border-left: 3px solid #333 !important;
+    page-break-inside: avoid;
+    margin-bottom: 16px;
+  }
+
+  .paper-body {
+    max-height: none !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    padding: 0 12px 12px !important;
+  }
+
+  .paper-card.open .paper-body {
+    max-height: none !important;
+  }
+
+  /* Keep KaTeX math visible */
+  .katex,
+  .katex-html,
+  .katex-display {
+    display: inline !important;
+    color: #111 !important;
+  }
+
+  /* Monospace for code blocks and pre elements */
+  pre,
+  code,
+  .concept-diagram,
+  .font-mono {
+    font-family: 'JetBrains Mono', 'Courier New', Courier, monospace !important;
+    font-size: 0.8rem !important;
+    background: #f5f5f5 !important;
+    color: #111 !important;
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* Links: show URL inline */
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.7rem;
+    color: #555 !important;
+  }
+
+  /* Suppress URL display for internal anchors */
+  a[href^="#"]::after {
+    content: '';
+  }
+
+  /* Headings */
+  h1, h2, h3 {
+    page-break-after: avoid;
+    color: #000 !important;
+  }
+
+  /* Reading-time and prereq badges: visible but minimal */
+  .reading-time,
+  .paper-status-badge,
+  .paper-relevance-badge {
+    border: 1px solid #999 !important;
+    background: none !important;
+    color: #333 !important;
+  }
+
+  .prereqs {
+    border: 1px solid #ddd !important;
+    background: #fafafa !important;
+  }
+
+  .prereqs-label,
+  .prereq-link {
+    color: #333 !important;
+    border-color: #bbb !important;
+  }
+}
+
+/* ── .print-only mode: same rules applied outside of @media print ──
+   Activated when JS sets document.documentElement.classList.add('print-only')
+   e.g. in response to ?print=session-<id> query param. ── */
+
+html.print-only .nav,
+html.print-only .day-tabs,
+html.print-only .progress-indicator,
+html.print-only .pomodoro-compact,
+html.print-only .pomodoro-panel,
+html.print-only .search-container,
+html.print-only .mobile-menu-btn,
+html.print-only .lexicon-toggle,
+html.print-only .global-view-toggle,
+html.print-only footer,
+html.print-only button,
+html.print-only video,
+html.print-only .yt-thumbnail,
+html.print-only .youtube-lite,
+html.print-only .yt-play-btn,
+html.print-only .view-toggle,
+html.print-only .paper-check-row,
+html.print-only .paper-chevron,
+html.print-only .whats-new-badge {
+  display: none !important;
+}
+
+html.print-only .day-section {
+  display: none !important;
+}
+
+html.print-only .day-section.active {
+  display: block !important;
+}
+
+html.print-only .paper-body {
+  max-height: none !important;
+  opacity: 1 !important;
+  overflow: visible !important;
+  padding: 0 12px 12px !important;
+}

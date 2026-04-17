@@ -12,6 +12,18 @@ const STORAGE_KEYS = {
 
 const CHAPTER_KEYS = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'ch26', 'rust', 'method', 'flashcards'];
 
+/*
+ * RECENT_LOG_IDS — paper ids that appear in research-log entries from the last 7 days.
+ * Seeded manually; regenerate via scripts/weekly-update.sh or fetch research-log/index.json
+ * when that file exists.
+ * Last updated: 2026-04-17
+ */
+const RECENT_LOG_IDS = [
+  'tessaro-zhu-bbs-2023',
+  'saac-2025',
+  'zk-creds-2022',
+];
+
 const POMODORO = {
   WORK_SECONDS: 25 * 60,
   BREAK_SECONDS: 5 * 60,
@@ -57,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderStudyGuides();
   if (typeof renderPaperGuides === 'function') {
-    renderPaperGuides();
+    renderPaperGuides(RECENT_LOG_IDS);
   }
   if (typeof initConceptSearch === 'function') {
     initConceptSearch();

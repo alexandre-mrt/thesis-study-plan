@@ -1225,3 +1225,80 @@ body {
   color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
+
+/* === Paper Card UX Additions (T13) === */
+
+/* Reading-time pill — appears in .paper-badges alongside status/relevance badges */
+.reading-time {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+/* Prerequisites block — shown inside the intuitive-content panel */
+.prereqs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+.prereqs-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.prereq-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.prereq-link:hover {
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.25);
+  text-decoration: underline;
+}
+
+/* "What's New" badge — absolute-positioned top-right of .paper-card */
+.paper-card {
+  position: relative;
+}
+
+.whats-new-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #10B981;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  z-index: 2;
+  pointer-events: none;
+  text-transform: uppercase;
+}

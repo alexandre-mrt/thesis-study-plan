@@ -54,6 +54,20 @@ const PAPER_TECH_DATA = {
 window.PAPER_GUIDE_DATA = PAPER_GUIDE_DATA;
 window.PAPER_TECH_DATA = PAPER_TECH_DATA;
 
+/* === Find Paper by ID (cross-chapter lookup for prereq links) === */
+
+function findPaperById(paperId) {
+  const chapterKeys = Object.keys(PAPER_GUIDE_DATA);
+  for (let i = 0; i < chapterKeys.length; i++) {
+    const getter = PAPER_GUIDE_DATA[chapterKeys[i]];
+    const guide = getter ? getter() : null;
+    if (!guide || !guide.papers) continue;
+    const found = guide.papers.find((p) => p.id === paperId);
+    if (found) return found;
+  }
+  return null;
+}
+
 /* === State Persistence === */
 
 function loadPaperGuideState() {
@@ -144,6 +158,32 @@ function buildPaperIntuitiveContent(paper) {
       '<span class="thesis-example-label">Applied to your thesis</span>' +
       '<p>' + escapeHtml(paper.thesisExample) + '</p>';
     container.appendChild(example);
+  }
+
+  /* Prerequisites block — only rendered when prerequisites array is non-empty */
+  if (paper.prerequisites && paper.prerequisites.length > 0) {
+    const prereqDiv = document.createElement('div');
+    prereqDiv.className = 'prereqs';
+
+    const label = document.createElement('span');
+    label.className = 'prereqs-label';
+    label.textContent = 'Prerequisites:';
+    prereqDiv.appendChild(label);
+
+    paper.prerequisites.forEach((prereqId) => {
+      /* Look up a known paper by id across all loaded chapter guides */
+      const resolved = findPaperById(prereqId);
+      const link = document.createElement('a');
+      link.href = '#paper-' + prereqId;
+      link.textContent = resolved ? resolved.name : prereqId;
+      link.className = 'prereq-link';
+      if (resolved) {
+        link.title = 'Jump to: ' + resolved.name;
+      }
+      prereqDiv.appendChild(link);
+    });
+
+    container.appendChild(prereqDiv);
   }
 
   return container;
@@ -260,7 +300,7 @@ function buildPaperHeader(paper, cardKey, card, savedState) {
 
 /* === Build Paper Card === */
 
-function buildPaperCard(paper, techPaper, chapterKey, paperIdx, savedState, viewState, checkedState) {
+function buildPaperCard(paper, techPaper, chapterKey, paperIdx, savedState, viewState, checkedState, recentLogIds) {
   const cardKey = chapterKey + '-p' + paperIdx;
   const dayColor = CHAPTER_COLORS[chapterKey] || CHAPTER_COLORS.ch21;
 
@@ -269,6 +309,18 @@ function buildPaperCard(paper, techPaper, chapterKey, paperIdx, savedState, view
   card.style.setProperty('--day-color', dayColor);
   card.dataset.chapterKey = chapterKey;
   card.dataset.paperIdx = String(paperIdx);
+  /* Set paper id as data attribute for anchor targeting */
+  if (paper.id) {
+    card.id = 'paper-' + paper.id;
+  }
+
+  /* "What's New" badge — shown when paper id appears in recent research logs */
+  if (paper.id && Array.isArray(recentLogIds) && recentLogIds.indexOf(paper.id) !== -1) {
+    const newBadge = document.createElement('span');
+    newBadge.className = 'whats-new-badge';
+    newBadge.textContent = 'NEW';
+    card.appendChild(newBadge);
+  }
 
   const header = buildPaperHeader(paper, cardKey, card, savedState);
   card.appendChild(header);
@@ -409,13 +461,16 @@ window.navigateToPaper = function navigateToPaper(chapterKey, paperIdx) {
 
 /* === Main Render Entry Point === */
 
-function renderPaperGuides() {
+function renderPaperGuides(recentLogIds) {
   const containers = document.querySelectorAll('.paper-guide-container[data-chapter]');
   if (containers.length === 0) return;
 
   const savedState = loadPaperGuideState();
   const viewState = loadViewToggleState();
   const checkedState = loadPaperCheckedState();
+
+  /* Default to empty array when caller does not supply recent IDs */
+  const logIds = Array.isArray(recentLogIds) ? recentLogIds : [];
 
   containers.forEach((container) => {
     const chapterKey = container.dataset.chapter;
@@ -439,7 +494,7 @@ function renderPaperGuides() {
     guide.papers.forEach((paper, idx) => {
       const techPaper = findTechPaper(techData, paper.name);
       const card = buildPaperCard(
-        paper, techPaper, chapterKey, idx, savedState, viewState, checkedState
+        paper, techPaper, chapterKey, idx, savedState, viewState, checkedState, logIds
       );
       section.appendChild(card);
     });
