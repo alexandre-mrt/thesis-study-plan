@@ -6,6 +6,35 @@ Categories: UNCERTAINTY · ASSUMPTION · BLOCKED · UNFIXED · TEST GAP · DEPEN
 
 ---
 
+### ASSUMPTION: today CSS class name discrepancy (T9 — plan.js)
+- **Iteration**: 1
+- **File**: plan.js (renderCell), plan.css:373
+- **What I needed**: Task spec says class `plan-session--today`, but plan.css (T10) defines `.plan-cell.today`
+- **What I did**: Used `.today` (matches actual plan.css). The spec's `plan-session--today` appears to be a draft name that T10 changed. Current impl is correct against the actual CSS.
+- **Confidence**: HIGH
+- **User action needed**: None unless T11 changes the CSS class — verify `.plan-cell.today` is still the right selector.
+
+### ASSUMPTION: synthesis chapter CSS tint (T9 — plan.js)
+- **Iteration**: 1
+- **File**: plan.js:21 (CHAPTER_DATA_ATTR), plan.css:392-398
+- **What I needed**: A `data-chapter="synthesis"` CSS rule in plan.css
+- **What I did**: plan.css has no rule for synthesis. Mapped `synthesis` -> `ch26` (purple) as fallback.
+- **Confidence**: MEDIUM
+- **User action needed**: Add `.plan-cell[data-chapter="synthesis"] { --chapter-color: var(--color-ch25); }` (or any color) to plan.css if synthesis sessions need a distinct tint.
+
+### UNCERTAINTY: Sui Confidential Transactions design doc not yet published
+- **Iteration**: 1
+- **File**: ch26-papers-guide.js, ch26-papers-technical.js
+- **What I needed**: The actual Mysten Labs design document for Sui confidential transactions
+- **What I did**: Based the technical content on (a) UTT paper which Mysten co-authored,
+  (b) Aptos Confidential Asset design (similar architecture), and (c) Mysten Labs
+  public communications. Marked with NIGHT-SHIFT-REVIEW in ch26-papers-technical.js
+  formalDefinition block for the Sui Confidential Transactions paper.
+- **Confidence**: MEDIUM
+- **User action needed**: When the Mysten Labs design doc is published, update
+  ch26-papers-guide.js (venue field currently "TBD") and ch26-papers-technical.js
+  (formalDefinition and mathDetails for Sui Confidential Transactions paper).
+
 ## Template for entries
 ```
 ### <CATEGORY>: <short title>
