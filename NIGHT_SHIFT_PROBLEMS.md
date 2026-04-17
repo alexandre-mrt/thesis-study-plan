@@ -44,3 +44,33 @@ Categories: UNCERTAINTY · ASSUMPTION · BLOCKED · UNFIXED · TEST GAP · DEPEN
 - **What I did**: Used well-established canonical URLs (openfhe.org, github.com/zama-ai/tfhe-rs, github.com/microsoft/SEAL, github.com/data61/MP-SPDZ, rfc-editor.org/rfc/rfc9591, microsoft.github.io/Picnic, security.apple.com/blog/contact-key-verification, eprint.iacr.org canonical paper IDs). The specific ePrint IDs for Pianissimo (2024/429), Silent-OT update (2024/1079), DKLs (2023/765), Groth DKG (2021/005), PVSS (2021/339) are based on prior knowledge and may need a manual check.
 - **Confidence**: MEDIUM
 - **User action needed**: Spot-check ePrint IDs before pushing to prod site.
+
+### ASSUMPTION: study plan end date is Fri 2026-07-31 (not Sat 2026-08-01)
+- **Iteration**: 1 (T1 plan)
+- **File**: study-plan/sessions.json
+- **What I needed**: Clarify end date — the spec said "ends Fri 2026-08-01", but 2026-08-01 is a Saturday.
+- **What I did**: Stopped at the last weekday before 2026-08-01 inclusive, i.e. Fri 2026-07-31. That yields exactly 75 weekdays starting 2026-04-20 → 15 weeks × 5 weekdays, matching the session count.
+- **Confidence**: HIGH
+- **User action needed**: Confirm — the 75-session arithmetic only works with 2026-07-31 as the final session; 2026-08-01 would need 76 sessions or a weekend entry.
+
+### ASSUMPTION: Ch 2.4 SOTA date/status claims (T5)
+- **Iteration**: 1
+- **File**: sota-ch24.js
+- **What I needed**: live confirmation of 2025-2026 project statuses
+- **What I did**: Wrote 12 entries with architecture/math claims at HIGH confidence; status dates at MEDIUM. All 12 `link:` URLs HTTP-200 verified (curl -L). Dates to spot-check before citing in thesis:
+  - Penumbra mainnet 2024-07-30 (used project root link, not specific blog post which 404'd)
+  - Namada "shielded rewards" live 2024-12 (used MASP circuits blog post as link)
+  - Bitcoin Core PR numbers (#28122, #30108) for BIP 352 scanning — best-effort recall
+  - Monero FCMP++ "targeted for 2026 hard fork" — community target, not scheduled
+  - Roman Storm conviction/sentencing claims — reflect public reporting
+  - Solana Confidential Mint / Balances 2025 dates — based on solana-program.com docs URL
+- **Confidence**: MEDIUM on dates, HIGH on architecture/math/links
+- **User action needed**: Spot-check the 2-3 most recent dates before citing in thesis chapter
+
+### ASSUMPTION: ePrint IDs used as `paper_refs` slugs (T1 plan)
+- **Iteration**: 1 (T1 plan)
+- **File**: study-plan/sessions.json
+- **What I needed**: A canonical paper ID scheme.
+- **What I did**: Used short slugs derived from the `name:` fields in ch*-papers-guide.js (e.g. `tessaro-zhu-bbs-2023`, `utt-2022`, `bulletproofs-plus-plus`). These are internal refs; the site's paper cards use the full `name:` string. No external BibTeX DB is referenced.
+- **Confidence**: HIGH
+- **User action needed**: If you want these slugs to map to a formal BibTeX db or a paper-refs lookup, extend with a second pass.
