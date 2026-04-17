@@ -1064,17 +1064,52 @@ body {
 
 /* === Responsive: Tablet === */
 @media (max-width: 768px) {
+  html, body { overflow-x: hidden; }
   :root { --nav-height: auto; }
-  .nav { height: auto; padding: 12px 0; position: sticky; }
-  .nav-inner { flex-wrap: wrap; gap: 10px; padding: 0 16px; }
-  .nav-left { flex-wrap: wrap; gap: 10px; width: 100%; }
-  .nav-title { font-size: 14px; }
-  .nav-right { width: 100%; justify-content: space-between; }
-  .nav.collapsed .nav-left { display: flex; }
-  .nav.collapsed .day-tabs, .nav.collapsed .nav-right { display: none; }
-  .nav.collapsed .mobile-menu-btn { display: flex; }
+  .nav { height: auto; padding: 10px 0; position: sticky; }
+  /* Right padding leaves room for the absolutely-positioned hamburger button */
+  .nav-inner { flex-wrap: wrap; gap: 8px; padding: 0 52px 0 16px; }
+  /* nav-left: no flex-wrap so title stays left and tabs scroll in one row */
+  .nav-left { flex-wrap: nowrap; gap: 8px; width: 100%; min-width: 0; align-items: center; }
+  .nav-title { font-size: 14px; white-space: nowrap; flex-shrink: 0; }
+
+  /* Chapter tabs: always visible, horizontally scrollable with scroll-snap */
+  .day-tabs {
+    display: flex !important;   /* override any collapsed/expanded display:none */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;      /* Firefox */
+    gap: 4px;
+    padding: 4px 0;
+    /* Fade gradient on right edge as scroll affordance */
+    -webkit-mask-image: linear-gradient(90deg, black 85%, transparent 100%);
+    mask-image: linear-gradient(90deg, black 85%, transparent 100%);
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+
+  /* Each tab: fixed size, never shrinks, scroll-snaps */
+  .day-tab {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  /* Hamburger button: always visible on mobile */
   .mobile-menu-btn { display: flex; }
-  .nav.expanded .day-tabs, .nav.expanded .nav-right { display: flex; }
+
+  /* nav-right and search: hidden in collapsed state (default), shown when expanded */
+  .nav-right { display: none; width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .search-container { display: none; margin: 0; width: 100%; }
+
+  .nav.expanded .nav-right { display: flex; }
+  .nav.expanded .search-container { display: flex; }
+
+  /* Misc layout fixes (kept from original) */
   .progress-bar-wrap { width: 80px; }
   .main { padding: 20px 16px 60px; }
   .day-title { font-size: 24px; }
@@ -1085,18 +1120,17 @@ body {
   .shortcuts-hint { display: none; }
   .concept-diagram { font-size: 11px; padding: 12px; }
   .connections-summary { font-size: 13px; }
-  .search-container { margin: 0 0.5rem; width: 100%; }
   .concept-search { width: 100%; }
   .concept-search:focus { width: 100%; }
   .search-results { min-width: 280px; }
   .search-kbd-hint { display: none; }
-  .nav.collapsed .search-container { display: none; }
 }
 
 /* === Responsive: Small Mobile === */
 @media (max-width: 480px) {
-  .day-tabs { width: 100%; justify-content: space-between; }
-  .day-tab { flex: 1; justify-content: center; padding: 6px 8px; font-size: 12px; }
+  /* Tabs scroll horizontally — do NOT set flex:1 or justify-content:space-between
+     (those would squeeze tabs and cause overflow at 375px) */
+  .day-tab { padding: 10px 10px; font-size: 11px; }
   .day-title { font-size: 20px; }
   .block-title { font-size: 17px; }
 }
