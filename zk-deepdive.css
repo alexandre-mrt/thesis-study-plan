@@ -466,6 +466,22 @@ ol.zk-list li::before {
   -webkit-overflow-scrolling: touch;
 }
 
+.zk-dd-diagram-mermaid {
+  background: #0a0a0a;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  min-height: 80px;
+}
+
+.zk-dd-diagram-mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* === Public/Private Table in Deep Dive === */
 .zk-pp-section {
   margin: 20px 0;
