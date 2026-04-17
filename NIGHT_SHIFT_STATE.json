@@ -6,7 +6,7 @@
     "started_at": "2026-04-17T16:45:00+02:00",
     "iteration": 2,
     "total_tasks": 18,
-    "completed_tasks": 9,
+    "completed_tasks": 10,
     "mission": "Transform thesis-study-plan into full 15-week (75 sessions \u00d7 2h = 150h) thesis prep program with SOTA content, Plan tab, weekly research loop, morning briefing integration. See NIGHT_SHIFT_THESIS_PREP_SPEC.md.",
     "window": "2026-04-20 to 2026-08-01",
     "cadence": "weekdays, 10h/week, 2h/session"
@@ -52,7 +52,7 @@
       "id": "T3",
       "title": "SOTA content: Ch 2.2 Confidential TX + Bulletproofs++",
       "description": "Create sota-ch22.js: Bulletproofs++, Flashproofs refinements, Binius range proofs, ElGamal veiled TX (Aptos 2024). Same structure as T2.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": 1,
       "depends_on": [],
       "parallel_group": "A",
@@ -63,7 +63,7 @@
       ],
       "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:15:00+02:00"
     },
     {
       "id": "T4",
