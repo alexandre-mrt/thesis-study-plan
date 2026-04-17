@@ -316,9 +316,22 @@ body {
   padding: 8px 24px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 12px;
 }
+
+.sub-header-tabs {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+}
+
+.sub-header-tabs::-webkit-scrollbar { display: none; }
+
+.sub-header-tabs .day-tab { flex-shrink: 0; }
 
 /* === Bottom bar (pomodoro compact + global progress) === */
 .bottom-bar {

@@ -29,10 +29,6 @@
       <div class="nav-left">
         <span class="nav-title">Thesis Prep</span>
         <div class="day-tabs" role="tablist">
-          <button class="day-tab" data-day="flashcards" role="tab" aria-selected="false" aria-controls="flashcards">
-            <span class="day-tab-dot" style="background: #6366F1"></span>
-            &#x1F3B4; Flashcards
-          </button>
           <button class="day-tab active" data-day="ch21" role="tab" aria-selected="true" aria-controls="ch-21">
             <span class="day-tab-dot" style="background: var(--color-ch21)"></span>
             Ch 2.1
@@ -65,10 +61,6 @@
             <span class="day-tab-dot" style="background: #F43F5E"></span>
             Method
           </button>
-          <button class="day-tab" data-day="plan" role="tab" aria-selected="false" aria-controls="plan-section-wrap">
-            <span class="day-tab-dot" style="background: #6366F1"></span>
-            &#128197; Plan
-          </button>
           <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
             <span class="day-tab-dot" style="background: #8B5CF6"></span>
             ZK Deep Dive
@@ -86,9 +78,19 @@
     </div>
   </nav>
 
-  <!-- Sub-header: mode toggle just below nav -->
+  <!-- Sub-header: extra tabs (Plan, Flashcards) + mode toggle just below nav -->
   <div class="sub-header">
     <div class="sub-header-inner">
+      <div class="sub-header-tabs" role="tablist">
+        <button class="day-tab" data-day="plan" role="tab" aria-selected="false" aria-controls="plan-section-wrap">
+          <span class="day-tab-dot" style="background: #6366F1"></span>
+          &#128197; Plan
+        </button>
+        <button class="day-tab" data-day="flashcards" role="tab" aria-selected="false" aria-controls="flashcards">
+          <span class="day-tab-dot" style="background: #6366F1"></span>
+          &#x1F3B4; Flashcards
+        </button>
+      </div>
       <div class="global-view-toggle" id="global-view-toggle">
         <span class="global-view-label">Mode</span>
         <button class="global-view-btn active" data-view="intuitive">Intuitive</button>
