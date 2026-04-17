@@ -4,9 +4,9 @@
     "project": "thesis-study-plan",
     "branch": "feat/night-shift-2026-04-17-plan-sota",
     "started_at": "2026-04-17T16:45:00+02:00",
-    "iteration": 5,
+    "iteration": 6,
     "total_tasks": 19,
-    "completed_tasks": 16,
+    "completed_tasks": 18,
     "mission": "Transform thesis-study-plan into full 15-week (75 sessions \u00d7 2h = 150h) thesis prep program with SOTA content, Plan tab, weekly research loop, morning briefing integration. See NIGHT_SHIFT_THESIS_PREP_SPEC.md.",
     "window": "2026-04-20 to 2026-08-01",
     "cadence": "weekdays, 10h/week, 2h/session"
@@ -239,7 +239,7 @@
       "id": "T13",
       "title": "UX heuristics: readingMinutes + prerequisite links + print stylesheet",
       "description": "Add readingMinutes field across existing study cards (estimate from word count). Add 'prerequisites' field on paper cards with links to other concepts. Create print.css for ?print=session-<id> single-session A4 sheet. Add 'What's new' badge reading from research-log entries of last 7 days.",
-      "status": "pending",
+      "status": "completed",
       "priority": 2,
       "depends_on": [
         "T11"
@@ -253,15 +253,15 @@
         "app.js",
         "print.css"
       ],
-      "iterations_attempted": 0,
+      "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:30:00+02:00"
     },
     {
       "id": "T14",
       "title": "UX heuristics: smart search + weekly review modal + dual Pomodoro",
       "description": "Update search.js: boost recent results (from research-log timestamps), show chapter+phase alongside. Add weekly-review modal auto-opening Fridays with 10-min checklist. Add 50/10 Pomodoro preset for Plan tab (keep existing 25/5 for chapters).",
-      "status": "pending",
+      "status": "completed",
       "priority": 2,
       "depends_on": [
         "T11"
@@ -274,9 +274,9 @@
         "app.js",
         "index.html"
       ],
-      "iterations_attempted": 0,
+      "iterations_attempted": 1,
       "blocked_reason": null,
-      "completed_at": null
+      "completed_at": "2026-04-17T17:32:00+02:00"
     },
     {
       "id": "T15",
