@@ -452,6 +452,99 @@ window.CH25_PAPERS = {
         "The fundamental engine of modern SNARKs. Converts exponential " +
         "sums to linear-round interactive proofs. Powers Spartan, HyperNova, " +
         "Jolt — the exact tools used in the thesis folding pipeline."
+    },
+
+    /* ── Paper 6: Lattice-Based Cryptography ── */
+    {
+      name: "Lattice-Based Cryptography: From LWE to Post-Quantum ZK",
+      authors: "Regev (2005), Lyubashevsky (2012), Beullens & Seiler (LaBRADOR, 2023)",
+      venue: "STOC 2005 (LWE), EUROCRYPT 2012 (Fiat-Shamir for lattices), CRYPTO 2023 (LaBRADOR), CRYPTO 2024 (Greyhound)",
+      status: "queued",
+      relevance: "future-work",
+      analogy:
+        "Imagine a grid of evenly spaced points stretching to infinity — like " +
+        "an infinite sheet of graph paper in hundreds of dimensions. Lattice " +
+        "cryptography works because two simple operations become impossibly " +
+        "hard in high dimensions: (1) finding the closest grid point to an " +
+        "arbitrary target, and (2) finding a short combination of grid vectors " +
+        "that sums to a specific result. The beauty is that quantum computers, " +
+        "which shatter RSA and pairings via Shor's algorithm, gain essentially " +
+        "no advantage against lattice problems. This makes lattices the only " +
+        "known foundation that supports encryption, signatures, ZK proofs, " +
+        "AND fully homomorphic encryption — all post-quantum secure.",
+      diagram:
+        '┌────────────────────────────────────────────────────────────┐\n' +
+        '│        Lattice-Based Cryptography — Thesis Relevance       │\n' +
+        '├────────────────────────────────────────────────────────────┤\n' +
+        '│                                                            │\n' +
+        '│  HARD PROBLEMS                                             │\n' +
+        '│  LWE:  b = A·s + e (mod q)      → find secret s           │\n' +
+        '│  SIS:  A·x = 0 (mod q)           → find short x           │\n' +
+        '│  Module variants: matrices over Z_q[X]/(X^n+1)            │\n' +
+        '│                                                            │\n' +
+        '│  NIST STANDARDS (Aug 2024)                                 │\n' +
+        '│  FIPS 203: ML-KEM (Kyber)    → key encapsulation          │\n' +
+        '│  FIPS 204: ML-DSA (Dilithium) → digital signatures        │\n' +
+        '│  FIPS 205: SLH-DSA (SPHINCS+) → hash-based signatures     │\n' +
+        '│                                                            │\n' +
+        '│  ZK PROOFS (research frontier)                             │\n' +
+        '│  Labrador (CRYPTO 2024) — first practical lattice SNARK    │\n' +
+        '│  Greyhound (2024) — improved structured commitments        │\n' +
+        '│  Proof size: ~50-100 KB (vs 288 B for Groth16)            │\n' +
+        '│                                                            │\n' +
+        '│  THESIS: pairing-based now → lattice-based future work     │\n' +
+        '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  LP["Lattice Hard Problems<br/>LWE + SIS"]\n' +
+        '  LP --> NIST["NIST Standards (2024)<br/>ML-KEM, ML-DSA, SLH-DSA"]\n' +
+        '  LP --> ZK["Post-Quantum ZK<br/>Labrador, Greyhound"]\n' +
+        '  LP --> FHE["FHE Schemes<br/>CKKS, BFV, BGV, TFHE"]\n' +
+        '  ZK --> THESIS["Thesis Migration Path<br/>Groth16 → Labrador<br/>BBS+ → Lattice credentials"]\n' +
+        '  NIST --> THESIS\n' +
+        '  classDef proofsystem fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef prover fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef verifier fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  class LP proofsystem\n' +
+        '  class NIST,ZK,FHE prover\n' +
+        '  class THESIS verifier',
+      keyPoints: [
+        "Post-quantum secure: lattice problems (LWE, SIS) resist both " +
+          "classical and quantum attacks — Shor's algorithm does not help",
+        "NIST standardized ML-KEM (Kyber) and ML-DSA (Dilithium) in August " +
+          "2024 as FIPS 203 and 204 — lattices are now the official PQ standard",
+        "LaBRADOR (CRYPTO 2023) is the first practical lattice-based proof system: " +
+          "~50 KB proofs. Greyhound (CRYPTO 2024) adds sublinear verification. " +
+          "RoKoko (2026) achieves polylog verifier, 100x faster",
+        "Key tradeoff vs pairing-based: lattice proofs are 100-300x larger " +
+          "and 10x slower to verify, but survive quantum computers",
+        "Lattices also enable FHE (compute on encrypted data) — the only " +
+          "known mathematical foundation supporting encryption, signatures, " +
+          "ZK proofs, AND FHE simultaneously",
+        "Module-LWE (used by Kyber/Dilithium) offers the best balance of " +
+          "security, performance, and implementation simplicity"
+      ],
+      connections:
+        "Lattice-based crypto is the post-quantum migration path for your " +
+        "thesis. Currently the system uses BLS12-381 pairings for Groth16 " +
+        "and BBS+ — both broken by Shor's algorithm. The future-work chapter " +
+        "should outline: (1) replace BBS+ with lattice-based anonymous " +
+        "credentials, (2) replace Groth16 with Labrador/Greyhound, " +
+        "(3) leverage the TEE to absorb the larger proof sizes off-chain.",
+      thesisExample:
+        "In your discussion and future work chapters, present the lattice " +
+        "migration as a concrete path: 'The current pairing-based design " +
+        "(BLS12-381 Groth16, BBS+ signatures) is vulnerable to quantum " +
+        "attacks. A post-quantum variant would replace Groth16 with " +
+        "Labrador [Beullens-Seiler, CRYPTO 2024], accepting ~50-100 KB " +
+        "proof sizes. The TEE auditor architecture (§5) mitigates this: " +
+        "lattice proofs are verified off-chain inside the TEE, and only " +
+        "compact attestations are posted on Sui.' Include the comparison " +
+        "table from the ZK Deep Dive section.",
+      keyTakeaway:
+        "The post-quantum foundation for all thesis cryptography. Not used " +
+        "today (proof sizes too large), but the concrete migration path " +
+        "when quantum computers threaten pairing-based systems."
     }
   ]
 };

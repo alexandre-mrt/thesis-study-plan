@@ -333,6 +333,42 @@ window.SOTA_CH25 = {
       benchmarks:
         "Spartan on 1M R1CS: ~2s prover (CPU, no FFT); proof ~30KB; verifier ~20ms.",
       tags: ["sumcheck", "gkr", "spartan", "linear-prover"]
+    },
+
+    /* ── 13. Lattice-based ZK — Labrador and post-quantum proofs ── */
+    {
+      name: "LaBRADOR → Greyhound → RoKoko: Lattice ZK Proof Evolution",
+      authors: "Beullens, Seiler (LaBRADOR); Beullens et al. (Greyhound); Klooss et al. (RoKoko)",
+      venue: "CRYPTO 2023 (LaBRADOR) / CRYPTO 2024 (Greyhound) / ePrint 2026/575 (RoKoko)",
+      year: 2026,
+      link: "https://eprint.iacr.org/2022/1341",
+      recap_short:
+        "Three generations of lattice-based ZK: LaBRADOR (first compact, ~50KB), Greyhound (fast polynomial commitments), RoKoko (sublinear verifier, 100x faster).",
+      recap_long:
+        "LaBRADOR (Beullens & Seiler, CRYPTO 2023, ePrint 2022/1341) is the first lattice-based proof system " +
+        "producing compact proofs (~50 KB) for R1CS statements, using Module-SIS Ajtai commitments with amortized " +
+        "opening proofs and Lyubashevsky-style rejection sampling. Greyhound (CRYPTO 2024) adds fast polynomial " +
+        "commitments from lattices, achieving ~53 KB proofs with O(√N) sublinear verification — a crucial " +
+        "improvement for on-chain use. RoKoko (Klooss et al., ePrint 2026/575) is the latest SOTA: it generalizes " +
+        "LaBRADOR's double-commitment recursion to achieve ~200 KB proofs with polylogarithmic verifier and ~100x " +
+        "faster verification than Greyhound. " +
+        "Practical tooling: the LaZer library (IBM, ACM CCS 2024) automates lattice ZK proof generation, " +
+        "implementing blind signatures, anonymous credentials, and proofs of knowledge of Kyber keys with " +
+        "proof sizes in the 32-48 KB range for specific protocols. " +
+        "For lattice-based anonymous credentials: Jeudy et al. (CRYPTO 2023) gave the first practical " +
+        "construction from module lattices; Cloudflare (2024-2025) deployed PQ anonymous credentials with " +
+        "~80 KB presentation proofs; Chathurangi et al. (2026) added traceability. No direct BBS+ equivalent " +
+        "exists — the gap is ~40-80 KB lattice proofs vs ~200 B BBS+ proofs.",
+      math_highlight:
+        "$\\mathsf{Com}(\\mathbf{x}; \\mathbf{r}) = \\mathbf{A} \\binom{\\mathbf{x}}{\\mathbf{r}} \\pmod{q}$, binding from SIS, hiding from LWE",
+      why_for_thesis:
+        "Concrete post-quantum migration path for the Groth16 decider in the folding pipeline. When quantum " +
+        "computers break pairings, Greyhound/RoKoko replace Groth16 with transparent, PQ-safe proofs. The TEE " +
+        "absorbs the ~100x proof size increase by verifying off-chain. LaZer provides a practical implementation " +
+        "for lattice-based anonymous credentials.",
+      benchmarks:
+        "LaBRADOR: proof ~50KB, linear verifier. Greyhound: ~53KB, O(√N) verifier. RoKoko: ~200KB, polylog verifier (100x faster). Compare: Groth16 288B / 10ms.",
+      tags: ["lattice", "post-quantum", "labrador", "greyhound", "rokoko", "module-sis", "transparent"]
     }
   ]
 };

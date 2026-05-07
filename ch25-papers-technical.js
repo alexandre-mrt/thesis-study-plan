@@ -323,6 +323,105 @@ window.CH25_PAPERS_TECH = {
             "where \\( s \\) is the layer width — dramatically less than evaluating the full circuit."
         }
       ]
+    },
+
+    /* ── Paper 6: Lattice-Based Cryptography ── */
+    {
+      name: "Lattice-Based Cryptography: From LWE to Post-Quantum ZK",
+      formalDefinition:
+        "Lattice-based cryptography relies on the hardness of finding structured solutions " +
+        "in high-dimensional integer lattices. The two foundational problems are:" +
+        "<ol>" +
+        "<li><strong>LWE (Learning With Errors)</strong> [Regev, STOC 2005]: Given " +
+        "\\( (\\mathbf{A}, \\mathbf{b}) \\) where \\( \\mathbf{A} \\xleftarrow{\\$} \\mathbb{Z}_q^{m \\times n} \\), " +
+        "\\( \\mathbf{s} \\xleftarrow{\\$} \\mathbb{Z}_q^n \\), \\( \\mathbf{e} \\leftarrow \\chi^m \\) " +
+        "(small Gaussian error), and \\( \\mathbf{b} = \\mathbf{A}\\mathbf{s} + \\mathbf{e} \\pmod{q} \\), " +
+        "distinguish \\( (\\mathbf{A}, \\mathbf{b}) \\) from uniform. " +
+        "Worst-case to average-case reduction: LWE is at least as hard as " +
+        "\\( \\widetilde{O}(n/\\alpha) \\)-approximate SIVP on \\(n\\)-dimensional lattices.</li>" +
+        "<li><strong>SIS (Short Integer Solution)</strong> [Ajtai, 1996]: Given " +
+        "\\( \\mathbf{A} \\xleftarrow{\\$} \\mathbb{Z}_q^{n \\times m} \\), find " +
+        "\\( \\mathbf{x} \\in \\mathbb{Z}^m \\) with \\( \\|\\mathbf{x}\\| \\leq \\beta \\) " +
+        "and \\( \\mathbf{A}\\mathbf{x} = \\mathbf{0} \\pmod{q} \\). " +
+        "SIS is the lattice analogue of finding collisions in hash functions.</li>" +
+        "</ol>" +
+        "Both problems have <strong>worst-case to average-case reductions</strong>: solving " +
+        "a random instance is as hard as solving the hardest lattice instance of the same dimension.",
+      mathDetails: [
+        {
+          subtitle: "Module-LWE: The NIST Standard Foundation",
+          content:
+            "ML-KEM (Kyber, FIPS 203) and ML-DSA (Dilithium, FIPS 204) use Module-LWE, " +
+            "which works over the polynomial ring \\( R_q = \\mathbb{Z}_q[X]/(X^n + 1) \\): " +
+            "\\[ \\mathbf{b} = \\mathbf{A} \\mathbf{s} + \\mathbf{e} \\in R_q^k \\] " +
+            "where \\( \\mathbf{A} \\in R_q^{k \\times k} \\), \\( \\mathbf{s}, \\mathbf{e} \\in R_q^k \\). " +
+            "Each element of \\( R_q \\) is a polynomial of degree \\( < n \\) (typically \\( n = 256 \\)), " +
+            "and multiplication in \\( R_q \\) is fast via the NTT (Number Theoretic Transform). " +
+            "Typical parameters:" +
+            "<ul>" +
+            "<li><strong>ML-KEM-768</strong> (Kyber-768): \\( n = 256, k = 3, q = 3329 \\). " +
+            "Public key 1184 B, ciphertext 1088 B. Security: NIST Level 3 (~AES-192).</li>" +
+            "<li><strong>ML-DSA-65</strong> (Dilithium-3): \\( n = 256, k = 6, l = 5, q = 8380417 \\). " +
+            "Public key 1952 B, signature 3293 B. Security: NIST Level 3.</li>" +
+            "</ul>" +
+            "Key sizes are ~10-30x larger than elliptic curve equivalents, but performance " +
+            "is competitive: ML-KEM key generation and encapsulation run in microseconds."
+        },
+        {
+          subtitle: "Lattice-Based ZK: The Ajtai Commitment and Labrador",
+          content:
+            "The <strong>Ajtai commitment scheme</strong> (1996) is the lattice analogue of " +
+            "Pedersen commitments. Given \\( \\mathbf{A} \\xleftarrow{\\$} \\mathbb{Z}_q^{n \\times m} \\): " +
+            "\\[ \\mathsf{Com}(\\mathbf{x}; \\mathbf{r}) = \\mathbf{A} \\begin{pmatrix} \\mathbf{x} \\\\ " +
+            "\\mathbf{r} \\end{pmatrix} \\pmod{q} \\] " +
+            "Binding relies on SIS hardness (finding two short openings = finding a short SIS solution). " +
+            "Hiding relies on LWE (the commitment looks random). " +
+            "<br/><br/>" +
+            "<strong>LaBRADOR</strong> (Beullens & Seiler, CRYPTO 2023, ePrint 2022/1341) builds a practical proof system " +
+            "on top of Ajtai commitments. The key techniques:" +
+            "<ol>" +
+            "<li><strong>Amortized opening proofs:</strong> Instead of proving each commitment " +
+            "opening individually, Labrador batches \\( N \\) openings into one proof using " +
+            "a random linear combination challenge</li>" +
+            "<li><strong>Garbage terms and norm bounds:</strong> Lattice proofs must show that " +
+            "witness vectors are short (\\( \\|\\mathbf{x}\\| \\leq \\beta \\)). Labrador uses " +
+            "a rejection sampling technique (Lyubashevsky, 2012) to prevent the proof from " +
+            "leaking the witness norm</li>" +
+            "<li><strong>Structured commitments:</strong> Using Module-SIS over polynomial rings " +
+            "reduces the commitment matrix size from \\( O(n \\times m) \\) to \\( O(k \\times l) \\) " +
+            "ring elements</li>" +
+            "</ol>" +
+            "LaBRADOR achieves proof sizes of <strong>~50 KB</strong> for R1CS statements — " +
+            "about 180x larger than Groth16 (288 B) but with transparent setup and post-quantum security. " +
+            "Greyhound (CRYPTO 2024) adds fast polynomial commitments with \\( O(\\sqrt{N}) \\) sublinear " +
+            "verification (~53 KB proofs). RoKoko (ePrint 2026/575) achieves polylogarithmic verification, " +
+            "~100x faster than Greyhound. The LaZer library (IBM, CCS 2024) provides a practical " +
+            "implementation for anonymous credentials and Kyber key proofs (32-48 KB for specific protocols)."
+        },
+        {
+          subtitle: "Quantum Threat to the Thesis and Migration Path",
+          content:
+            "The thesis uses three cryptographic primitives vulnerable to quantum attacks:" +
+            "<ol>" +
+            "<li><strong>BBS+ signatures</strong> (BLS12-381 pairing): Shor's algorithm computes " +
+            "discrete logs in \\( \\mathbb{G}_1, \\mathbb{G}_2 \\) in polynomial time. " +
+            "Migration: lattice-based anonymous credentials (e.g., based on Module-SIS commitments " +
+            "+ Lyubashevsky's Fiat-Shamir framework)</li>" +
+            "<li><strong>Groth16 proofs</strong> (BN254/BLS12-381 pairings): the pairing check " +
+            "\\( e(A,B) = e(\\alpha,\\beta) \\cdot e(C,\\delta) \\cdot e(\\mathit{pub},\\gamma) \\) " +
+            "is broken if an attacker can compute discrete logs. " +
+            "Migration: Labrador or hash-based STARKs (FRI)</li>" +
+            "<li><strong>Pedersen commitments</strong> (discrete-log binding): \\( C = vG + rH \\) " +
+            "can be opened to any value if discrete logs are computable. " +
+            "Migration: Ajtai commitments (SIS-based binding)</li>" +
+            "</ol>" +
+            "Estimated quantum timeline: NIST estimates cryptographically relevant quantum " +
+            "computers (CRQC) are 10-20 years away. The thesis architecture should be designed " +
+            "for <strong>crypto-agility</strong>: abstract the commitment and proof interfaces " +
+            "so that lattice-based implementations can be swapped in without changing the " +
+            "protocol layer."
+        }
+      ]
     }
   ]
 };

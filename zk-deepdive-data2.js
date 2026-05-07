@@ -455,4 +455,180 @@ window.ZK_DEEPDIVE_SECTIONS_2 = [
       'via a polynomial commitment. Understanding sumcheck is prerequisite to debugging why a Sonobe proof ' +
       'fails: the error almost always traces back to a round polynomial inconsistency.',
   },
+
+  /* ================================================================
+   * SECTION 9: Lattice-Based Cryptography
+   * ================================================================ */
+  {
+    id: 'zk-lattices',
+    title: 'Lattice-Based Cryptography (The Post-Quantum Foundation)',
+    icon: '🔷',
+    content:
+      '<p><strong>Lattice-based cryptography</strong> is the most important family of post-quantum ' +
+      'cryptographic constructions. It underpins the NIST post-quantum standards (ML-KEM, ML-DSA), ' +
+      'enables fully homomorphic encryption (FHE), and is the leading candidate for post-quantum ' +
+      'zero-knowledge proofs. If quantum computers break pairings, lattices are the migration path ' +
+      'for everything in this thesis.</p>' +
+
+      '<h4>Intuitive Explanation: The Noisy Grid Analogy</h4>' +
+      '<p>Imagine a perfect 2D grid of points (like graph paper). If someone gives you a point ' +
+      '<strong>exactly on the grid</strong>, you can easily determine which grid intersection it corresponds to. ' +
+      'But what if they give you a point that is <strong>slightly off</strong> — nudged by a tiny random error? ' +
+      'Now finding the nearest grid point is surprisingly hard, especially in high dimensions.</p>' +
+      '<p>This is the essence of the <strong>Learning With Errors (LWE)</strong> problem: given a system of ' +
+      'linear equations over a finite field with small random errors added, recover the secret. ' +
+      'In 2 dimensions it is easy; in 500+ dimensions, no known algorithm (classical or quantum) ' +
+      'can solve it efficiently.</p>' +
+
+      '<h4>What Is a Lattice?</h4>' +
+      '<p>Formally, a lattice \\(\\mathcal{L}\\) is the set of all integer linear combinations of ' +
+      'a set of basis vectors \\(\\{\\mathbf{b}_1, \\ldots, \\mathbf{b}_n\\}\\):</p>' +
+      '<p class="zk-formal-math">\\[\\mathcal{L} = \\left\\{ \\sum_{i=1}^n z_i \\mathbf{b}_i : z_i \\in \\mathbb{Z} \\right\\}\\]</p>' +
+      '<p>Think of it as a <strong>regularly spaced grid</strong> in \\(n\\)-dimensional space. ' +
+      'The key insight: while the grid is regular, finding the closest grid point to an arbitrary ' +
+      'target is computationally hard when \\(n\\) is large — this is the ' +
+      '<strong>Closest Vector Problem (CVP)</strong>.</p>' +
+
+      '<h4>The Two Core Hard Problems</h4>' +
+      '<div class="zk-property-grid">' +
+      '<div class="zk-property-card">' +
+      '<h4>LWE (Learning With Errors)</h4>' +
+      '<p class="zk-formal">Given \\((\\mathbf{A}, \\mathbf{b} = \\mathbf{A}\\mathbf{s} + \\mathbf{e})\\) ' +
+      'where \\(\\mathbf{A}\\) is random, \\(\\mathbf{s}\\) is the secret, and \\(\\mathbf{e}\\) is ' +
+      'a small error vector, find \\(\\mathbf{s}\\).</p>' +
+      '<p class="zk-intuition">Analogy: you hear a melody (secret) played through heavy static (error). ' +
+      'Recovering the melody from one noisy recording is impossible — but even with many recordings ' +
+      '(many equations), the noise hides the melody.</p>' +
+      '<p class="zk-formal-math">\\(\\mathbf{b} = \\mathbf{A}\\mathbf{s} + \\mathbf{e} \\pmod{q}, ' +
+      '\\quad \\|\\mathbf{e}\\| \\ll q\\)</p>' +
+      '<p><strong>Used for:</strong> encryption (ML-KEM/Kyber), FHE (CKKS, BFV, BGV)</p>' +
+      '</div>' +
+      '<div class="zk-property-card">' +
+      '<h4>SIS (Short Integer Solution)</h4>' +
+      '<p class="zk-formal">Given a random matrix \\(\\mathbf{A}\\), find a short nonzero vector ' +
+      '\\(\\mathbf{x}\\) such that \\(\\mathbf{A}\\mathbf{x} = \\mathbf{0} \\pmod{q}\\) ' +
+      'with \\(\\|\\mathbf{x}\\| \\leq \\beta\\).</p>' +
+      '<p class="zk-intuition">Analogy: find a combination of grid basis vectors that lands near the ' +
+      'origin, without using trivially large coefficients. Easy to verify (multiply and check), ' +
+      'hard to find.</p>' +
+      '<p class="zk-formal-math">\\(\\mathbf{A} \\mathbf{x} = \\mathbf{0} \\pmod{q}, ' +
+      '\\quad \\|\\mathbf{x}\\|_\\infty \\leq \\beta\\)</p>' +
+      '<p><strong>Used for:</strong> digital signatures (ML-DSA/Dilithium), hash functions, commitments</p>' +
+      '</div>' +
+      '</div>' +
+
+      '<h4>Structured Variants for Efficiency</h4>' +
+      '<ul class="zk-list">' +
+      '<li><strong>Ring-LWE:</strong> Replace the random matrix \\(\\mathbf{A}\\) with a structured ' +
+      'polynomial ring \\(R_q = \\mathbb{Z}_q[X]/(X^n+1)\\). Operations become polynomial ' +
+      'multiplications — much faster (\\(O(n \\log n)\\) via NTT vs \\(O(n^2)\\) for plain LWE)</li>' +
+      '<li><strong>Module-LWE:</strong> A middle ground — work with small matrices over \\(R_q\\). ' +
+      'This is what ML-KEM (Kyber) and ML-DSA (Dilithium) use. "Module" = matrices of ring elements</li>' +
+      '</ul>' +
+
+      '<h4>NIST Post-Quantum Standards (2024)</h4>' +
+      '<table class="zk-comparison-table">' +
+      '<thead><tr>' +
+      '<th>Standard</th><th>FIPS</th><th>Based On</th><th>Purpose</th><th>Key Size</th>' +
+      '</tr></thead>' +
+      '<tbody>' +
+      '<tr><td><strong>ML-KEM</strong> (Kyber)</td><td>FIPS 203</td><td>Module-LWE</td><td>Key encapsulation</td><td>800-1568 B</td></tr>' +
+      '<tr><td><strong>ML-DSA</strong> (Dilithium)</td><td>FIPS 204</td><td>Module-LWE + SIS</td><td>Digital signatures</td><td>1312-2592 B</td></tr>' +
+      '<tr><td><strong>SLH-DSA</strong> (SPHINCS+)</td><td>FIPS 205</td><td>Hash-based</td><td>Signatures (stateless)</td><td>32-64 B</td></tr>' +
+      '</tbody></table>' +
+      '<p class="zk-table-note">ML-KEM and ML-DSA are lattice-based; SLH-DSA is hash-based (included for comparison). ' +
+      'All three were standardized by NIST in August 2024.</p>' +
+
+      '<h4>Lattice-Based Zero-Knowledge Proofs</h4>' +
+      '<p>The thesis currently uses pairing-based proofs (Groth16 on BLS12-381). If quantum computers ' +
+      'become practical, these break. Lattice-based ZK proofs are the post-quantum alternative:</p>' +
+      '<ul class="zk-list">' +
+      '<li><strong>LaBRADOR</strong> (Beullens & Seiler — CRYPTO 2023): first practical lattice-based ' +
+      'proof system for R1CS. Proof size ~50 KB (vs 288 B for Groth16), but post-quantum secure. ' +
+      'Based on the Ajtai commitment scheme + amortized opening proofs</li>' +
+      '<li><strong>Greyhound</strong> (CRYPTO 2024): adds fast polynomial commitments from lattices, ' +
+      '~53 KB proofs with \\(O(\\sqrt{N})\\) sublinear verification</li>' +
+      '<li><strong>RoKoko</strong> (ePrint 2026): latest SOTA with polylogarithmic verifier and ~100x ' +
+      'faster verification than Greyhound. ~200 KB proofs</li>' +
+      '<li><strong>LaZer</strong> (IBM, CCS 2024): practical library implementing lattice ZK for ' +
+      'anonymous credentials and Kyber key proofs. Proof sizes 32-48 KB for specific protocols</li>' +
+      '</ul>' +
+
+      '<div class="zk-callout zk-callout-critical">' +
+      '<span class="zk-callout-label">KEY TRADEOFF</span>' +
+      '<p>Lattice-based proofs are <strong>10-100x larger</strong> than pairing-based proofs ' +
+      '(~50 KB vs ~288 B for Groth16). Verification is also slower (~10x). But they survive ' +
+      'quantum computers. The thesis\'s hybrid ZK+TEE architecture could mitigate this: the TEE ' +
+      'verifies lattice proofs off-chain (where size/speed matter less) and produces compact ' +
+      'attestations for on-chain settlement.</p>' +
+      '</div>' +
+
+      '<h4>Comparison: Pairing-Based vs Lattice-Based</h4>' +
+      '<table class="zk-comparison-table">' +
+      '<thead><tr>' +
+      '<th>Property</th><th>Pairing-Based (Groth16)</th><th>Lattice-Based (Greyhound)</th>' +
+      '</tr></thead>' +
+      '<tbody>' +
+      '<tr><td>Proof size</td><td>~288 B</td><td>~53 KB</td></tr>' +
+      '<tr><td>Verification time</td><td>~10 ms (3 pairings)</td><td>~100-500 ms (\\(O(\\sqrt{N})\\))</td></tr>' +
+      '<tr><td>Prover time</td><td>~100 ms (100K constraints)</td><td>~1-10 s</td></tr>' +
+      '<tr><td>Trusted setup</td><td>Per-circuit (Groth16)</td><td>None (transparent)</td></tr>' +
+      '<tr><td>Post-quantum</td><td>No (broken by Shor)</td><td>Yes (Module-SIS/LWE)</td></tr>' +
+      '<tr><td>Maturity</td><td>Production (2016+)</td><td>Research (2023+)</td></tr>' +
+      '</tbody></table>',
+
+    diagram:
+      '  LATTICE-BASED CRYPTOGRAPHY — THE POST-QUANTUM STACK\n' +
+      '  \n' +
+      '  HARD PROBLEMS (quantum-resistant)\n' +
+      '  ┌──────────────────────────────────────────────────────┐\n' +
+      '  │  LWE:  b = A·s + e (mod q)     → find s            │\n' +
+      '  │  SIS:  A·x = 0 (mod q)          → find short x     │\n' +
+      '  │  Ring variants: use R_q = Z_q[X]/(X^n+1) for speed │\n' +
+      '  └──────────────────────────────────────────────────────┘\n' +
+      '              |                    |\n' +
+      '              v                    v\n' +
+      '  NIST STANDARDS (2024)       ZK PROOF SYSTEMS\n' +
+      '  ┌─────────────────────┐     ┌──────────────────────┐\n' +
+      '  │ ML-KEM  (Kyber)     │     │ Labrador (CRYPTO 24) │\n' +
+      '  │ → key encapsulation │     │ → lattice SNARK      │\n' +
+      '  │ ML-DSA  (Dilithium) │     │ Greyhound (2024)     │\n' +
+      '  │ → digital signatures│     │ → improved Labrador  │\n' +
+      '  │ SLH-DSA (SPHINCS+)  │     │ Lattice Bulletproofs │\n' +
+      '  │ → hash-based sigs   │     │ → PQ range proofs    │\n' +
+      '  └─────────────────────┘     └──────────────────────┘\n' +
+      '              |                    |\n' +
+      '              v                    v\n' +
+      '  FHE (homomorphic)          THESIS MIGRATION PATH\n' +
+      '  ┌─────────────────────┐    ┌──────────────────────┐\n' +
+      '  │ CKKS: approx arith  │    │ Current: Groth16     │\n' +
+      '  │ BFV/BGV: exact arith│    │ (BLS12-381 pairings) │\n' +
+      '  │ TFHE: bit-level     │    │ Future: Labrador /   │\n' +
+      '  │ All based on LWE    │    │ lattice Bulletproofs  │\n' +
+      '  └─────────────────────┘    └──────────────────────┘\n' +
+      '  \n' +
+      '  WHY LATTICES RESIST QUANTUM COMPUTERS:\n' +
+      '  Shor\'s algorithm breaks: factoring, discrete log, pairings\n' +
+      '  Shor CANNOT solve: CVP, SVP, LWE, SIS on lattices\n' +
+      '  Best quantum speedup for lattice problems: ~√2 (negligible)',
+
+    publicPrivate: [
+      { item: 'Lattice basis / public matrix A', status: 'public', holder: 'Everyone', when: 'Setup' },
+      { item: 'Secret vector s', status: 'private', holder: 'Key holder', when: 'Key generation' },
+      { item: 'Error vector e', status: 'private', holder: 'Discarded after encryption', when: 'Encryption' },
+      { item: 'LWE sample (A, b=As+e)', status: 'public', holder: 'Everyone', when: 'Ciphertext / public key' },
+      { item: 'SIS solution x', status: 'private', holder: 'Prover', when: 'Proof generation' },
+      { item: 'Lattice ZK proof', status: 'public', holder: 'On-chain', when: 'Verification' },
+    ],
+
+    thesisExample:
+      'The thesis currently uses BLS12-381 pairings for Groth16 and BBS+ signatures — both broken by ' +
+      'Shor\'s algorithm on a quantum computer. The post-quantum migration path is lattice-based: ' +
+      '(1) Replace BBS+ signatures with a lattice-based anonymous credential scheme (e.g., based on ' +
+      'Module-SIS commitments). (2) Replace Groth16 with a lattice-based proof system like Labrador. ' +
+      '(3) The TEE auditor becomes even more valuable: it can verify large lattice proofs off-chain ' +
+      'and produce compact attestations, hiding the proof size penalty from on-chain costs. ' +
+      'In the discussion chapter, present lattice migration as a concrete future work path with ' +
+      'estimated proof size and performance tradeoffs.',
+  },
 ];
