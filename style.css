@@ -663,26 +663,26 @@ body { padding-bottom: 56px; }
   z-index: 60;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 10px 0;
-  margin: 8px 0 0;
+  gap: 5px;
+  padding: 6px 0;
+  margin: 4px 0 0;
   background: rgba(15, 15, 15, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .chapter-subnav-tab {
-  padding: 8px 16px;
+  padding: 5px 12px;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   color: var(--text-secondary);
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-height: 36px;
+  min-height: 30px;
   white-space: nowrap;
 }
 .chapter-subnav-tab:hover {
