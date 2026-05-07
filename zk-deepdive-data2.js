@@ -297,4 +297,162 @@ window.ZK_DEEPDIVE_SECTIONS_2 = [
       'achieves high throughput (TEE batch processing). If the TEE is compromised, privacy degrades ' +
       'gracefully because the ZK proofs remain sound.',
   },
+
+  /* ================================================================
+   * SECTION 8: The Sumcheck Protocol
+   * ================================================================ */
+  {
+    id: 'zk-sumcheck',
+    title: 'The Sumcheck Protocol (The Engine Behind Modern SNARKs)',
+    icon: '∑',
+    content:
+      '<p>The <strong>sumcheck protocol</strong> is arguably the most important building block in modern ' +
+      'proof systems. Invented in 1992, it was overshadowed by Plonk-era polynomial IOPs, but is now ' +
+      '<strong>central</strong> to HyperNova, Spartan, Lasso, Jolt, and Binius. If you understand sumcheck, ' +
+      'you understand the engine that powers the thesis\'s folding pipeline.</p>' +
+
+      '<h4>Intuitive Explanation: The Ballot-Counting Analogy</h4>' +
+      '<p>Imagine you are an election auditor. There are \\(2^n\\) ballot boxes across \\(n\\) districts. ' +
+      'You want to verify the <strong>total vote count</strong> is correct, but you cannot physically open ' +
+      'every box — there are too many. The sumcheck protocol lets you verify the total by checking just ' +
+      '\\(n\\) <em>partial sums</em>, one per district dimension, using randomness to "compress" each layer.</p>' +
+      '<p>At each round, the prover sends a small polynomial (degree \\(d\\)) that describes one "slice" of ' +
+      'the sum. The verifier checks that it is consistent with the previous round, picks a random challenge, ' +
+      'and moves to the next dimension. After \\(n\\) rounds, the verifier is left with a single evaluation ' +
+      '\\(g(r_1, \\ldots, r_n)\\) that they can check directly — or delegate to another protocol (like a PCS).</p>' +
+
+      '<h4>The Protocol Step by Step</h4>' +
+      '<p>We want to prove:</p>' +
+      '<p class="zk-formal-math">\\[H = \\sum_{x_1 \\in \\{0,1\\}} \\sum_{x_2 \\in \\{0,1\\}} \\cdots ' +
+      '\\sum_{x_n \\in \\{0,1\\}} g(x_1, x_2, \\ldots, x_n)\\]</p>' +
+      '<p>where \\(g\\) is a multivariate polynomial over a finite field \\(\\mathbb{F}\\), ' +
+      'and the sum is over the Boolean hypercube \\(\\{0,1\\}^n\\).</p>' +
+
+      '<div class="zk-step">' +
+      '<div class="zk-step-number">1</div>' +
+      '<div class="zk-step-content">' +
+      '<h4>Round 1 — Fix all variables except \\(x_1\\)</h4>' +
+      '<p>The prover sends a univariate polynomial:</p>' +
+      '<p class="zk-formal-math">\\[s_1(X_1) = \\sum_{x_2, \\ldots, x_n \\in \\{0,1\\}} g(X_1, x_2, \\ldots, x_n)\\]</p>' +
+      '<p>The verifier checks: \\(s_1(0) + s_1(1) = H\\). If this holds, the verifier picks a random ' +
+      '\\(r_1 \\in \\mathbb{F}\\) and sends it to the prover.</p>' +
+      '</div></div>' +
+
+      '<div class="zk-step">' +
+      '<div class="zk-step-number">2</div>' +
+      '<div class="zk-step-content">' +
+      '<h4>Round \\(i\\) — Fix \\(x_i\\), challenge on previous</h4>' +
+      '<p>The prover sends:</p>' +
+      '<p class="zk-formal-math">\\[s_i(X_i) = \\sum_{x_{i+1}, \\ldots, x_n \\in \\{0,1\\}} ' +
+      'g(r_1, \\ldots, r_{i-1}, X_i, x_{i+1}, \\ldots, x_n)\\]</p>' +
+      '<p>The verifier checks: \\(s_i(0) + s_i(1) = s_{i-1}(r_{i-1})\\), then picks random ' +
+      '\\(r_i \\in \\mathbb{F}\\).</p>' +
+      '</div></div>' +
+
+      '<div class="zk-step">' +
+      '<div class="zk-step-number">3</div>' +
+      '<div class="zk-step-content">' +
+      '<h4>Final Round — Single-point evaluation</h4>' +
+      '<p>After \\(n\\) rounds, the verifier must check \\(g(r_1, \\ldots, r_n) = s_n(r_n)\\). ' +
+      'This is a single-point evaluation of \\(g\\), which can be checked via an oracle or a ' +
+      '<strong>polynomial commitment scheme</strong> (PCS).</p>' +
+      '</div></div>' +
+
+      '<h4>Why Is This So Powerful?</h4>' +
+      '<ul class="zk-list">' +
+      '<li><strong>Communication:</strong> \\(O(n \\cdot d)\\) field elements total — exponentially less ' +
+      'than the \\(2^n\\) terms being summed</li>' +
+      '<li><strong>Verifier work:</strong> \\(O(n \\cdot d)\\) — the verifier does almost nothing</li>' +
+      '<li><strong>Prover work:</strong> \\(O(2^n)\\) total field operations — the prover visits each evaluation ' +
+      'point once, halving the work each round. Structured instances (sparse R1CS) reduce this further</li>' +
+      '<li><strong>No FFT required:</strong> Unlike Plonk/Groth16, sumcheck works without FFT — prover ' +
+      'memory is linear, not superlinear</li>' +
+      '<li><strong>Composable:</strong> Sumcheck can be nested, batched, and composed with any PCS</li>' +
+      '</ul>' +
+
+      '<h4>Technical: Soundness Guarantee</h4>' +
+      '<p>By the Schwartz-Zippel lemma, if \\(g\\) has total degree \\(d\\) in each variable, the ' +
+      'probability of a cheating prover fooling the verifier in one round is at most \\(d / |\\mathbb{F}|\\). ' +
+      'Over \\(n\\) rounds, the total soundness error is:</p>' +
+      '<p class="zk-formal-math">\\[\\epsilon \\leq \\frac{n \\cdot d}{|\\mathbb{F}|}\\]</p>' +
+      '<p>For a 256-bit field with \\(n = 20\\) variables and degree \\(d = 3\\): ' +
+      '\\(\\epsilon \\leq 60 / 2^{256} \\approx 0\\). Practically unbreakable.</p>' +
+
+      '<h4>Where Sumcheck Appears in Modern Systems</h4>' +
+      '<table class="zk-comparison-table">' +
+      '<thead><tr>' +
+      '<th>System</th><th>Role of Sumcheck</th><th>What It Replaces</th>' +
+      '</tr></thead>' +
+      '<tbody>' +
+      '<tr><td><strong>Spartan</strong></td><td>Core proof protocol — proves R1CS satisfiability via sumcheck on multilinear extensions</td><td>FFT-based polynomial evaluation (Groth16/PLONK)</td></tr>' +
+      '<tr><td><strong>HyperNova</strong></td><td>Multifolding — batches multiple CCS instances into one check at a random point</td><td>Per-instance folding verifier</td></tr>' +
+      '<tr><td><strong>Lasso/Jolt</strong></td><td>Lookup arguments — proves table membership via sumcheck decomposition</td><td>Plookup-style permutation arguments</td></tr>' +
+      '<tr><td><strong>Binius</strong></td><td>Small-field sumcheck over binary tower fields for hash-heavy circuits</td><td>Large prime field arithmetic</td></tr>' +
+      '<tr><td><strong>GKR</strong></td><td>Layer-by-layer verification of arithmetic circuits via sumcheck reduction</td><td>Full circuit evaluation by verifier</td></tr>' +
+      '</tbody></table>' +
+
+      '<div class="zk-callout zk-callout-critical">' +
+      '<span class="zk-callout-label">KEY INSIGHT</span>' +
+      '<p>Sumcheck converts a <strong>global claim</strong> (sum over exponentially many points) into a ' +
+      '<strong>local claim</strong> (evaluation at one random point). This is the fundamental trick. ' +
+      'Every system that uses sumcheck is exploiting this reduction: "I do not need to verify the whole ' +
+      'computation — just one random slice of it."</p>' +
+      '</div>',
+
+    diagram:
+      '  THE SUMCHECK PROTOCOL — ROUND BY ROUND\n' +
+      '  \n' +
+      '  Claim: H = sum over {0,1}^n of g(x1, ..., xn)\n' +
+      '  \n' +
+      '  PROVER                                      VERIFIER\n' +
+      '  ------                                      --------\n' +
+      '  \n' +
+      '  Round 1:\n' +
+      '  Compute s1(X) = sum_{x2..xn} g(X, x2, ..., xn)\n' +
+      '  Send s1(X) [degree d polynomial]     ------>  Check: s1(0) + s1(1) = H ?\n' +
+      '                                       <------  Send random r1\n' +
+      '  \n' +
+      '  Round 2:\n' +
+      '  Compute s2(X) = sum_{x3..xn} g(r1, X, x3, ..., xn)\n' +
+      '  Send s2(X)                           ------>  Check: s2(0) + s2(1) = s1(r1) ?\n' +
+      '                                       <------  Send random r2\n' +
+      '  \n' +
+      '       ...            (repeat for n rounds)           ...\n' +
+      '  \n' +
+      '  Round n:\n' +
+      '  Compute sn(X) = g(r1, ..., r_{n-1}, X)\n' +
+      '  Send sn(X)                           ------>  Check: sn(0) + sn(1) = s_{n-1}(r_{n-1}) ?\n' +
+      '                                       <------  Send random rn\n' +
+      '  \n' +
+      '  Final check:\n' +
+      '                                                Check: g(r1, ..., rn) = sn(rn) ?\n' +
+      '                                                (via oracle / PCS evaluation proof)\n' +
+      '  \n' +
+      '  COST SUMMARY\n' +
+      '  ─────────────────────────────────────────────────────────\n' +
+      '  Communication:  n polynomials of degree d  = O(n*d) field elements\n' +
+      '  Verifier:       n consistency checks       = O(n*d) field ops\n' +
+      '  Prover:         sum over 2^n points        = O(2^n) field ops\n' +
+      '  Soundness:      n*d / |F|                  ≈ 0 for large fields\n' +
+      '  ─────────────────────────────────────────────────────────\n' +
+      '  \n' +
+      '  KEY: 2^n terms verified with only n rounds of interaction!',
+
+    publicPrivate: [
+      { item: 'Polynomial g (circuit encoding)', status: 'public', holder: 'Both prover + verifier', when: 'Protocol start' },
+      { item: 'Claimed sum H', status: 'public', holder: 'Both parties', when: 'Protocol start' },
+      { item: 'Round polynomials s_i(X)', status: 'public', holder: 'Sent by prover', when: 'Each round' },
+      { item: 'Random challenges r_i', status: 'public', holder: 'Chosen by verifier', when: 'Each round' },
+      { item: 'Witness (secret inputs to g)', status: 'private', holder: 'Prover only', when: 'During computation' },
+      { item: 'Final evaluation g(r1,...,rn)', status: 'public', holder: 'Verified via PCS', when: 'Final round' },
+    ],
+
+    thesisExample:
+      'In the thesis folding pipeline, Spartan uses sumcheck as its core proving mechanism to verify R1CS ' +
+      'satisfiability of the credential/payment circuit. When HyperNova folds multiple CCS instances (e.g., ' +
+      'batching N credential presentations), the multifolding verifier is a sumcheck invocation. The final ' +
+      'Spartan decider proof — the one submitted on-chain to Sui — is a sumcheck-based argument compressed ' +
+      'via a polynomial commitment. Understanding sumcheck is prerequisite to debugging why a Sonobe proof ' +
+      'fails: the error almost always traces back to a round polynomial inconsistency.',
+  },
 ];

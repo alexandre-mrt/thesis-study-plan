@@ -946,10 +946,36 @@ body { padding-bottom: 56px; }
   padding: 0.6rem 0.8rem;
   cursor: pointer;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.6rem;
   border-bottom: 1px solid rgba(255,255,255,0.03);
   transition: background var(--transition-fast);
+}
+
+.search-result-text-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.search-result-snippet {
+  font-size: 0.72rem;
+  color: #888;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.search-result-snippet mark {
+  background: rgba(99,102,241,0.25);
+  color: #c4b5fd;
+  border-radius: 2px;
+  padding: 0 1px;
 }
 
 .search-result-item:hover,
@@ -983,8 +1009,6 @@ body { padding-bottom: 56px; }
 .search-result-name {
   font-size: 0.9rem;
   color: var(--text-primary);
-  flex: 1;
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1020,6 +1044,20 @@ body { padding-bottom: 56px; }
 
 .concept-card.highlighted {
   animation: concept-highlight 1.5s ease-out;
+}
+
+/* Search term highlight in navigated cards */
+@keyframes search-term-pulse {
+  0% { background: rgba(99,102,241,0.5); }
+  100% { background: rgba(99,102,241,0); }
+}
+
+.search-term-highlight {
+  background: rgba(99,102,241,0.45);
+  color: #e0ddff;
+  border-radius: 3px;
+  padding: 1px 3px;
+  animation: search-term-pulse 4s ease-out forwards;
 }
 
 /* === History Section === */

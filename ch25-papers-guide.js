@@ -360,6 +360,98 @@ window.CH25_PAPERS = {
       keyTakeaway:
         "The strongest industry critique of ZKPs. Your thesis must address " +
         "silent failures, auditability, and performance to be credible."
+    },
+
+    /* ── Paper 5: The Sumcheck Protocol ── */
+    {
+      name: "The Sumcheck Protocol (LFKN 1992 + Modern Revival)",
+      authors: "Lund, Fortnow, Karloff, Nisan (1992) / Thaler (2013-2024)",
+      venue: "JCSS 1992 + Thaler's Proofs, Arguments and Zero Knowledge, 2023",
+      status: "queued",
+      relevance: "core",
+      analogy:
+        "Imagine you are an election auditor with 2^20 (one million) ballot boxes " +
+        "distributed across 20 regions. You need to verify the total vote count " +
+        "is correct, but you cannot physically open every box — it would take " +
+        "forever. The sumcheck protocol lets you verify the total by checking " +
+        "just 20 'partial sum' polynomials — one per region dimension — using " +
+        "randomness to compress each layer. At each step, the prover commits " +
+        "to a small summary of one dimension, the verifier spot-checks it " +
+        "against the previous round using a random challenge, and they move to " +
+        "the next dimension. After 20 rounds, the verifier is left with a " +
+        "single evaluation to check directly. The key insight: you reduce a " +
+        "global claim (sum over exponentially many points) to a local claim " +
+        "(one evaluation at a random point).",
+      diagram:
+        '┌────────────────────────────────────────────────────────────┐\n' +
+        '│           The Sumcheck Protocol — Core Mechanism            │\n' +
+        '├────────────────────────────────────────────────────────────┤\n' +
+        '│                                                            │\n' +
+        '│  CLAIM: H = Σ_{x ∈ {0,1}^n} g(x)                         │\n' +
+        '│                                                            │\n' +
+        '│  PROVER                         VERIFIER                   │\n' +
+        '│  ┌──────────────┐               ┌──────────────┐           │\n' +
+        '│  │ Sends s1(X)  │ ──────────→   │ s1(0)+s1(1)  │           │\n' +
+        '│  │ (univariate) │ ←── r1 ───   │ =? H          │           │\n' +
+        '│  │ Sends s2(X)  │ ──────────→   │ s2(0)+s2(1)  │           │\n' +
+        '│  │              │ ←── r2 ───   │ =? s1(r1)     │           │\n' +
+        '│  │    ...       │     ...       │    ...        │           │\n' +
+        '│  │ Sends sn(X)  │ ──────────→   │ sn(0)+sn(1)  │           │\n' +
+        '│  │              │ ←── rn ───   │ =? s_{n-1}()  │           │\n' +
+        '│  └──────────────┘               └──────────────┘           │\n' +
+        '│                                                            │\n' +
+        '│  FINAL: Verifier checks g(r1,...,rn) = sn(rn) via PCS     │\n' +
+        '│                                                            │\n' +
+        '│  COST: n rounds, O(n·d) communication, O(n·d) verifier     │\n' +
+        '│  SOUNDNESS: n·d / |F| ≈ 0 for large fields                │\n' +
+        '└────────────────────────────────────────────────────────────┘',
+      diagram_mermaid:
+        'flowchart TD\n' +
+        '  CLAIM["Claim: H = Σ g(x) over {0,1}^n"]\n' +
+        '  CLAIM --> R1["Round 1: Prover sends s₁(X)<br/>Verifier checks s₁(0)+s₁(1) = H<br/>Verifier sends random r₁"]\n' +
+        '  R1 --> R2["Round 2: Prover sends s₂(X)<br/>Verifier checks s₂(0)+s₂(1) = s₁(r₁)<br/>Verifier sends random r₂"]\n' +
+        '  R2 --> RN["...<br/>Round n: Prover sends sₙ(X)<br/>Verifier checks sₙ(0)+sₙ(1) = sₙ₋₁(rₙ₋₁)"]\n' +
+        '  RN --> FINAL["Final: Verifier checks g(r₁,...,rₙ) = sₙ(rₙ)<br/><b>via polynomial commitment (PCS)</b>"]\n' +
+        '  FINAL --> RESULT["✓ Accept or ✗ Reject<br/>Soundness: n·d/|F| ≈ 0"]\n' +
+        '  classDef proofsystem fill:#111827,stroke:#6366F1,color:#fff\n' +
+        '  classDef prover fill:#1f2937,stroke:#06B6D4,color:#fff\n' +
+        '  classDef verifier fill:#1a1a1a,stroke:#10B981,color:#fff\n' +
+        '  class CLAIM proofsystem\n' +
+        '  class R1,R2,RN prover\n' +
+        '  class FINAL,RESULT verifier',
+      keyPoints: [
+        "The most important building block in modern SNARKs — central to " +
+          "Spartan, HyperNova, Lasso/Jolt, Binius, and GKR protocols",
+        "Converts an exponential-size sum (2^n terms) into n rounds of " +
+          "interaction, each involving a small degree-d polynomial",
+        "Communication cost O(n·d) — exponentially less than 2^n naive " +
+          "verification. Verifier work is O(n·d), nearly trivial",
+        "No FFT required — unlike Plonk/Groth16, sumcheck provers use " +
+          "linear memory, making it ideal for large structured computations",
+        "Soundness guaranteed by Schwartz-Zippel lemma: cheating probability " +
+          "≤ n·d/|F|, which is negligible for 256-bit fields",
+        "Composable: can be nested, batched, and paired with any polynomial " +
+          "commitment scheme (KZG, FRI, IPA)"
+      ],
+      connections:
+        "Sumcheck is the engine behind the thesis's folding pipeline. " +
+        "Spartan — the final decider SNARK in Sonobe — is a sumcheck-based " +
+        "protocol. HyperNova's multifolding uses sumcheck to batch CCS " +
+        "instances. Lasso/Jolt's lookup arguments decompose via sumcheck. " +
+        "Understanding sumcheck mechanics is prerequisite to debugging " +
+        "why a Sonobe proof fails.",
+      thesisExample:
+        "In your implementation chapter, when describing the folding + final " +
+        "SNARK pipeline, explain that the Spartan decider works by expressing " +
+        "R1CS satisfiability as a sum over the Boolean hypercube, then " +
+        "applying the sumcheck protocol to reduce verification to a single " +
+        "polynomial evaluation. This is why the decider proof is small and " +
+        "fast to verify on Sui: sumcheck compresses the check to O(n) rounds, " +
+        "and the final evaluation is delegated to a polynomial commitment.",
+      keyTakeaway:
+        "The fundamental engine of modern SNARKs. Converts exponential " +
+        "sums to linear-round interactive proofs. Powers Spartan, HyperNova, " +
+        "Jolt — the exact tools used in the thesis folding pipeline."
     }
   ]
 };

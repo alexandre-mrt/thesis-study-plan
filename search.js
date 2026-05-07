@@ -271,6 +271,18 @@ function computeScore(entry, matchType) {
   return tierBase + yearBoost(entry.timestamp);
 }
 
+function extractSnippet(searchText, query, contextLen) {
+  contextLen = contextLen || 60;
+  const idx = searchText.indexOf(query);
+  if (idx === -1) return '';
+  const start = Math.max(0, idx - contextLen);
+  const end = Math.min(searchText.length, idx + query.length + contextLen);
+  let snippet = searchText.substring(start, end).trim();
+  if (start > 0) snippet = '…' + snippet;
+  if (end < searchText.length) snippet = snippet + '…';
+  return snippet;
+}
+
 function searchConcepts(query) {
   if (!query || query.trim().length === 0) return [];
 
@@ -281,11 +293,12 @@ function searchConcepts(query) {
 
   searchIndex.forEach((entry) => {
     if (entry.nameLower === q) {
-      exactMatches.push({ ...entry, matchType: MATCH_TYPE.EXACT_NAME });
+      exactMatches.push({ ...entry, matchType: MATCH_TYPE.EXACT_NAME, snippet: '' });
     } else if (entry.nameLower.includes(q)) {
-      nameMatches.push({ ...entry, matchType: MATCH_TYPE.NAME_CONTAINS });
+      nameMatches.push({ ...entry, matchType: MATCH_TYPE.NAME_CONTAINS, snippet: '' });
     } else if (entry.searchText.includes(q)) {
-      textMatches.push({ ...entry, matchType: MATCH_TYPE.FULL_TEXT });
+      const snippet = extractSnippet(entry.searchText, q);
+      textMatches.push({ ...entry, matchType: MATCH_TYPE.FULL_TEXT, snippet: snippet });
     }
   });
 
@@ -328,12 +341,15 @@ function buildResultChapterLabel(result) {
   return result.blockTitle || '';
 }
 
+let lastSearchQuery = '';
+
 function renderSearchResults(results, query) {
   const container = document.getElementById('search-results');
   if (!container) return;
 
   container.innerHTML = '';
   selectedResultIndex = -1;
+  lastSearchQuery = query.trim();
 
   if (results.length === 0 && query.trim().length > 0) {
     const noResults = document.createElement('div');
@@ -371,9 +387,20 @@ function renderSearchResults(results, query) {
       dayBadge.textContent = CHAPTER_LABELS[chapterKey] || result.day;
     }
 
+    const textWrap = document.createElement('div');
+    textWrap.className = 'search-result-text-wrap';
+
     const name = document.createElement('span');
     name.className = 'search-result-name';
     name.innerHTML = highlightMatch(result.name, query);
+    textWrap.appendChild(name);
+
+    if (result.snippet) {
+      const snippetEl = document.createElement('span');
+      snippetEl.className = 'search-result-snippet';
+      snippetEl.innerHTML = highlightMatch(result.snippet, query);
+      textWrap.appendChild(snippetEl);
+    }
 
     const blockLabel = document.createElement('span');
     blockLabel.className = 'search-result-block';
@@ -394,7 +421,7 @@ function renderSearchResults(results, query) {
     chapterTag.textContent = buildResultChapterLabel(result);
 
     item.appendChild(dayBadge);
-    item.appendChild(name);
+    item.appendChild(textWrap);
     if (kindChip) item.appendChild(kindChip);
     item.appendChild(blockLabel);
     item.appendChild(chapterTag);
@@ -482,6 +509,46 @@ function handleSearchKeydown(e) {
   }
 }
 
+/* === Highlight search term in target card === */
+
+function highlightSearchTermInCard(card, query) {
+  if (!query || !card) return;
+  clearSearchHighlights();
+
+  const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, null);
+  const q = query.toLowerCase();
+  const nodesToWrap = [];
+
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    const text = node.textContent;
+    const idx = text.toLowerCase().indexOf(q);
+    if (idx !== -1) {
+      nodesToWrap.push({ node, idx, len: query.length });
+    }
+  }
+
+  nodesToWrap.forEach(({ node, idx, len }) => {
+    const range = document.createRange();
+    range.setStart(node, idx);
+    range.setEnd(node, idx + len);
+    const mark = document.createElement('mark');
+    mark.className = 'search-term-highlight';
+    range.surroundContents(mark);
+  });
+
+  setTimeout(clearSearchHighlights, 4000);
+}
+
+function clearSearchHighlights() {
+  document.querySelectorAll('.search-term-highlight').forEach((mark) => {
+    const parent = mark.parentNode;
+    if (!parent) return;
+    parent.replaceChild(document.createTextNode(mark.textContent), mark);
+    parent.normalize();
+  });
+}
+
 /* === Navigation to Concept === */
 
 function navigateToConcept(result) {
@@ -546,6 +613,8 @@ function navigateToConcept(result) {
         setTimeout(() => {
           targetCard.classList.remove('highlighted');
         }, HIGHLIGHT_DURATION_MS);
+
+        highlightSearchTermInCard(targetCard, lastSearchQuery);
       }, SCROLL_DELAY_MS);
     }, EXPAND_DELAY_MS);
   }, EXPAND_DELAY_MS);
@@ -574,6 +643,8 @@ function navigateToZKDeepdive(result) {
       setTimeout(() => {
         targetCard.classList.remove('highlighted');
       }, HIGHLIGHT_DURATION_MS);
+
+      highlightSearchTermInCard(targetCard, lastSearchQuery);
     }, SCROLL_DELAY_MS);
   }, EXPAND_DELAY_MS);
 }
@@ -607,6 +678,8 @@ function navigateToSota(result) {
       setTimeout(() => {
         targetCard.classList.remove('highlighted');
       }, HIGHLIGHT_DURATION_MS);
+
+      highlightSearchTermInCard(targetCard, lastSearchQuery);
     }, SCROLL_DELAY_MS);
   }, EXPAND_DELAY_MS);
 }
@@ -644,6 +717,8 @@ function navigateToPaper(result) {
       setTimeout(() => {
         targetCard.classList.remove('highlighted');
       }, HIGHLIGHT_DURATION_MS);
+
+      highlightSearchTermInCard(targetCard, lastSearchQuery);
     }, SCROLL_DELAY_MS);
   }, EXPAND_DELAY_MS);
 }

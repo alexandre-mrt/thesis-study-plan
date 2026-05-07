@@ -240,6 +240,89 @@ window.CH25_PAPERS_TECH = {
             "</ol>"
         }
       ]
+    },
+
+    /* ── Paper 5: The Sumcheck Protocol ── */
+    {
+      name: "The Sumcheck Protocol (LFKN 1992 + Modern Revival)",
+      formalDefinition:
+        "The sumcheck protocol is an interactive proof for claims of the form " +
+        "\\( H = \\sum_{x \\in \\{0,1\\}^n} g(x) \\), where \\( g: \\mathbb{F}^n \\to \\mathbb{F} \\) " +
+        "is a polynomial of individual degree \\( d \\) in each variable. The protocol runs in \\( n \\) " +
+        "rounds, reducing the exponential-size sum to a single evaluation \\( g(r_1, \\ldots, r_n) \\)." +
+        "<ol>" +
+        "<li><strong>Round \\( i \\):</strong> The prover sends a univariate polynomial " +
+        "\\( s_i(X_i) = \\sum_{x_{i+1}, \\ldots, x_n \\in \\{0,1\\}} g(r_1, \\ldots, r_{i-1}, X_i, x_{i+1}, \\ldots, x_n) \\), " +
+        "which has degree \\( \\leq d \\).</li>" +
+        "<li><strong>Verifier check:</strong> \\( s_i(0) + s_i(1) = s_{i-1}(r_{i-1}) \\) " +
+        "(for round 1: \\( s_1(0) + s_1(1) = H \\)).</li>" +
+        "<li><strong>Challenge:</strong> The verifier samples \\( r_i \\xleftarrow{\\$} \\mathbb{F} \\).</li>" +
+        "</ol>" +
+        "After \\( n \\) rounds, the verifier checks \\( g(r_1, \\ldots, r_n) = s_n(r_n) \\) " +
+        "via an oracle or polynomial commitment scheme.",
+      mathDetails: [
+        {
+          subtitle: "Soundness Analysis via Schwartz-Zippel",
+          content:
+            "If the claimed sum is incorrect (\\( H \\neq \\sum_x g(x) \\)), a cheating prover must " +
+            "send a polynomial \\( s_1'(X_1) \\neq s_1(X_1) \\) that still satisfies " +
+            "\\( s_1'(0) + s_1'(1) = H \\). The key observation: \\( s_1'(X_1) - s_1(X_1) \\) is a " +
+            "nonzero polynomial of degree \\( \\leq d \\). By the Schwartz-Zippel lemma, " +
+            "\\[ \\Pr_{r_1 \\leftarrow \\mathbb{F}}[s_1'(r_1) = s_1(r_1)] \\leq \\frac{d}{|\\mathbb{F}|} \\] " +
+            "With probability \\( \\geq 1 - d/|\\mathbb{F}| \\), the cheating prover's lie propagates to round 2 " +
+            "as an incorrect reduced claim. By union bound over \\( n \\) rounds: " +
+            "\\[ \\Pr[\\text{cheat succeeds}] \\leq \\frac{n \\cdot d}{|\\mathbb{F}|} \\] " +
+            "For \\( n = 30 \\), \\( d = 3 \\), \\( |\\mathbb{F}| = 2^{256} \\): " +
+            "\\( \\epsilon \\leq 90 / 2^{256} \\approx 10^{-76} \\)."
+        },
+        {
+          subtitle: "Multilinear Extensions and Efficient Sumcheck",
+          content:
+            "In practice, \\( g \\) is the <em>multilinear extension</em> (MLE) of a function " +
+            "\\( f: \\{0,1\\}^n \\to \\mathbb{F} \\): " +
+            "\\[ \\tilde{f}(x_1, \\ldots, x_n) = \\sum_{w \\in \\{0,1\\}^n} f(w) \\cdot \\prod_{i=1}^n " +
+            "\\big( x_i \\cdot w_i + (1-x_i)(1-w_i) \\big) \\] " +
+            "The MLE \\( \\tilde{f} \\) has degree 1 in each variable (\\( d = 1 \\)), so each round " +
+            "polynomial \\( s_i \\) is a degree-1 univariate, requiring only 2 evaluations. The " +
+            "prover can compute all \\( s_i \\) in \\( O(2^n) \\) total time using a " +
+            "<em>streaming</em> algorithm that halves the work each round: " +
+            "\\[ T_{\\text{prover}} = 2^n + 2^{n-1} + \\cdots + 2 = O(2^n) \\] " +
+            "This is <strong>optimal</strong>: the prover visits each evaluation point exactly once. " +
+            "Spartan and Lasso exploit this for R1CS and lookup arguments respectively."
+        },
+        {
+          subtitle: "Sumcheck in Spartan: R1CS to Sumcheck Reduction",
+          content:
+            "Spartan (Setty, CRYPTO 2020) converts R1CS satisfiability into a sumcheck claim. " +
+            "Given R1CS matrices \\( A, B, C \\in \\mathbb{F}^{m \\times m} \\) and witness \\( z \\), " +
+            "satisfiability requires \\( Az \\circ Bz = Cz \\). Spartan encodes this as: " +
+            "\\[ \\sum_{x \\in \\{0,1\\}^{\\log m}} \\tilde{eq}(\\tau, x) \\cdot " +
+            "\\big( \\tilde{A}(x) \\cdot \\tilde{B}(x) - \\tilde{C}(x) \\big) = 0 \\] " +
+            "where \\( \\tau \\xleftarrow{\\$} \\mathbb{F}^{\\log m} \\) is a random point and " +
+            "\\( \\tilde{eq}(\\tau, x) = \\prod_i (\\tau_i x_i + (1-\\tau_i)(1-x_i)) \\). " +
+            "The prover runs sumcheck on this expression. The verifier's final check reduces to " +
+            "evaluating \\( \\tilde{A}, \\tilde{B}, \\tilde{C}, \\tilde{z} \\) at one random point, " +
+            "delegated to a polynomial commitment. " +
+            "Key property: <strong>no FFT needed</strong> — the prover's dominant cost is \\( O(m) \\) " +
+            "field operations (linear in the number of constraints), with memory \\( O(m) \\). " +
+            "This is why Spartan is the natural decider for folding schemes: it handles sparse " +
+            "R1CS efficiently without the superlinear overhead of Groth16/PLONK."
+        },
+        {
+          subtitle: "GKR Protocol: Sumcheck for Circuit Verification",
+          content:
+            "The GKR protocol (Goldwasser, Kalai, Rothblum, 2008/2015) uses sumcheck to verify " +
+            "arithmetic circuit evaluation layer by layer. For a circuit with \\( d \\) layers, the " +
+            "verifier starts with a claim about the output and reduces it via sumcheck to a claim " +
+            "about the layer below. At each layer \\( i \\): " +
+            "\\[ \\tilde{V}_i(r) = \\sum_{p,q \\in \\{0,1\\}^{s_i}} \\tilde{\\text{add}}_i(r,p,q) " +
+            "\\cdot (\\tilde{V}_{i+1}(p) + \\tilde{V}_{i+1}(q)) + \\tilde{\\text{mult}}_i(r,p,q) " +
+            "\\cdot \\tilde{V}_{i+1}(p) \\cdot \\tilde{V}_{i+1}(q) \\] " +
+            "Each layer reduction is one sumcheck invocation. After \\( d \\) layers, the verifier " +
+            "checks the input layer directly. Total verifier cost: \\( O(d \\cdot s \\cdot \\log s) \\) " +
+            "where \\( s \\) is the layer width — dramatically less than evaluating the full circuit."
+        }
+      ]
     }
   ]
 };
