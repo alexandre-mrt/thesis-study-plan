@@ -441,6 +441,192 @@ window.RUST_GUIDE = {
           }
         ]
       }
+      /* ───────── arkworks Ecosystem ───────── */
+      {
+        name: "arkworks Ecosystem (ark-ff, ark-ec, ark-groth16)",
+        analogy:
+          "LEGO blocks for cryptographic math. Instead of building a bridge from " +
+          "raw steel, you get pre-fabricated beams (finite fields), joints (elliptic " +
+          "curves), and connectors (polynomial commitments) that snap together. " +
+          "ark-ff gives you field elements, ark-ec gives you curve points, ark-poly " +
+          "gives you polynomials, and ark-groth16 gives you a complete proof system. " +
+          "Each block works independently, but they are designed to interlock — " +
+          "because they share the same trait system, you can swap BLS12-381 for BN254 " +
+          "by changing one type parameter, and every operation from field arithmetic " +
+          "to pairing checks adapts automatically.",
+        diagram:
+          '┌─────────────────────────────────────────────────────┐\n' +
+          '│            arkworks 0.5 Crate Ecosystem             │\n' +
+          '├─────────────────────────────────────────────────────┤\n' +
+          '│                                                     │\n' +
+          '│  ALGEBRA LAYER (arkworks-rs/algebra)                │\n' +
+          '│  ┌─────────────────────────────────────────────┐    │\n' +
+          '│  │ ark-ff       Field, PrimeField, FftField    │    │\n' +
+          '│  │ ark-ec       CurveGroup, AffineRepr, Pairing│    │\n' +
+          '│  │ ark-poly     DensePolynomial, EvalDomain     │    │\n' +
+          '│  │ ark-serialize  Compressed / Validated IO     │    │\n' +
+          '│  └─────────────────────────────────────────────┘    │\n' +
+          '│       ▲                                             │\n' +
+          '│       │ depends on                                  │\n' +
+          '│  CURVE IMPLEMENTATIONS                              │\n' +
+          '│  ┌─────────────────────────────────────────────┐    │\n' +
+          '│  │ ark-bls12-381   G1, G2, Fr, Fq, Bls12_381  │    │\n' +
+          '│  │ ark-bn254       G1, G2, Fr, Fq, Bn254       │    │\n' +
+          '│  │ ark-ed25519     EdwardsConfig                │    │\n' +
+          '│  │ ark-bw6-761     BW6 cycle curve              │    │\n' +
+          '│  └─────────────────────────────────────────────┘    │\n' +
+          '│       ▲                                             │\n' +
+          '│       │ depends on                                  │\n' +
+          '│  PROOF SYSTEMS                                      │\n' +
+          '│  ┌─────────────────────────────────────────────┐    │\n' +
+          '│  │ ark-relations   R1CS (ConstraintSystem)     │    │\n' +
+          '│  │ ark-r1cs-std    Gadgets (AllocVar, EqGadget)│    │\n' +
+          '│  │ ark-groth16     Prove / Verify (Groth16)    │    │\n' +
+          '│  │ ark-marlin      Universal SNARK              │    │\n' +
+          '│  └─────────────────────────────────────────────┘    │\n' +
+          '│                                                     │\n' +
+          '│  THESIS USAGE:                                      │\n' +
+          '│  utt-rs → ark-bls12-381 + ark-ec + ark-ff (0.5)    │\n' +
+          '│  Sonobe → ark-relations + ark-groth16 (decider)     │\n' +
+          '└─────────────────────────────────────────────────────┘',
+        keyPoints: [
+          "Modular architecture: each crate handles one concern — fields (ark-ff), " +
+            "curves (ark-ec), polynomials (ark-poly), proofs (ark-groth16). Swap " +
+            "any layer without touching the others",
+          "Trait-based generics: write code once over CurveGroup or PrimeField, " +
+            "instantiate with BLS12-381, BN254, or any curve. Your credential code " +
+            "compiles for any pairing-friendly curve",
+          "arkworks 0.5 breaking changes: CurveGroup replaces ProjectiveCurve, " +
+            "AffineRepr replaces AffineCurve, generator() replaces " +
+            "prime_subgroup_generator(). The thesis codebase (utt-rs) is already on 0.5",
+          "ark-groth16 + ark-relations: define circuits as ConstraintSynthesizer, " +
+            "generate proving/verification keys, create and verify Groth16 proofs. " +
+            "This is the exact flow used by Sonobe's decider SNARK",
+          "Multi-scalar multiplication (MSM) via VariableBaseMSM::msm() — the " +
+            "performance bottleneck in proof generation. Understanding MSM tuning " +
+            "is key to optimizing prover latency",
+          "Pairing operations via the Pairing trait: Bls12_381::pairing(g1, g2) " +
+            "computes e(G1, G2) → GT. Used for Groth16 verification and BBS+ " +
+            "signature verification"
+        ],
+        connections:
+          "arkworks IS the foundation of your thesis implementation. The utt-rs " +
+          "crate uses ark-bls12-381, ark-ec, ark-ff, and ark-serialize at version " +
+          "0.5. Every BBS+ operation (signing, proof generation, verification) is " +
+          "an arkworks field/curve operation. Sonobe uses ark-relations and " +
+          "ark-groth16 for the final decider proof. You cannot debug thesis code " +
+          "without understanding arkworks traits and their error messages.",
+        thesisExample:
+          "When implementing BBS+ selective disclosure in utt-rs, you will: " +
+          "(1) sample random blinding factors with Fr::rand(&mut rng), " +
+          "(2) compute Pedersen-like commitments with G1Projective scalar " +
+          "multiplication, (3) evaluate multilinear polynomials for the " +
+          "credential proof circuit, and (4) verify pairings with " +
+          "Bls12_381::pairing(). Each of these is a direct arkworks API call. " +
+          "For the Sonobe folding pipeline, the final Groth16 decider uses " +
+          "ark-groth16's Groth16::prove() and Groth16::verify() — the exact " +
+          "same API shown in the code examples.",
+        history: {
+          inventor: "Pratyush Mishra, arkworks-rs contributors",
+          year: 2020,
+          context:
+            "arkworks grew from zexe (Bowe, Chiesa, Green, Miers, Mishra, Wu, " +
+            "Oakland S&P 2020), which pioneered decentralized private computation. " +
+            "Pratyush Mishra (UC Berkeley → Aleo) led the extraction of zexe's " +
+            "algebra and proof system code into reusable crates. The 0.3 release " +
+            "(2021) established the trait-based architecture. The 0.4 release (2022) " +
+            "added Compress/Validate serialization. The 0.5 release (2024) cleaned " +
+            "up the curve trait hierarchy (CurveGroup/AffineRepr). Today arkworks " +
+            "is the de facto standard for ZK proof systems in Rust — used by " +
+            "Sonobe, Jolt, Mina, Aleo, and many others.",
+          funFact:
+            "The name 'arkworks' comes from 'arithmetic + frameworks'. The library " +
+            "has over 100 contributors and is maintained as a community project " +
+            "rather than by a single company — unusual for crypto infrastructure " +
+            "where most libraries are corporate-backed."
+        },
+        limitations: [
+          "Compile times are brutal — generic-heavy code with deep trait bounds " +
+            "can take 60+ seconds for incremental builds. Use cargo check, not " +
+            "cargo build, during development",
+          "Error messages are cryptic — trait bound failures involving CurveGroup + " +
+            "PrimeField + CanonicalSerialize produce multi-page error output. Learn " +
+            "to read the 'required by this bound' chain",
+          "No GPU acceleration by default — MSM and NTT are CPU-only in arkworks. " +
+            "GPU provers (ICICLE, Sppark) wrap arkworks types but are separate crates",
+          "Documentation is minimal — the API docs exist but lack examples. The " +
+            "best way to learn is reading test files in each crate's tests/ directory",
+          "The 0.4 → 0.5 migration broke significant downstream code — watch for " +
+            "outdated examples and tutorials that still use ProjectiveCurve/AffineCurve"
+        ],
+        exercises: [
+          {
+            type: "code",
+            question:
+              "Write a Rust snippet that: (1) samples a random scalar r in Fr " +
+              "(BLS12-381), (2) computes P = r * G where G is the generator of G1, " +
+              "(3) serializes P to compressed bytes, (4) deserializes and verifies " +
+              "equality. Use arkworks 0.5 APIs.",
+            hint:
+              "Import ark_bls12_381::{Fr, G1Projective}, ark_ec::CurveGroup, " +
+              "ark_ff::UniformRand, ark_serialize::{CanonicalSerialize, CanonicalDeserialize}. " +
+              "Use G1Projective::generator() for G, and .into_affine() before serializing " +
+              "for compressed form.",
+            answer:
+              "use ark_bls12_381::{Fr, G1Projective, G1Affine};\n" +
+              "use ark_ec::CurveGroup;\n" +
+              "use ark_ff::UniformRand;\n" +
+              "use ark_serialize::{CanonicalSerialize, CanonicalDeserialize};\n\n" +
+              "let mut rng = ark_std::test_rng();\n" +
+              "let r = Fr::rand(&mut rng);\n" +
+              "let g = G1Projective::generator();\n" +
+              "let p = g * r;\n" +
+              "let p_affine = p.into_affine();\n\n" +
+              "let mut bytes = Vec::new();\n" +
+              "p_affine.serialize_compressed(&mut bytes).unwrap();\n\n" +
+              "let p_back = G1Affine::deserialize_compressed(&bytes[..]).unwrap();\n" +
+              "assert_eq!(p_affine, p_back);"
+          },
+          {
+            type: "code",
+            question:
+              "Define a minimal R1CS circuit in arkworks that proves knowledge " +
+              "of x such that x^3 + x + 5 = y (where y is a public input). " +
+              "Implement ConstraintSynthesizer and generate a Groth16 proof.",
+            hint:
+              "Implement the ConstraintSynthesizer<F> trait. In generate_constraints(), " +
+              "allocate x as a witness (AllocVar), compute x*x, then x*x*x, add x and 5, " +
+              "enforce equality with y (public input). Use ark_groth16::Groth16 for " +
+              "setup/prove/verify.",
+            answer:
+              "See the technical companion for the full working example with " +
+              "ConstraintSynthesizer, Groth16::circuit_specific_setup(), " +
+              "Groth16::prove(), and Groth16::verify()."
+          },
+          {
+            type: "conceptual",
+            question:
+              "Explain the difference between CurveGroup and AffineRepr in " +
+              "arkworks 0.5. When should you use each? What happens if you " +
+              "try to do repeated additions on AffineRepr points?",
+            hint:
+              "CurveGroup uses projective coordinates (3 field elements: X, Y, Z), " +
+              "AffineRepr uses affine coordinates (2 field elements: x, y). Think " +
+              "about what happens with the expensive field inversion in affine addition.",
+            answer:
+              "CurveGroup (projective) avoids field inversions during point " +
+              "addition by using homogeneous coordinates — additions and doublings " +
+              "are 10-15 field multiplications. AffineRepr (affine) requires a " +
+              "field inversion per addition (~100x slower than multiplication). " +
+              "Use CurveGroup for all intermediate computation (scalar multiplication, " +
+              "MSM, proof generation), then call .into_affine() only at the end for " +
+              "serialization or comparison. If you accidentally accumulate additions " +
+              "on AffineRepr, each addition triggers into_group() → add → into_affine(), " +
+              "paying an inversion every time. This is the #1 performance mistake " +
+              "in arkworks code."
+          }
+        ]
+      }
     ]
   }
 };

@@ -544,6 +544,353 @@ window.RUST_TECHNICAL = {
           }
         ]
       }
+      /* ───────── arkworks Ecosystem ───────── */
+      {
+        name: "arkworks Ecosystem (ark-ff, ark-ec, ark-groth16)",
+        formalDefinition:
+          "<p>arkworks is a modular Rust ecosystem for zero-knowledge proof systems, " +
+          "organized as a collection of interoperable crates. The architecture follows " +
+          "a strict layering: <strong>algebra</strong> (fields, curves, polynomials) → " +
+          "<strong>constraint systems</strong> (R1CS, circuit gadgets) → " +
+          "<strong>proof systems</strong> (Groth16, Marlin). Each layer depends only " +
+          "on the one below it via trait bounds.</p>" +
+          "<p><strong>Crate map (arkworks 0.5):</strong></p>" +
+          "<pre><code>" +
+          "arkworks-rs/algebra          # Core math\n" +
+          "├── ark-ff      0.5         # Field traits: Field, PrimeField, FftField\n" +
+          "├── ark-ec      0.5         # Curve traits: CurveGroup, AffineRepr, Pairing\n" +
+          "├── ark-poly    0.5         # Polynomials: DensePolynomial, EvaluationDomain\n" +
+          "├── ark-serialize 0.5       # Canonical (de)serialization\n" +
+          "└── ark-std     0.5         # Utilities: UniformRand, test_rng\n\n" +
+          "arkworks-rs/curves           # Concrete curve implementations\n" +
+          "├── ark-bls12-381           # BLS12-381: G1, G2, Fr, Fq, Bls12_381\n" +
+          "├── ark-bn254              # BN254: G1, G2, Fr, Fq, Bn254\n" +
+          "├── ark-ed25519            # Ed25519 (EdwardsConfig)\n" +
+          "└── ark-bw6-761            # BW6-761 (cycle for BLS12-377)\n\n" +
+          "arkworks-rs/snark            # Proof systems\n" +
+          "├── ark-relations  0.5      # R1CS: ConstraintSystem, ConstraintSynthesizer\n" +
+          "├── ark-r1cs-std  0.5       # Gadgets: AllocVar, EqGadget, FieldVar\n" +
+          "└── ark-snark     0.5       # SNARK trait\n\n" +
+          "arkworks-rs/groth16          # Groth16 proving system\n" +
+          "└── ark-groth16   0.5       # Groth16::prove(), verify(), setup()" +
+          "</code></pre>",
+        mathDetails: [
+          {
+            subtitle: "ark-ff: Field Element Operations",
+            content:
+              "<p>Field elements are the atomic unit of all ZK computation. Every " +
+              "scalar, every coordinate, every constraint value is a field element.</p>" +
+              "<pre><code>" +
+              "use ark_bls12_381::Fr;  // BLS12-381 scalar field\n" +
+              "use ark_ff::{Field, PrimeField, UniformRand, One, Zero, BigInteger};\n\n" +
+              "let mut rng = ark_std::test_rng();\n\n" +
+              "// Create field elements\n" +
+              "let a = Fr::from(42u64);              // from integer\n" +
+              "let b = Fr::rand(&amp;mut rng);            // random sampling\n" +
+              "let c = Fr::one();                     // multiplicative identity\n" +
+              "let z = Fr::zero();                    // additive identity\n\n" +
+              "// Arithmetic (all mod p)\n" +
+              "let sum = a + b;\n" +
+              "let product = a * b;\n" +
+              "let inv = a.inverse().unwrap();         // modular inverse\n" +
+              "assert_eq!(a * inv, Fr::one());\n\n" +
+              "// Exponentiation\n" +
+              "let a_cubed = a.pow([3u64]);            // a^3 mod p\n\n" +
+              "// Convert to/from bytes\n" +
+              "let bigint = a.into_bigint();           // to BigInteger\n" +
+              "let bytes = bigint.to_bytes_le();       // to little-endian bytes\n" +
+              "let a_back = Fr::from_le_bytes_mod_order(&amp;bytes);" +
+              "</code></pre>" +
+              "<p><strong>Pitfall:</strong> <code>Fr::from()</code> accepts <code>u64</code>, " +
+              "<code>u128</code>, or <code>BigInteger</code>. For larger values, use " +
+              "<code>Fr::from_le_bytes_mod_order()</code> which reduces mod p automatically.</p>" +
+              "<p><strong>0.5 change:</strong> <code>FftField</code> is no longer implied by " +
+              "<code>PrimeField</code>. If your generic code calls <code>EvaluationDomain::new()</code>, " +
+              "add an explicit <code>F: FftField</code> bound.</p>"
+          },
+          {
+            subtitle: "ark-ec: Elliptic Curve Operations",
+            content:
+              "<p>Curve points come in two representations: <strong>projective</strong> " +
+              "(fast arithmetic) and <strong>affine</strong> (compact storage).</p>" +
+              "<pre><code>" +
+              "use ark_bls12_381::{G1Projective, G1Affine, G2Projective, Fr};\n" +
+              "use ark_ec::{CurveGroup, AffineRepr, VariableBaseMSM, Group};\n" +
+              "use ark_ff::UniformRand;\n\n" +
+              "let mut rng = ark_std::test_rng();\n\n" +
+              "// Generator point\n" +
+              "let g = G1Projective::generator();      // canonical G1 generator\n\n" +
+              "// Scalar multiplication: P = r * G\n" +
+              "let r = Fr::rand(&amp;mut rng);\n" +
+              "let p = g * r;                          // projective result\n\n" +
+              "// Point addition\n" +
+              "let q = G1Projective::rand(&amp;mut rng);\n" +
+              "let sum = p + q;                        // projective addition\n\n" +
+              "// Convert projective → affine (for serialization)\n" +
+              "let p_affine: G1Affine = p.into_affine();\n\n" +
+              "// Multi-Scalar Multiplication (MSM) — the critical operation\n" +
+              "// Computes: result = sum(scalars[i] * bases[i])\n" +
+              "let bases = vec![g.into_affine(); 100];\n" +
+              "let scalars: Vec&lt;Fr&gt; = (0..100)\n" +
+              "    .map(|_| Fr::rand(&amp;mut rng))\n" +
+              "    .collect();\n" +
+              "let msm_result = G1Projective::msm(&amp;bases, &amp;scalars).unwrap();" +
+              "</code></pre>" +
+              "<p><strong>Performance rule:</strong> Always accumulate in " +
+              "<code>G1Projective</code> (CurveGroup). Call <code>.into_affine()</code> " +
+              "only at the end. An affine addition triggers a field inversion (~100x " +
+              "slower than a multiplication).</p>" +
+              "<p><strong>0.5 changes:</strong></p>" +
+              "<ul>" +
+              "<li><code>ProjectiveCurve</code> → <code>CurveGroup</code></li>" +
+              "<li><code>AffineCurve</code> → <code>AffineRepr</code></li>" +
+              "<li><code>G::prime_subgroup_generator()</code> → <code>G::generator()</code></li>" +
+              "<li><code>VariableBaseMSM::multi_scalar_mul()</code> → <code>G::msm()</code> " +
+              "(method on CurveGroup)</li>" +
+              "</ul>"
+          },
+          {
+            subtitle: "Pairings on BLS12-381",
+            content:
+              "<p>Pairings are bilinear maps \\( e: \\mathbb{G}_1 \\times \\mathbb{G}_2 \\to " +
+              "\\mathbb{G}_T \\) used for Groth16 verification and BBS+ signatures.</p>" +
+              "<pre><code>" +
+              "use ark_bls12_381::{Bls12_381, G1Projective, G2Projective, Fr};\n" +
+              "use ark_ec::{pairing::Pairing, CurveGroup, Group};\n" +
+              "use ark_ff::UniformRand;\n\n" +
+              "let mut rng = ark_std::test_rng();\n" +
+              "let a = Fr::rand(&amp;mut rng);\n" +
+              "let b = Fr::rand(&amp;mut rng);\n\n" +
+              "let g1 = G1Projective::generator();\n" +
+              "let g2 = G2Projective::generator();\n\n" +
+              "// Compute pairing: e(a*G1, b*G2)\n" +
+              "let p1 = (g1 * a).into_affine();\n" +
+              "let p2 = (g2 * b).into_affine();\n" +
+              "let result = Bls12_381::pairing(p1, p2);\n\n" +
+              "// Bilinearity check: e(a*G1, b*G2) == e(G1, G2)^(a*b)\n" +
+              "let lhs = result;\n" +
+              "let rhs = Bls12_381::pairing(\n" +
+              "    g1.into_affine(),\n" +
+              "    g2.into_affine(),\n" +
+              ").0.pow((a * b).into_bigint());\n" +
+              "assert_eq!(lhs.0, rhs);" +
+              "</code></pre>" +
+              "<p><strong>Multi-pairing:</strong> For Groth16 verification (3 pairings), " +
+              "use <code>Bls12_381::multi_pairing()</code> which is ~2x faster than " +
+              "computing pairings individually due to shared Miller loop optimization.</p>" +
+              "<p><strong>Thesis usage:</strong> BBS+ signature verification requires " +
+              "checking \\( e(\\sigma, \\widetilde{g}_2) = e(g_1, \\widetilde{w}) \\) — " +
+              "this is a direct <code>Bls12_381::pairing()</code> call.</p>"
+          },
+          {
+            subtitle: "ark-groth16: Circuit Definition and Proving",
+            content:
+              "<p>A complete example: proving knowledge of \\( x \\) such that " +
+              "\\( x^3 + x + 5 = y \\) where \\( y \\) is public.</p>" +
+              "<pre><code>" +
+              "use ark_ff::Field;\n" +
+              "use ark_relations::r1cs::{\n" +
+              "    ConstraintSynthesizer, ConstraintSystemRef, SynthesisError,\n" +
+              "};\n" +
+              "use ark_r1cs_std::{\n" +
+              "    alloc::AllocVar, eq::EqGadget, fields::fp::FpVar,\n" +
+              "};\n\n" +
+              "#[derive(Clone)]\n" +
+              "struct CubicCircuit&lt;F: Field&gt; {\n" +
+              "    x: Option&lt;F&gt;,  // private witness\n" +
+              "}\n\n" +
+              "impl&lt;F: Field&gt; ConstraintSynthesizer&lt;F&gt; for CubicCircuit&lt;F&gt; {\n" +
+              "    fn generate_constraints(\n" +
+              "        self,\n" +
+              "        cs: ConstraintSystemRef&lt;F&gt;,\n" +
+              "    ) -&gt; Result&lt;(), SynthesisError&gt; {\n" +
+              "        // Allocate private witness x\n" +
+              "        let x = FpVar::new_witness(cs.clone(), || {\n" +
+              "            self.x.ok_or(SynthesisError::AssignmentMissing)\n" +
+              "        })?;\n\n" +
+              "        // Compute x^2, x^3\n" +
+              "        let x_sq = &amp;x * &amp;x;\n" +
+              "        let x_cu = &amp;x_sq * &amp;x;\n\n" +
+              "        // Compute y = x^3 + x + 5\n" +
+              "        let five = FpVar::constant(F::from(5u64));\n" +
+              "        let y = &amp;x_cu + &amp;x + &amp;five;\n\n" +
+              "        // Allocate public input y\n" +
+              "        let y_pub = FpVar::new_input(cs, || {\n" +
+              "            Ok(y.value().unwrap())\n" +
+              "        })?;\n\n" +
+              "        // Enforce y == x^3 + x + 5\n" +
+              "        y.enforce_equal(&amp;y_pub)?;\n" +
+              "        Ok(())\n" +
+              "    }\n" +
+              "}" +
+              "</code></pre>" +
+              "<p><strong>Using the circuit with Groth16:</strong></p>" +
+              "<pre><code>" +
+              "use ark_bls12_381::{Bls12_381, Fr};\n" +
+              "use ark_groth16::Groth16;\n" +
+              "use ark_crypto_primitives::snark::{CircuitSpecificSetupSNARK, SNARK};\n\n" +
+              "let mut rng = ark_std::test_rng();\n\n" +
+              "// Setup: generate proving and verification keys\n" +
+              "let circuit = CubicCircuit::&lt;Fr&gt; { x: None };\n" +
+              "let (pk, vk) = Groth16::&lt;Bls12_381&gt;::setup(\n" +
+              "    circuit, &amp;mut rng\n" +
+              ").unwrap();\n\n" +
+              "// Prove: x = 3, so y = 27 + 3 + 5 = 35\n" +
+              "let circuit = CubicCircuit { x: Some(Fr::from(3u64)) };\n" +
+              "let proof = Groth16::&lt;Bls12_381&gt;::prove(&amp;pk, circuit, &amp;mut rng)\n" +
+              "    .unwrap();\n\n" +
+              "// Verify: public input is y = 35\n" +
+              "let public_input = vec![Fr::from(35u64)];\n" +
+              "let valid = Groth16::&lt;Bls12_381&gt;::verify(\n" +
+              "    &amp;vk, &amp;public_input, &amp;proof\n" +
+              ").unwrap();\n" +
+              "assert!(valid);" +
+              "</code></pre>" +
+              "<p><strong>Key pattern:</strong> <code>new_witness()</code> = private input, " +
+              "<code>new_input()</code> = public input. The circuit definition uses " +
+              "<code>x: None</code> for setup (constraint shape only) and " +
+              "<code>x: Some(value)</code> for proving.</p>"
+          },
+          {
+            subtitle: "ark-poly: Polynomial Operations",
+            content:
+              "<p>Polynomials are central to all polynomial-IOP proof systems " +
+              "(PLONK, Groth16 via QAP, Spartan via sumcheck).</p>" +
+              "<pre><code>" +
+              "use ark_bls12_381::Fr;\n" +
+              "use ark_poly::{\n" +
+              "    univariate::DensePolynomial,\n" +
+              "    DenseUVPolynomial, Polynomial,\n" +
+              "    EvaluationDomain, Radix2EvaluationDomain,\n" +
+              "};\n" +
+              "use ark_ff::{UniformRand, FftField};\n\n" +
+              "let mut rng = ark_std::test_rng();\n\n" +
+              "// Create polynomial p(x) = 3 + 2x + x^2\n" +
+              "let p = DensePolynomial::from_coefficients_vec(vec![\n" +
+              "    Fr::from(3u64),   // constant term\n" +
+              "    Fr::from(2u64),   // x coefficient\n" +
+              "    Fr::from(1u64),   // x^2 coefficient\n" +
+              "]);\n\n" +
+              "// Evaluate at a point\n" +
+              "let val = p.evaluate(&amp;Fr::from(5u64));\n" +
+              "// 3 + 2*5 + 25 = 38\n" +
+              "assert_eq!(val, Fr::from(38u64));\n\n" +
+              "// Polynomial arithmetic\n" +
+              "let q = DensePolynomial::from_coefficients_vec(\n" +
+              "    vec![Fr::from(1u64), Fr::from(1u64)]\n" +
+              ");  // q(x) = 1 + x\n" +
+              "let product = &amp;p * &amp;q;  // degree 3 polynomial\n\n" +
+              "// FFT / NTT via evaluation domain\n" +
+              "let domain = Radix2EvaluationDomain::&lt;Fr&gt;::new(8).unwrap();\n" +
+              "let evals = domain.fft(&amp;p.coeffs);  // 8 evaluations\n" +
+              "let coeffs_back = domain.ifft(&amp;evals);\n" +
+              "assert_eq!(p.coeffs, coeffs_back[..p.coeffs.len()]);" +
+              "</code></pre>" +
+              "<p><strong>Thesis usage:</strong> The sumcheck protocol operates on " +
+              "multilinear polynomials. Spartan's prover evaluates the R1CS matrices " +
+              "as multilinear extensions (MLEs) and sends round polynomials to the " +
+              "verifier — this is all <code>ark-poly</code> under the hood.</p>"
+          },
+          {
+            subtitle: "ark-serialize: Compact Binary IO",
+            content:
+              "<p>All arkworks types implement <code>CanonicalSerialize</code> / " +
+              "<code>CanonicalDeserialize</code> for compact binary encoding.</p>" +
+              "<pre><code>" +
+              "use ark_bls12_381::{G1Affine, Fr};\n" +
+              "use ark_serialize::{\n" +
+              "    CanonicalSerialize, CanonicalDeserialize,\n" +
+              "    Compress, Validate,\n" +
+              "};\n" +
+              "use ark_ec::CurveGroup;\n" +
+              "use ark_ff::UniformRand;\n\n" +
+              "let mut rng = ark_std::test_rng();\n" +
+              "let point = (ark_bls12_381::G1Projective::rand(&amp;mut rng))\n" +
+              "    .into_affine();\n\n" +
+              "// Compressed serialization (48 bytes for G1)\n" +
+              "let mut compressed = Vec::new();\n" +
+              "point.serialize_compressed(&amp;mut compressed).unwrap();\n" +
+              "assert_eq!(compressed.len(), 48);\n\n" +
+              "// Uncompressed (96 bytes for G1: x + y)\n" +
+              "let mut uncompressed = Vec::new();\n" +
+              "point.serialize_uncompressed(&amp;mut uncompressed).unwrap();\n" +
+              "assert_eq!(uncompressed.len(), 96);\n\n" +
+              "// Deserialization with explicit flags\n" +
+              "let p_back = G1Affine::deserialize_with_mode(\n" +
+              "    &amp;compressed[..],\n" +
+              "    Compress::Yes,\n" +
+              "    Validate::Yes,  // checks point is on curve + in subgroup\n" +
+              ").unwrap();\n" +
+              "assert_eq!(point, p_back);\n\n" +
+              "// Scalar field (32 bytes)\n" +
+              "let scalar = Fr::rand(&amp;mut rng);\n" +
+              "let mut s_bytes = Vec::new();\n" +
+              "scalar.serialize_compressed(&amp;mut s_bytes).unwrap();\n" +
+              "assert_eq!(s_bytes.len(), 32);" +
+              "</code></pre>" +
+              "<p><strong>Security note:</strong> Always use <code>Validate::Yes</code> when " +
+              "deserializing untrusted input. Without validation, a malicious point could " +
+              "be outside the prime-order subgroup, breaking pairing-based security " +
+              "(small-subgroup attack). Only skip validation for trusted internal data " +
+              "where performance matters.</p>" +
+              "<p><strong>0.5 change:</strong> The <code>Compress</code> / <code>Validate</code> " +
+              "flag enums (introduced in 0.4) are now the canonical API. The older " +
+              "<code>serialize(writer, compressed: bool)</code> helper is removed.</p>"
+          }
+        ],
+        practicalNotes:
+          "<p><strong>Cargo.toml for a thesis-relevant arkworks project:</strong></p>" +
+          "<pre><code>" +
+          "[dependencies]\n" +
+          "ark-ff       = \"0.5\"\n" +
+          "ark-ec       = \"0.5\"\n" +
+          "ark-poly     = \"0.5\"\n" +
+          "ark-serialize = { version = \"0.5\", features = [\"derive\"] }\n" +
+          "ark-std      = \"0.5\"\n" +
+          "ark-bls12-381 = \"0.5\"\n" +
+          "ark-bn254    = \"0.5\"      # for Groth16 on EVM\n" +
+          "ark-relations = \"0.5\"\n" +
+          "ark-r1cs-std = \"0.5\"\n" +
+          "ark-groth16  = \"0.5\"\n" +
+          "ark-snark    = \"0.5\"\n" +
+          "ark-crypto-primitives = { version = \"0.5\", features = [\"snark\"] }\n\n" +
+          "[dev-dependencies]\n" +
+          "ark-std = { version = \"0.5\", features = [\"std\"] }  # for test_rng()" +
+          "</code></pre>" +
+          "<p><strong>Common error fixes:</strong></p>" +
+          "<ul>" +
+          "<li><code>the trait bound FftField is not satisfied</code> → add " +
+          "<code>F: FftField</code> to your generic bounds (0.5 split)</li>" +
+          "<li><code>cannot find ProjectiveCurve</code> → use <code>CurveGroup</code> (0.5 rename)</li>" +
+          "<li><code>prime_subgroup_generator not found</code> → use <code>G::generator()</code></li>" +
+          "<li><code>serialize takes 2 arguments</code> → use <code>serialize_compressed()</code> " +
+          "or <code>serialize_with_mode(writer, Compress, Validate)</code></li>" +
+          "</ul>",
+        exercises: [
+          {
+            type: "code",
+            question:
+              "Extend the CubicCircuit example to prove knowledge of (x, y) " +
+              "such that x^2 + y^2 = z where z is a public input. Implement " +
+              "ConstraintSynthesizer and test with Groth16."
+          },
+          {
+            type: "code",
+            question:
+              "Write a function that computes a Pedersen commitment C = v*G + r*H " +
+              "using arkworks BLS12-381, where G and H are two independent G1 " +
+              "generators (derive H by hashing to curve). Verify the commitment " +
+              "opens correctly."
+          },
+          {
+            type: "comparison",
+            question:
+              "Benchmark ark-groth16 proving time on BN254 vs BLS12-381 for " +
+              "a 10K-constraint circuit. Which is faster and why? Use " +
+              "ark_std::start_timer! / end_timer! for measurement."
+          }
+        ]
+      }
     ]
   }
 };
