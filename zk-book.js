@@ -292,10 +292,21 @@ async function openChapter(container, slug) {
       });
     });
 
+    // Pre-render display math blocks via katex.render
+    if (typeof katex !== 'undefined') {
+      reader.querySelectorAll('.katex-block').forEach((block) => {
+        const b64 = block.dataset.math;
+        if (!b64) return;
+        try {
+          const raw = decodeURIComponent(escape(atob(b64)));
+          katex.render(raw.trim(), block, { displayMode: true, throwOnError: false });
+        } catch { /* leave as fallback text */ }
+      });
+    }
+    // Render remaining inline math
     if (typeof renderMathInElement === 'function') {
       renderMathInElement(reader, {
         delimiters: [
-          { left: '$$', right: '$$', display: true },
           { left: '$', right: '$', display: false },
           { left: '\\(', right: '\\)', display: false },
           { left: '\\[', right: '\\]', display: true },
@@ -327,103 +338,59 @@ function escapeHtmlSafe(str) {
 }
 
 function convertMarkdown(md) {
-  let html = md;
+  let src = md;
 
-  // Obsidian image embeds: ![[attachments/file.png]]
-  html = html.replace(/!\[\[([^\]]+)\]\]/g, (_, path) => {
-    const src = path.startsWith('attachments/') ? `zk-book-vault/${path}` : `zk-book-vault/attachments/${path}`;
-    return `<img src="${src}" alt="" loading="lazy">`;
+  // Obsidian image embeds: ![[file.png|alt]] or ![[attachments/file.png|alt]] or ![[file.png]]
+  src = src.replace(/!\[\[([^\]|]+)\|([^\]]*)\]\]/g, (_, path, alt) => {
+    const clean = path.trim();
+    const imgPath = clean.startsWith('attachments/') ? `zk-book-vault/${clean}` : `zk-book-vault/attachments/${clean}`;
+    return `![${alt}](${imgPath})`;
+  });
+  src = src.replace(/!\[\[([^\]]+)\]\]/g, (_, path) => {
+    const clean = path.trim();
+    const imgPath = clean.startsWith('attachments/') ? `zk-book-vault/${clean}` : `zk-book-vault/attachments/${clean}`;
+    return `![](${imgPath})`;
   });
 
   // Obsidian wiki links: [[slug|display]] or [[slug]]
-  html = html.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, slug, display) => {
-    return `<span class="zk-book-wikilink" data-slug="${slug}">${display}</span>`;
+  src = src.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, slug, display) => {
+    return `<span class="zk-book-wikilink" data-slug="${slug.trim()}">${display}</span>`;
   });
-  html = html.replace(/\[\[([^\]]+)\]\]/g, (_, slug) => {
-    return `<span class="zk-book-wikilink" data-slug="${slug}">${slug}</span>`;
-  });
-
-  // Protect code blocks and math blocks from further processing
-  const codeBlocks = [];
-  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
-    const idx = codeBlocks.length;
-    codeBlocks.push(`<pre><code class="language-${lang || 'text'}">${escapeHtmlSafe(code.trimEnd())}</code></pre>`);
-    return `%%CODEBLOCK_${idx}%%`;
+  src = src.replace(/\[\[([^\]]+)\]\]/g, (_, slug) => {
+    return `<span class="zk-book-wikilink" data-slug="${slug.trim()}">${slug.trim()}</span>`;
   });
 
+  // Protect math blocks from marked.js mangling
   const mathBlocks = [];
-  html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
+  src = src.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
     const idx = mathBlocks.length;
-    mathBlocks.push(`$$${math}$$`);
-    return `%%MATHBLOCK_${idx}%%`;
+    // Fix && → & for KaTeX align environments
+    const fixed = math.replace(/&&/g, '&');
+    const escaped = fixed.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    mathBlocks.push(`<div class="katex-block" data-math="${btoa(unescape(encodeURIComponent(fixed)))}">$$${escaped}$$</div>`);
+    return `\n\nZKMATHBLOCK${idx}ENDBLOCK\n\n`;
   });
 
-  // Inline code
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-  // Headers
-  html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
-  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-
-  // Bold and italic
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-  // Markdown links: [text](url)
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-
-  // Blockquotes
-  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-
-  // Horizontal rules
-  html = html.replace(/^---$/gm, '<hr>');
-
-  // Tables
-  html = html.replace(/^(\|.+\|)\n(\|[-| :]+\|)\n((?:\|.+\|\n?)+)/gm, (_, headerRow, _sep, bodyRows) => {
-    const headers = headerRow.split('|').filter(Boolean).map((h) => `<th>${h.trim()}</th>`).join('');
-    const rows = bodyRows.trim().split('\n').map((row) => {
-      const cells = row.split('|').filter(Boolean).map((c) => `<td>${c.trim()}</td>`).join('');
-      return `<tr>${cells}</tr>`;
-    }).join('');
-    return `<table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>`;
+  // Protect inline math from marked.js
+  const inlineMath = [];
+  src = src.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
+    const idx = inlineMath.length;
+    inlineMath.push(`$${math}$`);
+    return `ZKINLINEMATH${idx}ENDMATH`;
   });
 
-  // Unordered lists
-  html = html.replace(/^(\s*)[-*] (.+)$/gm, '$1<li>$2</li>');
-  html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+  // Use marked.js for the rest
+  const html = marked.parse(src, { breaks: false, gfm: true });
 
-  // Ordered lists
-  html = html.replace(/^(\s*)\d+\. (.+)$/gm, '$1<li>$2</li>');
-
-  // Paragraphs: lines that aren't HTML or blank
-  const lines = html.split('\n');
-  const result = [];
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line === '') {
-      result.push('');
-    } else if (
-      line.startsWith('<') ||
-      line.startsWith('%%') ||
-      line.startsWith('$')
-    ) {
-      result.push(line);
-    } else {
-      result.push(`<p>${line}</p>`);
-    }
-  }
-  html = result.join('\n');
-
-  // Restore code blocks and math blocks
-  for (let i = 0; i < codeBlocks.length; i++) {
-    html = html.replace(`%%CODEBLOCK_${i}%%`, codeBlocks[i]);
-  }
+  // Restore math blocks
+  let result = html;
   for (let i = 0; i < mathBlocks.length; i++) {
-    html = html.replace(`%%MATHBLOCK_${i}%%`, mathBlocks[i]);
+    result = result.replace(new RegExp(`<p>\\s*ZKMATHBLOCK${i}ENDBLOCK\\s*</p>`, 'g'), mathBlocks[i]);
+    result = result.replace(`ZKMATHBLOCK${i}ENDBLOCK`, mathBlocks[i]);
+  }
+  for (let i = 0; i < inlineMath.length; i++) {
+    result = result.replace(`ZKINLINEMATH${i}ENDMATH`, inlineMath[i]);
   }
 
-  return html;
+  return result;
 }
