@@ -178,6 +178,8 @@ function initDayTabs() {
       const day = tab.dataset.day;
       if (day === 'zk') {
         switchToZKDeepdive();
+      } else if (day === 'zk-security') {
+        switchToZKSecurity();
       } else if (day === 'plan') {
         // T14: Plan tab handled by switchPlan
         switchPlan();
@@ -208,6 +210,11 @@ function switchPlan() {
   if (zkSection) {
     zkSection.classList.remove('active');
     zkSection.hidden = true;
+  }
+  var zkSecSec = $('#zk-security');
+  if (zkSecSec) {
+    zkSecSec.classList.remove('active');
+    zkSecSec.hidden = true;
   }
 
   try {
@@ -248,10 +255,15 @@ function switchDay(chapterKey) {
     sec.hidden = !isActive;
   });
 
-  /* Hide ZK deep dive when switching to a chapter */
+  /* Hide ZK deep dive and ZK security when switching to a chapter */
   if (zkSection) {
     zkSection.classList.remove('active');
     zkSection.hidden = true;
+  }
+  var zkSecSection = $('#zk-security');
+  if (zkSecSection) {
+    zkSecSection.classList.remove('active');
+    zkSecSection.hidden = true;
   }
 
   /* Lazy-init flashcards on first visit */
@@ -327,12 +339,48 @@ function switchToZKDeepdive() {
   setPomodoroPreset('chapters');
 }
 
+function switchToZKSecurity() {
+  const tabs = $$('.day-tab');
+  const sections = $$('.day-section');
+  const secSection = $('#zk-security');
+
+  tabs.forEach((tab) => {
+    const isSec = tab.dataset.day === 'zk-security';
+    tab.classList.toggle('active', isSec);
+    tab.setAttribute('aria-selected', String(isSec));
+  });
+
+  sections.forEach((sec) => {
+    sec.classList.remove('active');
+    sec.hidden = true;
+  });
+
+  const zkSection = $('#zk-deepdive');
+  if (zkSection) { zkSection.classList.remove('active'); zkSection.hidden = true; }
+
+  if (secSection) {
+    secSection.classList.add('active');
+    secSection.hidden = false;
+
+    const content = $('#zk-security-content');
+    if (content && content.children.length === 0 && typeof renderZKSecurity === 'function') {
+      renderZKSecurity();
+    }
+  }
+
+  try { localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, 'zk-security'); } catch { /* */ }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setPomodoroPreset('chapters');
+}
+
 function restoreActiveDay() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.ACTIVE_DAY);
     if (saved) {
       if (saved === 'zk') {
         switchToZKDeepdive();
+      } else if (saved === 'zk-security') {
+        switchToZKSecurity();
       } else if (saved === 'plan') {
         switchPlan();
       } else if (CHAPTER_KEYS.includes(saved) && saved !== 'flashcards') {

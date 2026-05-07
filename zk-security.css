@@ -1,0 +1,149 @@
+/**
+ * ZK Security Audit — Styles
+ * Red/orange security theme for the ZK vulnerability audit page.
+ */
+
+:root {
+  --color-sec: #ef4444;
+  --color-sec-dim: rgba(239, 68, 68, 0.12);
+  --color-sec-border: rgba(239, 68, 68, 0.25);
+  --color-sec-orange: #f97316;
+}
+
+.day-tab[data-day="zk-security"] .day-tab-dot {
+  background: var(--color-sec) !important;
+}
+
+#zk-security { display: none; animation: fadeIn var(--transition-base) ease; }
+#zk-security.active { display: block; }
+
+/* Page header */
+.zk-sec-page-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle); }
+.zk-sec-page-label {
+  display: inline-block; font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-sec); margin-bottom: 8px;
+}
+.zk-sec-page-title { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 8px; }
+.zk-sec-page-subtitle { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; max-width: 700px; }
+
+/* Stats bar */
+.zk-sec-stats {
+  display: flex; gap: 24px; margin-bottom: 28px; padding: 16px 20px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+.zk-sec-stat { text-align: center; flex: 1; }
+.zk-sec-stat-num { display: block; font-size: 1.6rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); }
+.zk-sec-stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* TOC */
+.zk-sec-toc {
+  margin-bottom: 32px; padding: 16px 20px;
+  background: var(--color-sec-dim); border: 1px solid var(--color-sec-border);
+  border-left-width: 3px; border-radius: var(--radius-md);
+}
+.zk-sec-toc-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-sec); margin: 0 0 10px; }
+.zk-sec-toc-list { margin: 0; padding-left: 1.2em; }
+.zk-sec-toc-list li { margin-bottom: 4px; }
+.zk-sec-toc-list a { color: var(--text-secondary); text-decoration: none; font-size: 0.88rem; transition: color 0.15s; }
+.zk-sec-toc-list a:hover { color: var(--color-sec); }
+
+/* Category */
+.zk-sec-category { margin-bottom: 40px; }
+.zk-sec-cat-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); }
+.zk-sec-cat-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+.zk-sec-cat-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 4px; }
+.zk-sec-cat-desc { font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+/* Vuln card */
+.zk-sec-card {
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); margin-bottom: 10px; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.zk-sec-card:hover { border-color: rgba(255,255,255,0.12); }
+.zk-sec-card.open { border-color: var(--color-sec-border); }
+
+.zk-sec-card-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 14px 18px; cursor: pointer; gap: 12px;
+}
+.zk-sec-card-title-wrap { flex: 1; min-width: 0; }
+.zk-sec-card-title { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 6px; }
+.zk-sec-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+.zk-sec-year {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted);
+  padding: 1px 6px; border: 1px solid var(--border-subtle); border-radius: 3px;
+}
+.zk-sec-tag {
+  font-size: 0.62rem; color: var(--text-muted); padding: 1px 6px;
+  background: rgba(255,255,255,0.05); border-radius: 3px;
+  font-family: var(--font-mono); text-transform: lowercase;
+}
+
+.zk-sec-chevron {
+  font-size: 0.7rem; color: var(--text-muted); transition: transform 0.2s;
+  flex-shrink: 0; margin-top: 4px;
+}
+.zk-sec-card.open .zk-sec-chevron { transform: rotate(180deg); }
+
+/* Card body */
+.zk-sec-card-body {
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
+  padding: 0 18px;
+}
+.zk-sec-card.open .zk-sec-card-body {
+  max-height: 8000px; opacity: 1; padding: 0 18px 18px;
+}
+
+.zk-sec-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 14px; }
+.zk-sec-desc p { margin: 0 0 8px; }
+.zk-sec-desc strong { color: var(--text-primary); }
+
+/* Diagrams */
+.zk-sec-diagram {
+  background: #111; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+  padding: 14px 16px; font-family: var(--font-mono); font-size: 0.76rem;
+  line-height: 1.4; color: #ccc; overflow-x: auto; margin-bottom: 14px;
+  white-space: pre;
+}
+
+/* Code blocks */
+.zk-sec-code-block { margin-bottom: 12px; }
+.zk-sec-code-label {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 4px 10px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.zk-sec-code-bad { background: rgba(239,68,68,0.15); color: #ef4444; }
+.zk-sec-code-good { background: rgba(34,197,94,0.15); color: #22c55e; }
+.zk-sec-code {
+  background: #0d0d0d; border: 1px solid var(--border-subtle);
+  border-top: none; border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  padding: 12px 14px; font-family: var(--font-mono); font-size: 0.78rem;
+  line-height: 1.45; color: #e0e0e0; overflow-x: auto; margin: 0;
+  white-space: pre;
+}
+
+/* Impact / Mitigation */
+.zk-sec-impact {
+  font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5;
+  padding: 10px 14px; background: rgba(239,68,68,0.06); border-left: 3px solid var(--color-sec);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 10px;
+}
+.zk-sec-mitigation {
+  font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5;
+  padding: 10px 14px; background: rgba(34,197,94,0.06); border-left: 3px solid #22c55e;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 10px;
+}
+.zk-sec-refs {
+  font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-top: 8px;
+}
+.zk-sec-refs a { color: var(--color-sec); }
+
+@media (max-width: 768px) {
+  .zk-sec-stats { flex-wrap: wrap; gap: 12px; }
+  .zk-sec-stat { min-width: 80px; }
+  .zk-sec-page-title { font-size: 1.5rem; }
+}

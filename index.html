@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="print.css" media="print">
   <link rel="stylesheet" href="technical.css">
   <link rel="stylesheet" href="zk-deepdive.css">
+  <link rel="stylesheet" href="zk-security.css">
   <link rel="stylesheet" href="paper-cards.css">
   <link rel="stylesheet" href="plan.css">
   <link rel="stylesheet" href="flashcards.css">
@@ -64,6 +65,10 @@
           <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
             <span class="day-tab-dot" style="background: #8B5CF6"></span>
             ZK Deep Dive
+          </button>
+          <button class="day-tab" data-day="zk-security" role="tab" aria-selected="false" aria-controls="zk-security">
+            <span class="day-tab-dot" style="background: #ef4444"></span>
+            ZK Security
           </button>
         </div>
       </div>
@@ -1335,6 +1340,11 @@
       <div id="zk-deepdive-content"></div>
     </section>
 
+    <!-- ZK SECURITY AUDIT -->
+    <section id="zk-security" role="tabpanel" hidden>
+      <div id="zk-security-content"></div>
+    </section>
+
     <!-- FLASHCARDS -->
     <section class="day-section" id="flashcards" data-day="flashcards" role="tabpanel" hidden>
       <div class="day-header" style="--day-color: #6366F1">
@@ -1443,6 +1453,8 @@
   <script src="zk-deepdive-data.js"></script>
   <script src="zk-deepdive-data2.js"></script>
   <script src="zk-deepdive.js"></script>
+  <script src="zk-security-data.js"></script>
+  <script src="zk-security.js"></script>
   <script src="study-guide.js"></script>
   <script src="search.js"></script>
   <script src="flashcard-data.js"></script>
