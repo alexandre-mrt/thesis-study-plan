@@ -440,7 +440,7 @@ window.RUST_GUIDE = {
               "significant redesign for an account-based chain."
           }
         ]
-      }
+      },
       /* ───────── arkworks Ecosystem ───────── */
       {
         name: "arkworks Ecosystem (ark-ff, ark-ec, ark-groth16)",

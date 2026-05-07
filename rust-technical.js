@@ -543,7 +543,7 @@ window.RUST_TECHNICAL = {
               "privacy trade-offs of each approach?"
           }
         ]
-      }
+      },
       /* ───────── arkworks Ecosystem ───────── */
       {
         name: "arkworks Ecosystem (ark-ff, ark-ec, ark-groth16)",
