@@ -20,7 +20,7 @@
 /* Page header */
 .zk-sec-page-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle); }
 .zk-sec-page-label {
-  display: inline-block; font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  display: inline-block; font-family: var(--font-mono); font-size: 14px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-sec); margin-bottom: 8px;
 }
 .zk-sec-page-title { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 8px; }

@@ -34,7 +34,7 @@
 .fc-chip {
   padding: 6px 12px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   font-family: var(--font-body, sans-serif);
   background: rgba(255, 255, 255, 0.06);
@@ -69,7 +69,7 @@
 .fc-btn-secondary {
   padding: 6px 14px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 15px;
   font-family: var(--font-body, sans-serif);
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -86,7 +86,7 @@
 }
 
 .fc-progress-label {
-  font-size: 13px;
+  font-size: 15px;
   color: #737373;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -171,7 +171,7 @@
 /* Front content */
 
 .fc-chapter-tag {
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -189,7 +189,7 @@
 }
 
 .fc-flip-hint {
-  font-size: 12px;
+  font-size: 14px;
   color: #525252;
   margin-top: auto;
   padding-top: 8px;
@@ -205,7 +205,7 @@
 }
 
 .fc-category-tag {
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 500;
   color: #525252;
   text-transform: uppercase;
@@ -383,7 +383,7 @@
 
 @media (max-width: 360px) {
   .fc-chip {
-    font-size: 11px;
+    font-size: 15px;
     padding: 5px 9px;
   }
 

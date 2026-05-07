@@ -10,13 +10,13 @@
   border-radius: 999px; border: 1px solid var(--border-subtle);
 }
 .global-view-label {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  font-family: var(--font-mono); font-size: 15px; font-weight: 600;
   color: var(--text-muted); padding: 0 8px; text-transform: uppercase; letter-spacing: 0.05em;
 }
 .global-view-btn {
   padding: 4px 12px; border: none; border-radius: 999px;
   background: transparent; color: var(--text-secondary);
-  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
   cursor: pointer; transition: all var(--transition-fast); white-space: nowrap;
 }
 .global-view-btn:hover { color: var(--text-primary); }
@@ -31,7 +31,7 @@
 .view-btn {
   padding: 4px 14px; border: none; border-radius: 999px;
   background: transparent; color: var(--text-muted);
-  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
   cursor: pointer; transition: all var(--transition-fast);
 }
 .view-btn:hover { color: var(--text-primary); }
@@ -49,7 +49,7 @@
   border-left: 3px solid var(--day-color, var(--color-day1));
   background: rgba(255,255,255,0.02);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-family: var(--font-mono); font-size: 13px; line-height: 1.8;
+  font-family: var(--font-mono); font-size: 15px; line-height: 1.8;
   color: var(--text-secondary);
 }
 
@@ -62,19 +62,19 @@
 .math-detail-subtitle {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 14px; cursor: pointer; user-select: none;
-  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  font-size: 15px; font-weight: 600; color: var(--text-primary);
   background: rgba(255,255,255,0.03);
   transition: background var(--transition-fast);
 }
 .math-detail-subtitle:hover { background: rgba(255,255,255,0.06); }
 .math-detail-subtitle .chevron {
-  font-size: 10px; color: var(--text-muted);
+  font-size: 15px; color: var(--text-muted);
   transition: transform var(--transition-fast);
 }
 .math-detail-section.open .chevron { transform: rotate(180deg); }
 .math-detail-content {
   max-height: 0; overflow: hidden; opacity: 0;
-  padding: 0 14px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);
+  padding: 0 14px; font-size: 15px; line-height: 1.8; color: var(--text-secondary);
   transition: max-height var(--transition-slow), opacity var(--transition-base), padding var(--transition-base);
 }
 .math-detail-section.open .math-detail-content {
@@ -84,10 +84,10 @@
 .security-analysis, .practical-notes {
   padding: 14px 16px; margin-bottom: 16px;
   border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm);
-  font-size: 13px; line-height: 1.8; color: var(--text-secondary);
+  font-size: 15px; line-height: 1.8; color: var(--text-secondary);
 }
 .security-analysis h4, .practical-notes h4 {
-  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  font-size: 14px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.08em; color: var(--day-color, var(--color-day1));
   margin-bottom: 8px;
 }
@@ -96,7 +96,7 @@
 
 .key-formulas { margin-bottom: 16px; }
 .key-formulas > h4 {
-  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  font-size: 14px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.08em; color: var(--day-color, var(--color-day1));
   margin-bottom: 10px;
 }
@@ -107,11 +107,11 @@
   border-radius: var(--radius-sm); padding: 12px 14px; overflow-x: auto;
 }
 .formula-name {
-  display: block; font-family: var(--font-mono); font-size: 10px;
+  display: block; font-family: var(--font-mono); font-size: 15px;
   font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--text-muted); margin-bottom: 6px;
 }
-.formula-content { font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
+.formula-content { font-size: 15px; line-height: 1.6; color: var(--text-secondary); }
 
 /* === Who Knows What Table === */
 .public-private-section {

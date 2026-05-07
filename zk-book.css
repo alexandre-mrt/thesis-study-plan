@@ -5,7 +5,7 @@
   padding: 2.5rem 1rem 1.5rem;
 }
 .zk-book-header .day-label {
-  font-size: 0.75rem;
+  font-size: 0.88rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: #a78bfa;
@@ -41,7 +41,7 @@
   border: 1px solid rgba(167, 139, 250, 0.25);
   border-radius: 6px;
   color: #a78bfa;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -61,7 +61,7 @@
   border-radius: 8px;
 }
 .zk-book-crosslinks-label {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #94a3b8;
@@ -77,7 +77,7 @@
   border: 1px solid rgba(99, 102, 241, 0.3);
   border-radius: 4px;
   color: #818cf8;
-  font-size: 0.75rem;
+  font-size: 0.88rem;
   cursor: pointer;
   transition: background 0.15s;
   text-decoration: none;
@@ -97,7 +97,7 @@
   margin-bottom: 1.5rem;
 }
 .zk-book-group-title {
-  font-size: 0.75rem;
+  font-size: 0.88rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: #a78bfa;
@@ -138,7 +138,7 @@
 .zk-book-check:checked + .zk-book-checkmark::after {
   content: '\2713';
   color: #0f0f0f;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 .zk-book-item-done .zk-book-item-title {
@@ -166,7 +166,7 @@
 }
 .zk-book-item-num {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   color: #64748b;
   min-width: 1.8rem;
 }
@@ -176,7 +176,7 @@
 }
 .zk-book-item-badge {
   margin-left: auto;
-  font-size: 0.65rem;
+  font-size: 0.88rem;
   padding: 0.15rem 0.4rem;
   border-radius: 3px;
   background: rgba(99, 102, 241, 0.15);
@@ -224,7 +224,7 @@
   background: rgba(167, 139, 250, 0.1);
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   color: #c4b5fd;
 }
 .zk-book-reader pre {
@@ -238,7 +238,7 @@
 .zk-book-reader pre code {
   background: none;
   padding: 0;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #e2e8f0;
 }
 .zk-book-reader blockquote {
@@ -305,7 +305,7 @@
   border-top: 1px solid rgba(167, 139, 250, 0.12);
 }
 .zk-dd-book-links-label {
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #a78bfa;
