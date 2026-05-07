@@ -700,6 +700,19 @@ function initYouTubeThumbnails() {
       e.preventDefault();
       loadYouTubeIframe(thumb);
     });
+    const img = thumb.querySelector('img');
+    if (img) {
+      const fallback = () => {
+        const src = img.src;
+        if (src.includes('maxresdefault')) {
+          img.src = src.replace('maxresdefault', 'hqdefault');
+        } else if (src.includes('hqdefault')) {
+          img.src = src.replace('hqdefault', 'mqdefault');
+        }
+      };
+      img.addEventListener('error', fallback);
+      if (img.complete && img.naturalWidth === 0) fallback();
+    }
   });
 }
 
