@@ -258,7 +258,7 @@ async function openChapter(container, slug) {
 
   const crosslinksHtml = buildCrosslinksHtml(ch);
   container.innerHTML =
-    `<button class="zk-book-back" id="zk-book-back-btn">&larr; Back to Table of Contents</button>` +
+    `<div class="zk-book-back-wrap"><button class="zk-book-back" id="zk-book-back-btn">&larr; Back to Table of Contents</button></div>` +
     crosslinksHtml +
     `<div class="zk-book-reader"><div class="zk-book-loading">Loading chapter&hellip;</div></div>`;
 

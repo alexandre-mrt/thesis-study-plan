@@ -22,13 +22,21 @@
   font-size: 0.875rem;
 }
 
-/* Back button when reading a chapter */
+/* Back button wrapper — sticky on left while scrolling */
+.zk-book-back-wrap {
+  position: sticky;
+  top: 70px;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  background: rgba(15, 15, 15, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.1);
+}
 .zk-book-back {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.4rem 0.8rem;
-  margin: 1rem 1rem 0.5rem;
   background: rgba(167, 139, 250, 0.1);
   border: 1px solid rgba(167, 139, 250, 0.25);
   border-radius: 6px;
