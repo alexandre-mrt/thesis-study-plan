@@ -446,7 +446,7 @@ function buildPaperCard(paper, techPaper, chapterKey, paperIdx, savedState, view
   body.appendChild(technicalContent);
 
   /* View switch logic */
-  const switchView = (view) => {
+  const switchView = (view, fromGlobal) => {
     const isIntuitive = view === 'intuitive';
     intuitiveContent.classList.toggle('hidden', !isIntuitive);
     technicalContent.classList.toggle('active', !isIntuitive);
@@ -462,10 +462,17 @@ function buildPaperCard(paper, techPaper, chapterKey, paperIdx, savedState, view
     } else {
       renderMathIn(technicalContent);
     }
+
+    if (!fromGlobal && typeof syncGlobalToggle === 'function') {
+      syncGlobalToggle(view);
+    }
   };
 
   intuitiveBtn.addEventListener('click', () => switchView('intuitive'));
   technicalBtn.addEventListener('click', () => switchView('technical'));
+
+  intuitiveBtn.addEventListener('global-switch', () => switchView('intuitive', true));
+  technicalBtn.addEventListener('global-switch', () => switchView('technical', true));
 
   /* Keypoint takeaway footer */
   if (paper.keyTakeaway) {

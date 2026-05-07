@@ -604,7 +604,7 @@ function buildConceptCard(concept, techConcept, dayNum, conceptKey, savedState, 
   annotateAcronyms(technicalContent);
 
   /* Toggle logic */
-  const switchView = (view) => {
+  const switchView = (view, fromGlobal) => {
     const isIntuitive = view === 'intuitive';
     intuitiveContent.classList.toggle('hidden', !isIntuitive);
     technicalContent.classList.toggle('active', !isIntuitive);
@@ -618,10 +618,17 @@ function buildConceptCard(concept, techConcept, dayNum, conceptKey, savedState, 
     if (!isIntuitive) {
       renderMathIn(technicalContent);
     }
+
+    if (!fromGlobal) {
+      syncGlobalToggle(view);
+    }
   };
 
   intuitiveBtn.addEventListener('click', () => switchView('intuitive'));
   technicalBtn.addEventListener('click', () => switchView('technical'));
+
+  intuitiveBtn.addEventListener('global-switch', () => switchView('intuitive', true));
+  technicalBtn.addEventListener('global-switch', () => switchView('technical', true));
 
   card.appendChild(body);
 
@@ -906,11 +913,32 @@ function initStudyGuideToggles() {
 
 /* === Global View Toggle === */
 
+function syncGlobalToggle(view) {
+  const globalToggle = document.getElementById('global-view-toggle');
+  if (!globalToggle) return;
+  const buttons = globalToggle.querySelectorAll('.global-view-btn');
+  buttons.forEach((b) => {
+    b.classList.toggle('active', b.dataset.view === view);
+  });
+  updateGlobalToggleColor();
+}
+
 function initGlobalViewToggle() {
   const globalToggle = document.getElementById('global-view-toggle');
   if (!globalToggle) return;
 
   const buttons = globalToggle.querySelectorAll('.global-view-btn');
+
+  /* Detect current dominant view from active section's local toggles */
+  const activeSection = document.querySelector('.day-section.active');
+  if (activeSection) {
+    const techActive = activeSection.querySelectorAll('.view-btn[data-view="technical"].active').length;
+    const intActive = activeSection.querySelectorAll('.view-btn[data-view="intuitive"].active').length;
+    const dominantView = techActive > intActive ? 'technical' : 'intuitive';
+    buttons.forEach((b) => {
+      b.classList.toggle('active', b.dataset.view === dominantView);
+    });
+  }
 
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -923,15 +951,7 @@ function initGlobalViewToggle() {
       updateGlobalToggleColor();
 
       /* Switch all visible concept cards on the active day */
-      const activeSection = document.querySelector('.day-section.active');
-      if (!activeSection) return;
-
-      const viewBtns = activeSection.querySelectorAll('.view-btn[data-view="' + targetView + '"]');
-      viewBtns.forEach((vb) => {
-        if (!vb.classList.contains('active')) {
-          vb.click();
-        }
-      });
+      switchAllViewsOnDay(targetView);
     });
   });
 
@@ -965,7 +985,7 @@ function switchAllViewsOnDay(view) {
 
   activeSection.querySelectorAll('.view-btn[data-view="' + view + '"]').forEach((btn) => {
     if (!btn.classList.contains('active')) {
-      btn.click();
+      btn.dispatchEvent(new CustomEvent('global-switch', { detail: { view } }));
     }
   });
 }
