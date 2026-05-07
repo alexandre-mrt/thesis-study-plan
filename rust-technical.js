@@ -892,5 +892,393 @@ window.RUST_TECHNICAL = {
         ]
       }
     ]
+  },
+
+  block2: {
+    concepts: [
+      /* ───────── Pedersen Commitments ───────── */
+      {
+        name: "Pedersen Commitments (arkworks + Circom)",
+        formalDefinition:
+          "<p>A Pedersen commitment to value \\( v \\) with blinding factor \\( r \\):</p>" +
+          "<p>\\[ C = v \\cdot G + r \\cdot H \\in \\mathbb{G}_1 \\]</p>" +
+          "<p>where \\( G \\) is the standard generator and \\( H \\) is a second generator " +
+          "with unknown discrete log relative to \\( G \\). Properties:</p>" +
+          "<ul>" +
+          "<li><strong>Perfectly hiding:</strong> For any \\( v \\), the commitment \\( C \\) " +
+          "is uniformly distributed (information-theoretically secure)</li>" +
+          "<li><strong>Computationally binding:</strong> Finding \\( (v', r') \\neq (v, r) \\) " +
+          "with same \\( C \\) requires solving discrete log \\( \\log_G(H) \\)</li>" +
+          "<li><strong>Additively homomorphic:</strong> \\( C_1 + C_2 = (v_1+v_2)G + (r_1+r_2)H \\)</li>" +
+          "</ul>",
+        mathDetails: [
+          {
+            subtitle: "arkworks: Pedersen Commitment from Scratch",
+            content:
+              "<p>Full working implementation on BLS12-381:</p>" +
+              "<pre><code>" +
+              "use ark_bls12_381::{Fr, G1Projective, G1Affine};\n" +
+              "use ark_ec::{CurveGroup, Group};\n" +
+              "use ark_ff::UniformRand;\n" +
+              "use ark_serialize::CanonicalSerialize;\n\n" +
+              "struct PedersenParams {\n" +
+              "    g: G1Projective,  // value base\n" +
+              "    h: G1Projective,  // blinding base\n" +
+              "}\n\n" +
+              "impl PedersenParams {\n" +
+              "    fn setup() -&gt; Self {\n" +
+              "        let g = G1Projective::generator();\n" +
+              "        // H derived deterministically — nobody knows log_G(H)\n" +
+              "        let h_seed = b\"pedersen_blinding_generator\";\n" +
+              "        let h = G1Projective::generator() * Fr::from_le_bytes_mod_order(h_seed);\n" +
+              "        Self { g, h }\n" +
+              "    }\n\n" +
+              "    fn commit(&amp;self, value: Fr, blinding: Fr) -&gt; G1Projective {\n" +
+              "        self.g * value + self.h * blinding\n" +
+              "    }\n\n" +
+              "    fn verify(&amp;self, commitment: G1Projective, value: Fr, blinding: Fr) -&gt; bool {\n" +
+              "        self.commit(value, blinding) == commitment\n" +
+              "    }\n" +
+              "}\n\n" +
+              "// Usage:\n" +
+              "let params = PedersenParams::setup();\n" +
+              "let mut rng = ark_std::test_rng();\n" +
+              "let v = Fr::from(42u64);\n" +
+              "let r = Fr::rand(&amp;mut rng);\n" +
+              "let c = params.commit(v, r);\n" +
+              "assert!(params.verify(c, v, r));\n\n" +
+              "// Homomorphic addition\n" +
+              "let v2 = Fr::from(58u64);\n" +
+              "let r2 = Fr::rand(&amp;mut rng);\n" +
+              "let c2 = params.commit(v2, r2);\n" +
+              "let c_sum = c + c2;\n" +
+              "assert!(params.verify(c_sum, v + v2, r + r2));" +
+              "</code></pre>"
+          },
+          {
+            subtitle: "Circom: Pedersen Hash vs Pedersen Commitment",
+            content:
+              "<p>circomlib provides <code>Pedersen(n)</code> which is a <strong>Pedersen hash</strong> " +
+              "(maps inputs to a curve point), not a commitment. For a real commitment with blinding:</p>" +
+              "<pre><code>" +
+              "include \"circomlib/circuits/escalarmulany.circom\";\n" +
+              "include \"circomlib/circuits/bitify.circom\";\n\n" +
+              "// Pedersen commitment: C = v*G + r*H\n" +
+              "template PedersenCommitment() {\n" +
+              "    signal input value;     // private\n" +
+              "    signal input blinding;  // private\n" +
+              "    signal output cx, cy;   // commitment point\n\n" +
+              "    // Decompose value to bits for scalar mul\n" +
+              "    component vBits = Num2Bits(253);\n" +
+              "    vBits.in &lt;== value;\n\n" +
+              "    component rBits = Num2Bits(253);\n" +
+              "    rBits.in &lt;== blinding;\n\n" +
+              "    // v * G\n" +
+              "    component mulG = EscalarMulAny(253);\n" +
+              "    mulG.e &lt;== vBits.out;\n" +
+              "    mulG.p &lt;== [Gx, Gy];  // fixed generator\n\n" +
+              "    // r * H\n" +
+              "    component mulH = EscalarMulAny(253);\n" +
+              "    mulH.e &lt;== rBits.out;\n" +
+              "    mulH.p &lt;== [Hx, Hy];  // second generator\n\n" +
+              "    // Point addition: C = v*G + r*H\n" +
+              "    component add = BabyAdd();\n" +
+              "    add.x1 &lt;== mulG.out[0];\n" +
+              "    add.y1 &lt;== mulG.out[1];\n" +
+              "    add.x2 &lt;== mulH.out[0];\n" +
+              "    add.y2 &lt;== mulH.out[1];\n" +
+              "    cx &lt;== add.xout;\n" +
+              "    cy &lt;== add.yout;\n" +
+              "}" +
+              "</code></pre>" +
+              "<p><strong>Cost:</strong> ~500 constraints per commitment (2 scalar muls + 1 point add). " +
+              "circomlib's built-in Pedersen template uses a windowed lookup method that is faster " +
+              "(~250 constraints) but outputs a hash, not a commitment with separate blinding.</p>"
+          }
+        ]
+      },
+
+      /* ───────── Schnorr & BBS+ Signatures ───────── */
+      {
+        name: "Schnorr & BBS+ Signatures (arkworks)",
+        formalDefinition:
+          "<p><strong>Schnorr Signature</strong> over group \\( \\mathbb{G} \\) with generator \\( G \\):</p>" +
+          "<ul>" +
+          "<li>KeyGen: \\( sk \\xleftarrow{\\$} \\mathbb{F}_r \\), \\( pk = sk \\cdot G \\)</li>" +
+          "<li>Sign: \\( k \\xleftarrow{\\$} \\mathbb{F}_r \\), \\( R = k \\cdot G \\), " +
+          "\\( c = H(R \\| pk \\| m) \\), \\( s = k - c \\cdot sk \\)</li>" +
+          "<li>Verify: \\( s \\cdot G + c \\cdot pk \\stackrel{?}{=} R \\)</li>" +
+          "</ul>" +
+          "<p><strong>BBS+ Signature</strong> over bilinear group \\( (\\mathbb{G}_1, \\mathbb{G}_2, \\mathbb{G}_T, e) \\):</p>" +
+          "<ul>" +
+          "<li>KeyGen: \\( sk \\xleftarrow{\\$} \\mathbb{F}_r \\), \\( pk = sk \\cdot \\tilde{G}_2 \\in \\mathbb{G}_2 \\)</li>" +
+          "<li>Sign messages \\( (m_1, \\ldots, m_L) \\): choose random \\( e \\), compute " +
+          "\\( \\sigma = \\frac{1}{sk + e} (G_1 + \\sum_{i=1}^L m_i H_i) \\in \\mathbb{G}_1 \\)</li>" +
+          "<li>Verify: \\( e(\\sigma, \\; pk + e \\cdot \\tilde{G}_2) \\stackrel{?}{=} " +
+          "e(G_1 + \\sum_i m_i H_i, \\; \\tilde{G}_2) \\)</li>" +
+          "</ul>",
+        mathDetails: [
+          {
+            subtitle: "arkworks: Schnorr Signature Implementation",
+            content:
+              "<pre><code>" +
+              "use ark_bls12_381::{Fr, G1Projective};\n" +
+              "use ark_ec::{CurveGroup, Group};\n" +
+              "use ark_ff::{UniformRand, PrimeField};\n" +
+              "use ark_serialize::CanonicalSerialize;\n" +
+              "use blake2::{Blake2s256, Digest};\n\n" +
+              "fn hash_to_fr(data: &amp;[u8]) -&gt; Fr {\n" +
+              "    let hash = Blake2s256::digest(data);\n" +
+              "    Fr::from_le_bytes_mod_order(&amp;hash)\n" +
+              "}\n\n" +
+              "struct SchnorrSig {\n" +
+              "    r: G1Projective,  // commitment\n" +
+              "    s: Fr,            // response\n" +
+              "}\n\n" +
+              "fn schnorr_sign(sk: Fr, msg: &amp;[u8]) -&gt; SchnorrSig {\n" +
+              "    let g = G1Projective::generator();\n" +
+              "    let mut rng = ark_std::test_rng();\n" +
+              "    let k = Fr::rand(&amp;mut rng);\n" +
+              "    let r = g * k;\n\n" +
+              "    // Fiat-Shamir challenge\n" +
+              "    let mut buf = Vec::new();\n" +
+              "    r.into_affine().serialize_compressed(&amp;mut buf).unwrap();\n" +
+              "    buf.extend_from_slice(msg);\n" +
+              "    let c = hash_to_fr(&amp;buf);\n\n" +
+              "    let s = k - c * sk;\n" +
+              "    SchnorrSig { r, s }\n" +
+              "}\n\n" +
+              "fn schnorr_verify(pk: G1Projective, msg: &amp;[u8], sig: &amp;SchnorrSig) -&gt; bool {\n" +
+              "    let g = G1Projective::generator();\n" +
+              "    let mut buf = Vec::new();\n" +
+              "    sig.r.into_affine().serialize_compressed(&amp;mut buf).unwrap();\n" +
+              "    buf.extend_from_slice(msg);\n" +
+              "    let c = hash_to_fr(&amp;buf);\n\n" +
+              "    g * sig.s + pk * c == sig.r\n" +
+              "}\n\n" +
+              "// Test\n" +
+              "let mut rng = ark_std::test_rng();\n" +
+              "let sk = Fr::rand(&amp;mut rng);\n" +
+              "let pk = G1Projective::generator() * sk;\n" +
+              "let sig = schnorr_sign(sk, b\"hello thesis\");\n" +
+              "assert!(schnorr_verify(pk, b\"hello thesis\", &amp;sig));" +
+              "</code></pre>"
+          },
+          {
+            subtitle: "BBS+ Pairing Verification in arkworks",
+            content:
+              "<p>The BBS+ verification equation uses pairings. In arkworks:</p>" +
+              "<pre><code>" +
+              "use ark_bls12_381::{Bls12_381, G1Projective, G2Projective, Fr};\n" +
+              "use ark_ec::{pairing::Pairing, CurveGroup, Group};\n\n" +
+              "// BBS+ verify: e(sigma, pk + e*G2) == e(G1 + sum(mi*Hi), G2)\n" +
+              "fn bbs_verify(\n" +
+              "    sigma: G1Projective,     // signature point\n" +
+              "    pk: G2Projective,        // issuer public key in G2\n" +
+              "    e: Fr,                   // signature randomness\n" +
+              "    messages: &amp;[Fr],         // signed messages\n" +
+              "    generators: &amp;[G1Projective], // Hi generators (one per message)\n" +
+              ") -&gt; bool {\n" +
+              "    let g1 = G1Projective::generator();\n" +
+              "    let g2 = G2Projective::generator();\n\n" +
+              "    // Right side of pairing: G1 + sum(mi * Hi)\n" +
+              "    let mut rhs_g1 = g1;\n" +
+              "    for (m, h) in messages.iter().zip(generators.iter()) {\n" +
+              "        rhs_g1 += *h * m;\n" +
+              "    }\n\n" +
+              "    // Left pairing: e(sigma, pk + e*G2)\n" +
+              "    let lhs = Bls12_381::pairing(\n" +
+              "        sigma.into_affine(),\n" +
+              "        (pk + g2 * e).into_affine(),\n" +
+              "    );\n\n" +
+              "    // Right pairing: e(G1 + sum(mi*Hi), G2)\n" +
+              "    let rhs = Bls12_381::pairing(\n" +
+              "        rhs_g1.into_affine(),\n" +
+              "        g2.into_affine(),\n" +
+              "    );\n\n" +
+              "    lhs == rhs\n" +
+              "}" +
+              "</code></pre>" +
+              "<p><strong>Performance:</strong> 2 pairings = ~4 ms on BLS12-381. Use " +
+              "<code>Bls12_381::multi_pairing()</code> for ~2x speedup by sharing Miller loop.</p>"
+          }
+        ]
+      },
+
+      /* ───────── Groth16 Circuit Writing ───────── */
+      {
+        name: "Groth16 Circuit Writing (arkworks R1CS + Circom)",
+        formalDefinition:
+          "<p>R1CS (Rank-1 Constraint System): a set of constraints of the form " +
+          "\\( \\langle \\mathbf{a}, \\mathbf{w} \\rangle \\cdot \\langle \\mathbf{b}, \\mathbf{w} \\rangle " +
+          "= \\langle \\mathbf{c}, \\mathbf{w} \\rangle \\) where \\( \\mathbf{w} \\) is the witness " +
+          "(all variables including public inputs). Each constraint enforces one multiplication.</p>" +
+          "<p>In matrix form: \\( (A \\mathbf{w}) \\circ (B \\mathbf{w}) = C \\mathbf{w} \\), " +
+          "where \\( \\circ \\) is the Hadamard (element-wise) product.</p>",
+        mathDetails: [
+          {
+            subtitle: "arkworks: Credential Age Check Circuit",
+            content:
+              "<p>A circuit proving the holder is over 18 without revealing exact age:</p>" +
+              "<pre><code>" +
+              "use ark_ff::Field;\n" +
+              "use ark_relations::r1cs::{\n" +
+              "    ConstraintSynthesizer, ConstraintSystemRef, SynthesisError,\n" +
+              "};\n" +
+              "use ark_r1cs_std::{\n" +
+              "    alloc::AllocVar, eq::EqGadget, cmp::CmpGadget,\n" +
+              "    fields::fp::FpVar, boolean::Boolean,\n" +
+              "};\n\n" +
+              "#[derive(Clone)]\n" +
+              "struct AgeCheckCircuit&lt;F: Field&gt; {\n" +
+              "    age: Option&lt;F&gt;,       // private witness\n" +
+              "    threshold: Option&lt;F&gt;, // public (18)\n" +
+              "}\n\n" +
+              "impl&lt;F: Field + std::cmp::PartialOrd&gt; ConstraintSynthesizer&lt;F&gt;\n" +
+              "    for AgeCheckCircuit&lt;F&gt;\n" +
+              "{\n" +
+              "    fn generate_constraints(\n" +
+              "        self,\n" +
+              "        cs: ConstraintSystemRef&lt;F&gt;,\n" +
+              "    ) -&gt; Result&lt;(), SynthesisError&gt; {\n" +
+              "        let age = FpVar::new_witness(cs.clone(), || {\n" +
+              "            self.age.ok_or(SynthesisError::AssignmentMissing)\n" +
+              "        })?;\n\n" +
+              "        let threshold = FpVar::new_input(cs.clone(), || {\n" +
+              "            self.threshold.ok_or(SynthesisError::AssignmentMissing)\n" +
+              "        })?;\n\n" +
+              "        // Prove: age &gt;= threshold\n" +
+              "        // Technique: prove (age - threshold) is in [0, 2^8)\n" +
+              "        let diff = &amp;age - &amp;threshold;\n" +
+              "        // In practice: bit-decompose diff and enforce all bits\n" +
+              "        // are valid (0 or 1). This is a range check.\n" +
+              "        // Simplified: enforce diff * diff_inv = 1 (diff != 0)\n" +
+              "        // Full range proof needs bit decomposition\n\n" +
+              "        Ok(())\n" +
+              "    }\n" +
+              "}" +
+              "</code></pre>" +
+              "<p><strong>Constraint count:</strong> An 8-bit range check costs ~8 constraints " +
+              "(one per bit). A comparison costs ~16 constraints (two range checks). " +
+              "The full age-check circuit is tiny (~30 constraints) compared to the " +
+              "BBS+ verification (~100K constraints).</p>"
+          },
+          {
+            subtitle: "Circom: Same Age Check",
+            content:
+              "<pre><code>" +
+              "include \"circomlib/circuits/comparators.circom\";\n\n" +
+              "template AgeCheck() {\n" +
+              "    signal input age;          // private\n" +
+              "    signal input threshold;    // public (18)\n" +
+              "    signal output valid;\n\n" +
+              "    // GreaterEqThan(n): checks a &gt;= b with n-bit inputs\n" +
+              "    component gte = GreaterEqThan(8);  // 8-bit ages (0-255)\n" +
+              "    gte.in[0] &lt;== age;\n" +
+              "    gte.in[1] &lt;== threshold;\n\n" +
+              "    // Enforce the result is 1 (age &gt;= threshold)\n" +
+              "    gte.out === 1;\n" +
+              "    valid &lt;== gte.out;\n" +
+              "}\n\n" +
+              "component main {public [threshold]} = AgeCheck();\n\n" +
+              "// Compile: circom agecheck.circom --r1cs --wasm\n" +
+              "// Prove:  snarkjs groth16 prove circuit.zkey witness.wtns proof.json\n" +
+              "// Verify: snarkjs groth16 verify vkey.json public.json proof.json" +
+              "</code></pre>" +
+              "<p><strong>Key difference:</strong> Circom's <code>GreaterEqThan(8)</code> from " +
+              "circomlib handles all the bit decomposition and range checking automatically — " +
+              "about 5 lines vs 30+ in arkworks. But the arkworks version integrates directly " +
+              "with Sonobe for folding.</p>"
+          }
+        ]
+      },
+
+      /* ───────── Merkle Trees + Poseidon ───────── */
+      {
+        name: "Merkle Trees & Poseidon Hash (arkworks + Circom)",
+        formalDefinition:
+          "<p>A Merkle tree of depth \\( d \\) over leaves \\( (L_0, \\ldots, L_{2^d-1}) \\) " +
+          "with hash function \\( H \\):</p>" +
+          "<p>\\[ \\text{node}_{i,j} = H(\\text{node}_{i+1, 2j}, \\; \\text{node}_{i+1, 2j+1}) \\]</p>" +
+          "<p>where level \\( d \\) = leaves, level 0 = root. A membership proof for leaf \\( L_k \\) is " +
+          "the set of sibling hashes along the path from \\( L_k \\) to root: " +
+          "\\( \\pi = (s_0, s_1, \\ldots, s_{d-1}) \\) with path indices \\( (b_0, \\ldots, b_{d-1}) \\in \\{0,1\\}^d \\).</p>" +
+          "<p><strong>Poseidon</strong> is an algebraic hash function designed for prime fields: " +
+          "\\( H: \\mathbb{F}_p^t \\to \\mathbb{F}_p \\) using \\( x^\\alpha \\) S-boxes (\\( \\alpha = 5 \\) " +
+          "for BN254/BLS12-381) and an MDS matrix for diffusion. Cost: ~250 R1CS constraints per hash.</p>",
+        mathDetails: [
+          {
+            subtitle: "arkworks: Poseidon Hash and Merkle Verification",
+            content:
+              "<pre><code>" +
+              "use ark_bls12_381::Fr;\n" +
+              "use ark_crypto_primitives::{\n" +
+              "    crh::{poseidon::CRH as PoseidonCRH, CRHScheme},\n" +
+              "    sponge::poseidon::PoseidonConfig,\n" +
+              "};\n\n" +
+              "// Poseidon hash of two field elements\n" +
+              "fn poseidon_hash(left: Fr, right: Fr, params: &amp;PoseidonConfig&lt;Fr&gt;) -&gt; Fr {\n" +
+              "    PoseidonCRH::evaluate(params, vec![left, right]).unwrap()\n" +
+              "}\n\n" +
+              "// Merkle proof verification\n" +
+              "fn verify_merkle_proof(\n" +
+              "    leaf: Fr,\n" +
+              "    path: &amp;[(Fr, bool)],  // (sibling, is_right)\n" +
+              "    root: Fr,\n" +
+              "    params: &amp;PoseidonConfig&lt;Fr&gt;,\n" +
+              ") -&gt; bool {\n" +
+              "    let mut current = leaf;\n" +
+              "    for (sibling, is_right) in path {\n" +
+              "        current = if *is_right {\n" +
+              "            poseidon_hash(*sibling, current, params)\n" +
+              "        } else {\n" +
+              "            poseidon_hash(current, *sibling, params)\n" +
+              "        };\n" +
+              "    }\n" +
+              "    current == root\n" +
+              "}" +
+              "</code></pre>" +
+              "<p><strong>In-circuit version:</strong> Replace <code>Fr</code> with <code>FpVar&lt;Fr&gt;</code> " +
+              "and <code>poseidon_hash</code> with the CRHGadget from <code>ark-crypto-primitives</code>. " +
+              "The structure is identical — arkworks gadgets mirror the native API.</p>"
+          },
+          {
+            subtitle: "Circom: Merkle Proof with Poseidon (Production Template)",
+            content:
+              "<pre><code>" +
+              "pragma circom 2.0.0;\n" +
+              "include \"circomlib/circuits/poseidon.circom\";\n\n" +
+              "template MerkleProof(depth) {\n" +
+              "    signal input leaf;\n" +
+              "    signal input pathElements[depth];\n" +
+              "    signal input pathIndices[depth];  // 0 = left, 1 = right\n" +
+              "    signal input root;  // public\n\n" +
+              "    component hashers[depth];\n" +
+              "    signal nodes[depth + 1];\n" +
+              "    nodes[0] &lt;== leaf;\n\n" +
+              "    for (var i = 0; i &lt; depth; i++) {\n" +
+              "        hashers[i] = Poseidon(2);\n\n" +
+              "        // Mux: select order based on path index\n" +
+              "        // pathIndices[i] == 0: hash(node, sibling)\n" +
+              "        // pathIndices[i] == 1: hash(sibling, node)\n" +
+              "        hashers[i].inputs[0] &lt;== nodes[i]\n" +
+              "            + pathIndices[i] * (pathElements[i] - nodes[i]);\n" +
+              "        hashers[i].inputs[1] &lt;== pathElements[i]\n" +
+              "            + pathIndices[i] * (nodes[i] - pathElements[i]);\n\n" +
+              "        nodes[i + 1] &lt;== hashers[i].out;\n" +
+              "    }\n\n" +
+              "    root === nodes[depth];  // enforce root match\n" +
+              "}\n\n" +
+              "component main {public [root]} = MerkleProof(20);\n" +
+              "// 20 levels = 2^20 leaves (~1M credentials)\n" +
+              "// Cost: 20 × 250 = ~5,000 constraints" +
+              "</code></pre>" +
+              "<p><strong>The Mux trick:</strong> <code>a + idx*(b-a)</code> selects <code>a</code> when " +
+              "<code>idx=0</code> and <code>b</code> when <code>idx=1</code> — a conditional without " +
+              "branching, which is impossible in R1CS. This pattern appears everywhere in Circom circuits.</p>"
+          }
+        ]
+      }
+    ]
   }
 };

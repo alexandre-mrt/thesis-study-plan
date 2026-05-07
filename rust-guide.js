@@ -628,5 +628,488 @@ window.RUST_GUIDE = {
         ]
       }
     ]
+  },
+
+  /* ================================================================
+   * BLOCK 2: Cryptographic Functions — Hands-On with arkworks & Circom
+   * ================================================================ */
+  block2: {
+    title: "Cryptographic Functions in Practice",
+    connectionsSummary:
+      "This block provides hands-on examples of every cryptographic primitive " +
+      "used in the thesis: Pedersen commitments, Schnorr and BBS+ signatures, " +
+      "Groth16 circuit writing, and Merkle trees with Poseidon hash. Each concept " +
+      "includes working arkworks (Rust) code and equivalent Circom (circuit DSL) " +
+      "snippets so you can see the same operation in both the off-chain and in-circuit worlds.",
+    concepts: [
+      /* ───────── Pedersen Commitments ───────── */
+      {
+        name: "Pedersen Commitments (arkworks + Circom)",
+        analogy:
+          "A Pedersen commitment is a digital sealed envelope. You put a value " +
+          "inside, seal it with a random blinding factor, and hand the sealed " +
+          "envelope to someone. They cannot open it (hiding), and you cannot " +
+          "swap the value later (binding). The magic: sealed envelopes are additive — " +
+          "if Alice seals 3 and Bob seals 5, their sealed envelopes add up to a " +
+          "sealed 8, without anyone opening them. This is the foundation of " +
+          "confidential transactions.",
+        diagram:
+          '┌─────────────────────────────────────────────────────┐\n' +
+          '│           Pedersen Commitment: C = v·G + r·H        │\n' +
+          '├─────────────────────────────────────────────────────┤\n' +
+          '│                                                     │\n' +
+          '│  ARKWORKS (off-chain, Rust)                         │\n' +
+          '│  let g = G1Projective::generator();                 │\n' +
+          '│  let h = hash_to_g1("pedersen_h");                  │\n' +
+          '│  let c = g * v + h * r;                             │\n' +
+          '│                                                     │\n' +
+          '│  CIRCOM (in-circuit, DSL)                           │\n' +
+          '│  component ped = Pedersen(2);                       │\n' +
+          '│  ped.in[0] <== v;                                   │\n' +
+          '│  ped.in[1] <== r;                                   │\n' +
+          '│  commitment <== ped.out;                             │\n' +
+          '│                                                     │\n' +
+          '│  HOMOMORPHIC PROPERTY                               │\n' +
+          '│  C(v1,r1) + C(v2,r2) = C(v1+v2, r1+r2)            │\n' +
+          '│  → Verify balance without revealing amounts          │\n' +
+          '└─────────────────────────────────────────────────────┘',
+        keyPoints: [
+          "C = v·G + r·H where v is value, r is random blinding, G and H are " +
+            "independent generators. Hiding: C looks random. Binding: cannot find " +
+            "different (v', r') that opens to same C (discrete log hardness)",
+          "Homomorphic: C1 + C2 = C(v1+v2, r1+r2). This is how confidential " +
+            "transactions verify balance conservation without revealing amounts",
+          "arkworks: scalar multiplication on G1Projective. Use hash-to-curve " +
+            "for the second generator H to ensure nobody knows log_G(H)",
+          "Circom: use the Pedersen hash template from circomlib — but note it " +
+            "outputs a curve point hash, not a raw commitment. For real commitments, " +
+            "use EscalarMulAny with two bases",
+          "Cost: 1 scalar multiplication = ~250 constraints in R1CS. A Pedersen " +
+            "commitment proof adds ~500 constraints to your circuit"
+        ],
+        connections:
+          "Pedersen commitments are used everywhere in the thesis: confidential " +
+          "balances, BBS+ credential attribute hiding, and Merkle tree leaf " +
+          "commitments. Understanding the arkworks implementation is essential " +
+          "for debugging commitment verification failures.",
+        thesisExample:
+          "In the payment circuit, the prover commits to the transfer amount: " +
+          "C_amount = amount·G + blinding·H. The circuit checks that input " +
+          "commitments minus output commitments equals zero (balance conservation) " +
+          "without revealing the actual amounts. The range proof then shows " +
+          "each committed amount is non-negative.",
+        history: {
+          inventor: "Torben Pedersen",
+          year: 1991,
+          context:
+            "Published at CRYPTO 1991. Pedersen's scheme improved on earlier " +
+            "commitment schemes by being perfectly hiding (information-theoretically " +
+            "secure) while computationally binding (relies on discrete log). " +
+            "It became the standard commitment in privacy protocols because of " +
+            "its additive homomorphism — a property that coin-based and account-based " +
+            "confidential transactions both exploit.",
+          funFact:
+            "The choice of the second generator H is critical: if you know " +
+            "log_G(H) = k, you can open any commitment to any value. This is " +
+            "why H must be derived via a 'nothing-up-my-sleeve' process like " +
+            "hashing a fixed string to a curve point."
+        },
+        limitations: [
+          "Computationally binding only — a quantum computer that solves discrete " +
+            "log can break binding (find alternative openings)",
+          "Not additively homomorphic for multiplication — you can add commitments " +
+            "but not multiply them. For multiplication, you need pairings or " +
+            "additional ZK proof techniques",
+          "The blinding factor r must be truly random — reusing r across " +
+            "commitments leaks the difference of committed values"
+        ],
+        exercises: [
+          {
+            type: "code",
+            question:
+              "Using arkworks BLS12-381, implement a function that: (1) commits " +
+              "to two values v1=100 and v2=50 with random blindings, (2) computes " +
+              "the sum commitment, (3) verifies the sum commitment opens to 150 " +
+              "using the sum of blindings. Print the commitment sizes in bytes.",
+            hint:
+              "Use G1Projective::generator() for G. Derive H by hashing a fixed " +
+              "string: H = G1Projective::rand(&mut deterministic_rng). Commit " +
+              "with c = g * Fr::from(v) + h * r. The sum commitment is c1 + c2.",
+            answer:
+              "let g = G1Projective::generator();\n" +
+              "let h = G1Projective::rand(&mut ark_std::test_rng()); // deterministic H\n" +
+              "let r1 = Fr::rand(&mut rng); let r2 = Fr::rand(&mut rng);\n" +
+              "let c1 = g * Fr::from(100u64) + h * r1;\n" +
+              "let c2 = g * Fr::from(50u64) + h * r2;\n" +
+              "let c_sum = c1 + c2;\n" +
+              "let c_check = g * Fr::from(150u64) + h * (r1 + r2);\n" +
+              "assert_eq!(c_sum, c_check); // homomorphic!"
+          }
+        ]
+      },
+
+      /* ───────── Schnorr & BBS+ Signatures ───────── */
+      {
+        name: "Schnorr & BBS+ Signatures (arkworks)",
+        analogy:
+          "A Schnorr signature is like signing a document with invisible ink that " +
+          "only appears under UV light — anyone can verify the signature exists, " +
+          "but they learn nothing about the pen. BBS+ takes this further: you can " +
+          "sign a document with 10 fields, then show the signature is valid while " +
+          "revealing only 3 of the 10 fields. The verifier is convinced all 10 " +
+          "fields were signed, but sees only what you choose to disclose. This is " +
+          "selective disclosure — the core of anonymous credentials.",
+        diagram:
+          '┌─────────────────────────────────────────────────────┐\n' +
+          '│             Schnorr vs BBS+ Signatures              │\n' +
+          '├─────────────────────────────────────────────────────┤\n' +
+          '│                                                     │\n' +
+          '│  SCHNORR (single message, DL-based)                 │\n' +
+          '│  Keygen:  sk = x, pk = x·G                          │\n' +
+          '│  Sign:    k ← random, R = k·G                       │\n' +
+          '│           c = H(R || pk || msg)                      │\n' +
+          '│           s = k - c·x                                │\n' +
+          '│           σ = (R, s)                                 │\n' +
+          '│  Verify:  s·G + c·pk == R ?                          │\n' +
+          '│                                                     │\n' +
+          '│  BBS+ (multi-message, pairing-based)                │\n' +
+          '│  Keygen:  sk = x, pk = x·G2                         │\n' +
+          '│  Sign:    σ = 1/(x + e) · (G1 + Σ mᵢ·Hᵢ)           │\n' +
+          '│  Verify:  e(σ, pk + e·G2) == e(G1 + Σ mᵢ·Hᵢ, G2)  │\n' +
+          '│  Disclose: derive proof π revealing subset of mᵢ     │\n' +
+          '│                                                     │\n' +
+          '│  KEY DIFFERENCE:                                    │\n' +
+          '│  Schnorr: prove "I signed this message"             │\n' +
+          '│  BBS+:    prove "I signed messages including..."    │\n' +
+          '│           (selective disclosure, unlinkable)         │\n' +
+          '└─────────────────────────────────────────────────────┘',
+        keyPoints: [
+          "Schnorr: sign = (R, s) where R = k·G, s = k - c·x. Verification: " +
+            "s·G + c·pk = k·G = R. One scalar mul + one hash. ~64 bytes on BLS12-381",
+          "BBS+: sign N messages at once. Signature σ is a single G1 point. " +
+            "Selective disclosure: derive a ZK proof that reveals subset of " +
+            "messages while hiding the rest. Signature is ~48 bytes (compressed G1)",
+          "arkworks implementation: Schnorr uses ark-ec scalar mul + a hash-to-field. " +
+            "BBS+ uses Bls12_381::pairing() for verification. Both use Fr for scalars",
+          "BBS+ requires pairings (G1 × G2 → GT). Schnorr works on any group. " +
+            "This is why BBS+ needs BLS12-381 or BN254 — curves with efficient pairings",
+          "Unlinkability: each BBS+ proof is randomized — two proofs from the " +
+            "same credential are unlinkable. Schnorr signatures are always the same " +
+            "for the same message"
+        ],
+        connections:
+          "BBS+ is THE signature scheme for the thesis anonymous credentials. " +
+          "The issuer signs a credential (N attributes) with BBS+. The holder " +
+          "derives a selective disclosure proof revealing only chosen attributes. " +
+          "The Sui contract verifies the proof via pairing checks.",
+        thesisExample:
+          "Credential flow: (1) Issuer signs (name, age, country, id) with BBS+ " +
+          "using sk. Signature σ = 1/(sk+e) · (G1 + name·H1 + age·H2 + ...). " +
+          "(2) User derives proof π disclosing only age ≥ 18. (3) Sui verifier " +
+          "checks the pairing equation with the disclosed attributes and the proof.",
+        history: {
+          inventor: "Boneh, Boyen, Shacham (BBS+, 2004); Schnorr (1989)",
+          year: 2004,
+          context:
+            "Schnorr signatures (1989) were the first efficient discrete-log " +
+            "signatures, later standardized as EdDSA. BBS (Boneh-Boyen-Shacham, " +
+            "2004) introduced short group signatures. The '+' variant by Au, " +
+            "Susilo, and Mu (2006) added efficient multi-message signing and " +
+            "selective disclosure, making it the standard for anonymous credentials.",
+          funFact:
+            "BBS+ signatures are being considered for the W3C Verifiable " +
+            "Credentials standard and eIDAS 2.0. If adopted, every EU citizen's " +
+            "digital wallet could use BBS+ for privacy-preserving identity proofs."
+        },
+        limitations: [
+          "BBS+ requires pairing-friendly curves — cannot use ed25519 or secp256k1",
+          "BBS+ is NOT post-quantum — broken by Shor's algorithm. Lattice-based " +
+            "alternatives exist but are 100x larger (see lattice section)",
+          "Selective disclosure proofs are larger than the original signature " +
+            "(~300-500 bytes vs ~48 bytes) due to randomization commitments",
+          "BBS+ verification is ~5x slower than Schnorr due to pairing operations"
+        ],
+        exercises: [
+          {
+            type: "code",
+            question:
+              "Implement a minimal Schnorr signature in arkworks BLS12-381: " +
+              "keygen, sign, verify. Use Blake2s as the hash function. Test with " +
+              "a simple message.",
+            hint:
+              "sk = Fr::rand(&mut rng), pk = G1Projective::generator() * sk. " +
+              "Sign: k = Fr::rand(), R = g*k, c = hash(R || pk || msg) as Fr, " +
+              "s = k - c*sk. Verify: g*s + pk*c == R.",
+            answer:
+              "let g = G1Projective::generator();\n" +
+              "let sk = Fr::rand(&mut rng);\n" +
+              "let pk = g * sk;\n" +
+              "// Sign\n" +
+              "let k = Fr::rand(&mut rng);\n" +
+              "let r = g * k;\n" +
+              "let c = hash_to_fr(&[r, pk, msg]); // Blake2s → Fr\n" +
+              "let s = k - c * sk;\n" +
+              "// Verify\n" +
+              "assert_eq!(g * s + pk * c, r);"
+          }
+        ]
+      },
+
+      /* ───────── Groth16 Circuit Writing ───────── */
+      {
+        name: "Groth16 Circuit Writing (arkworks R1CS + Circom)",
+        analogy:
+          "Writing a ZK circuit is like writing a tax form that proves your income " +
+          "is above a threshold without showing the actual number. The form has " +
+          "boxes (variables), rules (constraints), and a final checkbox (output). " +
+          "The trick: every rule must be a simple multiplication — A × B = C. " +
+          "Any computation can be broken down into these simple multiplications, " +
+          "but the skill is doing it efficiently.",
+        diagram:
+          '┌─────────────────────────────────────────────────────┐\n' +
+          '│       Two Ways to Write ZK Circuits                 │\n' +
+          '├─────────────────────────────────────────────────────┤\n' +
+          '│                                                     │\n' +
+          '│  ARKWORKS (Rust, low-level R1CS)                    │\n' +
+          '│  ┌───────────────────────────────────────┐          │\n' +
+          '│  │ impl ConstraintSynthesizer<Fr> {      │          │\n' +
+          '│  │   fn generate_constraints(self, cs) { │          │\n' +
+          '│  │     let x = FpVar::new_witness(..);   │          │\n' +
+          '│  │     let y = &x * &x;  // x^2          │          │\n' +
+          '│  │     y.enforce_equal(&pub_input)?;      │          │\n' +
+          '│  │   }                                   │          │\n' +
+          '│  │ }                                      │          │\n' +
+          '│  └───────────────────────────────────────┘          │\n' +
+          '│  → Compiles to R1CS directly in Rust                │\n' +
+          '│  → Full control, type-safe, integrated with Sonobe  │\n' +
+          '│                                                     │\n' +
+          '│  CIRCOM (DSL, higher-level)                         │\n' +
+          '│  ┌───────────────────────────────────────┐          │\n' +
+          '│  │ template Square() {                   │          │\n' +
+          '│  │   signal input x;                     │          │\n' +
+          '│  │   signal output y;                    │          │\n' +
+          '│  │   y <== x * x;                        │          │\n' +
+          '│  │ }                                      │          │\n' +
+          '│  └───────────────────────────────────────┘          │\n' +
+          '│  → Compiles to R1CS via circom compiler             │\n' +
+          '│  → Easier syntax, large library (circomlib)         │\n' +
+          '│  → Proofs via snarkjs (JS) or rapidsnark (C++)     │\n' +
+          '│                                                     │\n' +
+          '│  THESIS: arkworks for Sonobe/folding pipeline       │\n' +
+          '│          Circom for standalone credential circuits   │\n' +
+          '└─────────────────────────────────────────────────────┘',
+        keyPoints: [
+          "R1CS: every constraint is A · B = C where A, B, C are linear " +
+            "combinations of witness variables. One multiplication = one constraint",
+          "arkworks: implement ConstraintSynthesizer<F> trait. Use FpVar " +
+            "(high-level) or cs.new_witness_variable() + lc!() macro (low-level). " +
+            "Compile to ark-groth16 for proving",
+          "Circom: signal = variable, <== = assign + constrain, <-- = assign only " +
+            "(dangerous: no constraint!). template = reusable component. " +
+            "circomlib provides Poseidon, MerkleProof, EdDSA, Pedersen templates",
+          "Constraint cost: addition is free (linear combination), multiplication " +
+            "costs 1 constraint. Hash functions dominate cost: SHA-256 = ~27K " +
+            "constraints, Poseidon = ~250 constraints",
+          "arkworks advantages: type-safe Rust, integrated with Sonobe folding, " +
+            "direct access to curve operations. Circom advantages: faster " +
+            "prototyping, huge template library, snarkjs/rapidsnark ecosystem"
+        ],
+        connections:
+          "The thesis uses both: arkworks R1CS for the Sonobe folding pipeline " +
+          "(credential verification as a folding step), and Circom for standalone " +
+          "circuit prototyping. Understanding both is essential for choosing the " +
+          "right tool for each sub-circuit.",
+        thesisExample:
+          "The credential verification circuit in arkworks: (1) allocate BBS+ " +
+          "signature as witness, (2) recompute the pairing equation in-circuit " +
+          "using ark-r1cs-std gadgets, (3) enforce equality with the public " +
+          "verification result. This circuit is ~100K constraints and feeds " +
+          "into Sonobe's Nova folding as one step.",
+        history: {
+          inventor: "Jens Groth (Groth16, 2016); iden3 team (Circom, 2018)",
+          year: 2016,
+          context:
+            "Groth16 (EUROCRYPT 2016) achieved the smallest proof size and " +
+            "fastest verification for R1CS-based SNARKs — still unbeaten in 2026. " +
+            "Circom was created by the iden3 team (Jordi Baylina) in 2018 to make " +
+            "circuit writing accessible. It compiles to R1CS and integrates with " +
+            "snarkjs for browser-based proving. circomlib (2019) provided standard " +
+            "templates that became the de facto building blocks for ZK applications.",
+          funFact:
+            "Circom's <== operator does two things: assigns a value AND creates " +
+            "a constraint. The <-- operator only assigns. Forgetting to add a " +
+            "separate constraint after <-- is the #1 source of circuit bugs — " +
+            "the prover can assign any value and the verifier won't catch it."
+        },
+        limitations: [
+          "Groth16 requires a per-circuit trusted setup — changing the circuit " +
+            "means redoing the ceremony. PLONK/Marlin avoid this with universal setup",
+          "Circom lacks a type system — all signals are field elements. No " +
+            "structs, no generics, no enums. Complex circuits get messy fast",
+          "arkworks R1CS is verbose — a simple hash check takes 50+ lines in " +
+            "Rust vs 5 lines in Circom. The tradeoff is safety vs productivity",
+          "Neither approach handles non-field operations well — bit operations, " +
+            "comparisons, and range checks require expensive bit decomposition"
+        ],
+        exercises: [
+          {
+            type: "code",
+            question:
+              "Write a Circom template that proves knowledge of a preimage: " +
+              "given public hash h, prove you know secret x such that " +
+              "Poseidon(x) = h. Then write the equivalent in arkworks.",
+            hint:
+              "Circom: include 'circomlib/poseidon.circom', use Poseidon(1) " +
+              "template. arkworks: use ark-crypto-primitives PoseidonHash or " +
+              "implement the sponge manually.",
+            answer:
+              "// CIRCOM\n" +
+              "include \"circomlib/circuits/poseidon.circom\";\n" +
+              "template PreimageProof() {\n" +
+              "  signal input x;        // private\n" +
+              "  signal input h;        // public\n" +
+              "  component hasher = Poseidon(1);\n" +
+              "  hasher.inputs[0] <== x;\n" +
+              "  h === hasher.out;\n" +
+              "}\n" +
+              "component main {public [h]} = PreimageProof();"
+          }
+        ]
+      },
+
+      /* ───────── Merkle Trees + Poseidon ───────── */
+      {
+        name: "Merkle Trees & Poseidon Hash (arkworks + Circom)",
+        analogy:
+          "A Merkle tree is a tournament bracket for data. Each leaf is a player, " +
+          "each internal node is the 'winner' (hash) of two children. The root " +
+          "summarizes the entire dataset in one hash. To prove a leaf is in the " +
+          "tree, you show only the path from leaf to root — O(log n) hashes, not " +
+          "the entire tree. Poseidon is a hash function designed to be cheap inside " +
+          "ZK circuits: ~250 constraints per hash vs ~27,000 for SHA-256. This is " +
+          "a 100x difference that makes Merkle proofs practical in ZK.",
+        diagram:
+          '┌─────────────────────────────────────────────────────┐\n' +
+          '│        Merkle Tree + Poseidon in ZK Circuits        │\n' +
+          '├─────────────────────────────────────────────────────┤\n' +
+          '│                                                     │\n' +
+          '│  TREE STRUCTURE (depth 3, 8 leaves)                 │\n' +
+          '│                    Root                              │\n' +
+          '│                   /    \\                             │\n' +
+          '│                 H01    H23                           │\n' +
+          '│                / \\    / \\                           │\n' +
+          '│              H0  H1  H2  H3                         │\n' +
+          '│              |   |   |   |                          │\n' +
+          '│             L0  L1  L2  L3  ...                     │\n' +
+          '│                                                     │\n' +
+          '│  MEMBERSHIP PROOF for L1:                           │\n' +
+          '│  Path: [L0, H23] (sibling at each level)            │\n' +
+          '│  Verify: H(H(L0,L1), H23) == Root ?                 │\n' +
+          '│  Cost: depth × hash = 3 × 250 = 750 constraints    │\n' +
+          '│                                                     │\n' +
+          '│  HASH COST COMPARISON (per hash call)               │\n' +
+          '│  SHA-256:   27,000 constraints  ████████████████     │\n' +
+          '│  Poseidon:     250 constraints  █                   │\n' +
+          '│  → Always use Poseidon inside ZK circuits!          │\n' +
+          '│                                                     │\n' +
+          '│  THESIS: credential Merkle tree uses Poseidon       │\n' +
+          '│  Depth 20 = 2^20 credentials, proof = 20 hashes    │\n' +
+          '│  Total: 20 × 250 = 5,000 constraints               │\n' +
+          '└─────────────────────────────────────────────────────┘',
+        keyPoints: [
+          "Merkle tree: binary hash tree where root = H(H(L0,L1), H(L2,L3)). " +
+            "Membership proof = sibling hashes along the path. Cost: O(log n) hashes",
+          "Poseidon hash: designed for prime fields (BN254, BLS12-381). ~250 " +
+            "constraints per hash in R1CS. Uses power-map S-boxes (x^5 or x^7) " +
+            "instead of XOR/bit ops — native to field arithmetic",
+          "arkworks: use ark-crypto-primitives::crh::poseidon for Poseidon. " +
+            "MerkleTree and MerkleTreePath types handle tree construction and " +
+            "proof generation. In-circuit verification via PathVar gadget",
+          "Circom: circomlib provides Poseidon(n) and MerkleTreeInclusionProof(depth) " +
+            "templates. Drop-in components for membership proofs",
+          "Thesis tree: depth 20 → holds 2^20 (~1M) credentials. Membership " +
+            "proof = 20 Poseidon hashes = ~5,000 constraints. Tiny compared to " +
+            "the BBS+ verification (~100K constraints)"
+        ],
+        connections:
+          "The credential Merkle tree is how the thesis tracks all issued " +
+          "credentials on-chain without storing them in the clear. The root is " +
+          "published on Sui. To prove credential validity, the user provides " +
+          "a Merkle path (private) that connects their credential leaf to the " +
+          "public root — all inside the ZK circuit.",
+        thesisExample:
+          "The credential circuit includes: (1) Poseidon hash of credential " +
+          "attributes to get leaf, (2) Merkle path verification against the " +
+          "on-chain root (20 Poseidon hashes = 5K constraints), (3) BBS+ " +
+          "signature verification (~100K constraints). Total: ~105K constraints. " +
+          "The Merkle path is a small fraction of the total circuit cost.",
+        history: {
+          inventor: "Ralph Merkle (trees, 1979); Grassi, Khovratovich et al. (Poseidon, 2019)",
+          year: 2019,
+          context:
+            "Merkle trees were invented by Ralph Merkle in 1979 for his PhD thesis " +
+            "and are used in nearly every blockchain (Bitcoin block headers, Ethereum " +
+            "state trie). Poseidon was published at USENIX Security 2021 by Grassi, " +
+            "Khovratovich, Rechberger, Roy, and Schofnegger, specifically designed " +
+            "to minimize constraint count in arithmetic circuits. It replaced " +
+            "MiMC and Rescue as the preferred ZK-friendly hash after its security " +
+            "analysis was completed.",
+          funFact:
+            "Using SHA-256 inside a ZK circuit costs 27,000 constraints per hash. " +
+            "A depth-20 Merkle proof with SHA-256 would cost 540,000 constraints — " +
+            "more than the entire credential circuit. Poseidon reduces this to 5,000, " +
+            "making the Merkle proof essentially free relative to BBS+ verification."
+        },
+        limitations: [
+          "Poseidon is relatively new (~2019) and has had fewer years of " +
+            "cryptanalysis than SHA-256. Some conservative applications still " +
+            "prefer SHA-256 despite the cost",
+          "Poseidon parameters (width, rounds, S-box) must match between " +
+            "the off-chain tree builder and the in-circuit verifier — mismatch " +
+            "is a silent bug that produces valid-looking but wrong proofs",
+          "Merkle trees are append-only by default. Updating or deleting a leaf " +
+            "requires recomputing the path — expensive for large trees. Indexed " +
+            "Merkle trees solve this but add complexity",
+          "The tree depth must be fixed at circuit compile time — cannot handle " +
+            "variable-depth trees in a single circuit"
+        ],
+        exercises: [
+          {
+            type: "code",
+            question:
+              "Write a Circom circuit that verifies a Merkle membership proof " +
+              "of depth 10 using Poseidon hash. Inputs: leaf (private), " +
+              "pathElements[10] (private), pathIndices[10] (private), root (public). " +
+              "The circuit should recompute the root from the leaf and path, " +
+              "then enforce equality with the public root.",
+            hint:
+              "Use circomlib's Poseidon(2) for each level. At each level, " +
+              "use pathIndices[i] to select which side the sibling goes on: " +
+              "if index=0, hash(current, sibling); if index=1, hash(sibling, current). " +
+              "Use a Mux to select left/right order.",
+            answer:
+              "include \"circomlib/circuits/poseidon.circom\";\n" +
+              "template MerkleProof(depth) {\n" +
+              "  signal input leaf;\n" +
+              "  signal input pathElements[depth];\n" +
+              "  signal input pathIndices[depth];\n" +
+              "  signal input root;\n" +
+              "  signal current[depth + 1];\n" +
+              "  current[0] <== leaf;\n" +
+              "  for (var i = 0; i < depth; i++) {\n" +
+              "    component h = Poseidon(2);\n" +
+              "    // if pathIndices[i]==0: h(current, sibling)\n" +
+              "    // if pathIndices[i]==1: h(sibling, current)\n" +
+              "    h.inputs[0] <== current[i] + pathIndices[i] * (pathElements[i] - current[i]);\n" +
+              "    h.inputs[1] <== pathElements[i] + pathIndices[i] * (current[i] - pathElements[i]);\n" +
+              "    current[i+1] <== h.out;\n" +
+              "  }\n" +
+              "  root === current[depth];\n" +
+              "}\n" +
+              "component main {public [root]} = MerkleProof(10);"
+          }
+        ]
+      }
+    ]
   }
 };
