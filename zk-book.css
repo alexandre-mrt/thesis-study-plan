@@ -1,0 +1,311 @@
+/* ZK Book Vault — Reader Styles */
+
+.zk-book-header {
+  text-align: center;
+  padding: 2.5rem 1rem 1.5rem;
+}
+.zk-book-header .day-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #a78bfa;
+  margin-bottom: 0.25rem;
+}
+.zk-book-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e5e5e5;
+  margin: 0.25rem 0;
+}
+.zk-book-header p {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+/* Back button when reading a chapter */
+.zk-book-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  margin: 1rem 1rem 0.5rem;
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 6px;
+  color: #a78bfa;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.zk-book-back:hover {
+  background: rgba(167, 139, 250, 0.2);
+}
+
+/* Cross-links banner */
+.zk-book-crosslinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 8px;
+}
+.zk-book-crosslinks-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #94a3b8;
+  width: 100%;
+  margin-bottom: 0.15rem;
+}
+.zk-book-crosslink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 4px;
+  color: #818cf8;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+}
+.zk-book-crosslink:hover {
+  background: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+}
+
+/* Table of contents grid */
+.zk-book-toc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+}
+.zk-book-group {
+  margin-bottom: 1.5rem;
+}
+.zk-book-group-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #a78bfa;
+  border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+.zk-book-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+/* Checkbox */
+.zk-book-check-wrap {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.zk-book-check { display: none; }
+.zk-book-checkmark {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(167, 139, 250, 0.35);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.zk-book-check:checked + .zk-book-checkmark {
+  background: #a78bfa;
+  border-color: #a78bfa;
+}
+.zk-book-check:checked + .zk-book-checkmark::after {
+  content: '\2713';
+  color: #0f0f0f;
+  font-size: 11px;
+  font-weight: 700;
+}
+.zk-book-item-done .zk-book-item-title {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+.zk-book-item-done .zk-book-item-num {
+  opacity: 0.4;
+}
+
+.zk-book-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.zk-book-item:hover {
+  background: rgba(167, 139, 250, 0.08);
+  border-color: rgba(167, 139, 250, 0.25);
+}
+.zk-book-item-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #64748b;
+  min-width: 1.8rem;
+}
+.zk-book-item-title {
+  color: #e5e5e5;
+  font-size: 0.85rem;
+}
+.zk-book-item-badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  white-space: nowrap;
+}
+
+/* Chapter reader */
+.zk-book-reader {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1.25rem 4rem;
+}
+.zk-book-loading {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+.zk-book-loading::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 1rem auto 0;
+  border: 2px solid rgba(167, 139, 250, 0.3);
+  border-top-color: #a78bfa;
+  border-radius: 50%;
+  animation: zk-book-spin 0.6s linear infinite;
+}
+@keyframes zk-book-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Rendered markdown */
+.zk-book-reader h1 { font-size: 1.6rem; color: #e5e5e5; margin: 1.5rem 0 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; }
+.zk-book-reader h2 { font-size: 1.25rem; color: #d4d4d4; margin: 1.5rem 0 0.5rem; }
+.zk-book-reader h3 { font-size: 1.05rem; color: #c0c0c0; margin: 1.2rem 0 0.4rem; }
+.zk-book-reader h4 { font-size: 0.95rem; color: #b0b0b0; margin: 1rem 0 0.3rem; }
+.zk-book-reader p { color: #c8c8c8; line-height: 1.7; margin: 0.6rem 0; font-size: 0.9rem; }
+.zk-book-reader ul, .zk-book-reader ol { color: #c8c8c8; padding-left: 1.5rem; margin: 0.5rem 0; }
+.zk-book-reader li { margin: 0.25rem 0; line-height: 1.6; font-size: 0.9rem; }
+.zk-book-reader code {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(167, 139, 250, 0.1);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.82rem;
+  color: #c4b5fd;
+}
+.zk-book-reader pre {
+  background: #1a1a2e;
+  border: 1px solid rgba(167, 139, 250, 0.15);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+.zk-book-reader pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.8rem;
+  color: #e2e8f0;
+}
+.zk-book-reader blockquote {
+  border-left: 3px solid #a78bfa;
+  padding: 0.5rem 1rem;
+  margin: 0.75rem 0;
+  background: rgba(167, 139, 250, 0.05);
+  color: #b0b0b0;
+}
+.zk-book-reader img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 0.75rem 0;
+}
+.zk-book-reader a {
+  color: #818cf8;
+  text-decoration: none;
+}
+.zk-book-reader a:hover {
+  text-decoration: underline;
+}
+.zk-book-reader table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+}
+.zk-book-reader th, .zk-book-reader td {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #c8c8c8;
+}
+.zk-book-reader th {
+  background: rgba(167, 139, 250, 0.1);
+  color: #d4d4d4;
+  font-weight: 600;
+}
+
+/* Internal wiki links */
+.zk-book-wikilink {
+  color: #a78bfa;
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(167, 139, 250, 0.4);
+  transition: color 0.15s;
+}
+.zk-book-wikilink:hover {
+  color: #c4b5fd;
+}
+
+/* KaTeX display blocks */
+.zk-book-reader .katex-display {
+  overflow-x: auto;
+  padding: 0.25rem 0;
+}
+
+/* ZK Deep Dive → Book links */
+.zk-dd-book-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(167, 139, 250, 0.12);
+}
+.zk-dd-book-links-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #a78bfa;
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  .zk-book-header h1 { font-size: 1.4rem; }
+  .zk-book-reader { padding: 0 0.75rem 3rem; }
+}

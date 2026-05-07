@@ -206,6 +206,30 @@ function buildDeepdiveSectionCard(sectionData, index, savedState) {
     body.appendChild(thesis);
   }
 
+  /* ZK Book cross-references */
+  if (typeof ZK_DEEPDIVE_TO_BOOK !== 'undefined') {
+    const bookSlugs = ZK_DEEPDIVE_TO_BOOK[sectionData.id];
+    if (bookSlugs && bookSlugs.length > 0) {
+      const bookLinks = document.createElement('div');
+      bookLinks.className = 'zk-dd-book-links';
+      bookLinks.innerHTML = '<span class="zk-dd-book-links-label">ZK BOOK</span>';
+      for (const slug of bookSlugs) {
+        const ch = typeof findChapter === 'function' ? findChapter(slug) : null;
+        const title = ch ? ch.title : slug.replace(/-/g, ' ');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.className = 'zk-book-crosslink';
+        a.textContent = title;
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (typeof openZKBookChapter === 'function') openZKBookChapter(slug);
+        });
+        bookLinks.appendChild(a);
+      }
+      body.appendChild(bookLinks);
+    }
+  }
+
   card.appendChild(body);
 
   /* Restore open state */
@@ -238,7 +262,8 @@ function renderZKDeepdive() {
     '<h1 class="zk-dd-page-title">Zero-Knowledge Proofs</h1>' +
     '<p class="zk-dd-page-subtitle">From real-world intuition to concrete implementation. ' +
     'An end-to-end walkthrough of how ZK proofs work in practice, ' +
-    'applied to anonymous credentials and private payments on Sui.</p>';
+    'applied to anonymous credentials and private payments on Sui.</p>' +
+    '<p style="margin-top:0.5rem;"><a href="#" class="zk-book-crosslink" style="display:inline-flex; padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="event.preventDefault(); switchToZKBook();">&rarr; ZK Book (RareSkills) — 75 chapters</a></p>';
   container.appendChild(headerEl);
 
   /* Table of contents */

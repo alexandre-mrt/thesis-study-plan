@@ -180,6 +180,8 @@ function initDayTabs() {
         switchToZKDeepdive();
       } else if (day === 'zk-security') {
         switchToZKSecurity();
+      } else if (day === 'zk-book') {
+        switchToZKBook();
       } else if (day === 'plan') {
         // T14: Plan tab handled by switchPlan
         switchPlan();
@@ -215,6 +217,11 @@ function switchPlan() {
   if (zkSecSec) {
     zkSecSec.classList.remove('active');
     zkSecSec.hidden = true;
+  }
+  var zkBookSec = $('#zk-book');
+  if (zkBookSec) {
+    zkBookSec.classList.remove('active');
+    zkBookSec.hidden = true;
   }
 
   try {
@@ -255,7 +262,7 @@ function switchDay(chapterKey) {
     sec.hidden = !isActive;
   });
 
-  /* Hide ZK deep dive and ZK security when switching to a chapter */
+  /* Hide ZK deep dive, ZK security, and ZK book when switching to a chapter */
   if (zkSection) {
     zkSection.classList.remove('active');
     zkSection.hidden = true;
@@ -264,6 +271,11 @@ function switchDay(chapterKey) {
   if (zkSecSection) {
     zkSecSection.classList.remove('active');
     zkSecSection.hidden = true;
+  }
+  var zkBookSection = $('#zk-book');
+  if (zkBookSection) {
+    zkBookSection.classList.remove('active');
+    zkBookSection.hidden = true;
   }
 
   /* Lazy-init flashcards on first visit */
@@ -315,6 +327,11 @@ function switchToZKDeepdive() {
     sec.hidden = true;
   });
 
+  var zkSecSec = $('#zk-security');
+  if (zkSecSec) { zkSecSec.classList.remove('active'); zkSecSec.hidden = true; }
+  var zkBookSec = $('#zk-book');
+  if (zkBookSec) { zkBookSec.classList.remove('active'); zkBookSec.hidden = true; }
+
   /* Show ZK deep dive */
   if (zkSection) {
     zkSection.classList.add('active');
@@ -357,6 +374,8 @@ function switchToZKSecurity() {
 
   const zkSection = $('#zk-deepdive');
   if (zkSection) { zkSection.classList.remove('active'); zkSection.hidden = true; }
+  var zkBookSec = $('#zk-book');
+  if (zkBookSec) { zkBookSec.classList.remove('active'); zkBookSec.hidden = true; }
 
   if (secSection) {
     secSection.classList.add('active');
@@ -373,6 +392,42 @@ function switchToZKSecurity() {
   setPomodoroPreset('chapters');
 }
 
+function switchToZKBook() {
+  const tabs = $$('.day-tab');
+  const sections = $$('.day-section');
+
+  tabs.forEach((tab) => {
+    const isBook = tab.dataset.day === 'zk-book';
+    tab.classList.toggle('active', isBook);
+    tab.setAttribute('aria-selected', String(isBook));
+  });
+
+  sections.forEach((sec) => {
+    sec.classList.remove('active');
+    sec.hidden = true;
+  });
+
+  const zkSection = $('#zk-deepdive');
+  if (zkSection) { zkSection.classList.remove('active'); zkSection.hidden = true; }
+  const zkSecSection = $('#zk-security');
+  if (zkSecSection) { zkSecSection.classList.remove('active'); zkSecSection.hidden = true; }
+
+  const bookSection = $('#zk-book');
+  if (bookSection) {
+    bookSection.classList.add('active');
+    bookSection.hidden = false;
+
+    const content = $('#zk-book-content');
+    if (content && content.children.length === 0 && typeof renderZKBook === 'function') {
+      renderZKBook();
+    }
+  }
+
+  try { localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, 'zk-book'); } catch { /* */ }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setPomodoroPreset('chapters');
+}
+
 function restoreActiveDay() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.ACTIVE_DAY);
@@ -381,6 +436,8 @@ function restoreActiveDay() {
         switchToZKDeepdive();
       } else if (saved === 'zk-security') {
         switchToZKSecurity();
+      } else if (saved === 'zk-book') {
+        switchToZKBook();
       } else if (saved === 'plan') {
         switchPlan();
       } else if (CHAPTER_KEYS.includes(saved) && saved !== 'flashcards') {
@@ -695,6 +752,10 @@ function initKeyboardShortcuts() {
       case 'z':
       case 'Z':
         switchToZKDeepdive();
+        break;
+      case 'b':
+      case 'B':
+        switchToZKBook();
         break;
       case 'p':
       case 'P':
