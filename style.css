@@ -867,11 +867,11 @@ body { padding-bottom: 56px; }
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius-sm);
-  padding: 0.35rem 0.7rem 0.35rem 2rem;
+  padding: 0.35rem 1.8rem 0.35rem 1.8rem;
   color: var(--text-primary);
-  font-size: 0.85rem;
-  width: 120px;
-  max-width: 160px;
+  font-size: 0.8rem;
+  width: 140px;
+  max-width: 180px;
   min-width: 0;
   transition: width 0.3s ease, border-color 0.2s;
   font-family: var(--font-body);

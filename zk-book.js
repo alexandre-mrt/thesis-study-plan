@@ -380,6 +380,9 @@ function convertMarkdown(md) {
   });
 
   // Use marked.js for the rest
+  if (typeof marked === 'undefined' || typeof marked.parse !== 'function') {
+    return '<p style="color:#ef4444;">marked.js not loaded — please refresh the page.</p>';
+  }
   const html = marked.parse(src, { breaks: false, gfm: true });
 
   // Restore math blocks
