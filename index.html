@@ -76,6 +76,10 @@
             <span class="day-tab-dot" style="background: #a78bfa"></span>
             Book
           </button>
+          <button class="day-tab" data-day="pq" role="tab" aria-selected="false" aria-controls="ch-pq">
+            <span class="day-tab-dot" style="background: #ef4444"></span>
+            PQ
+          </button>
         </div>
       </div>
       <div class="search-container">
@@ -1100,6 +1104,152 @@
       </div>
     </section>
 
+    <!-- ===== PQ — Post-Quantum Cryptography & Quantum Computing ===== -->
+    <section class="day-section" id="ch-pq" data-day="pq" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: #ef4444">
+        <div class="day-label">Post-Quantum</div>
+        <h1 class="day-title">Post-Quantum Cryptography &amp; Quantum Computing</h1>
+        <p class="day-date">Quantum Industry Day Notes &amp; Threat Landscape</p>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Quantum Threat Landscape &amp; Neutral Atom Computing</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Understand neutral atom quantum computing (lasers, Rydberg blockade, 1-qubit vs 2-qubit gates), the 2029 CRQC timeline (Aaronson, Gidney), Oratomic's 10,000-qubit threshold, Google + Succinct responsible disclosure via ZK, AI-accelerated quantum circuit optimization, and implications for pairing-based cryptography (BBS+, Groth16).
+        </div>
+        <button class="study-guide-toggle" style="--day-color: #ef4444">&#128214; Study Guide</button>
+        <div class="study-guide-container" data-day="pq" data-block="1"></div>
+        <div class="resources-grid">
+
+          <div class="resource-card" data-id="pqr1" style="--day-color: #ef4444">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="pqr1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">45min</span>
+            </div>
+            <h3 class="resource-title">Shor's Algorithm with 10,000 Reconfigurable Atomic Qubits</h3>
+            <p class="resource-author">Cain, Xu, King, Picard, Levine, Endres, Preskill, Huang, Bluvstein (Oratomic/Caltech)</p>
+            <a class="resource-link" href="https://arxiv.org/abs/2603.28627" target="_blank" rel="noopener noreferrer">arXiv:2603.28627 &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="pqr2" style="--day-color: #ef4444">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="pqr2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-paper">Paper</span>
+              <span class="time-badge">30min</span>
+            </div>
+            <h3 class="resource-title">How to Factor 2048-bit RSA with Less Than a Million Noisy Qubits</h3>
+            <p class="resource-author">Craig Gidney (Google Quantum AI)</p>
+            <a class="resource-link" href="https://arxiv.org/abs/2505.15917" target="_blank" rel="noopener noreferrer">arXiv:2505.15917 &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="pqr3" style="--day-color: #ef4444">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="pqr3">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-blog">Blog</span>
+              <span class="time-badge">15min</span>
+            </div>
+            <h3 class="resource-title">More on Whether Useful QC is Imminent</h3>
+            <p class="resource-author">Scott Aaronson (Shtetl-Optimized)</p>
+            <a class="resource-link" href="https://scottaaronson.blog/?p=9425" target="_blank" rel="noopener noreferrer">Aaronson Blog &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="pqr4" style="--day-color: #ef4444">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="pqr4">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-blog">Blog</span>
+              <span class="time-badge">20min</span>
+            </div>
+            <h3 class="resource-title">Quantum Error Correction Goes FOOM</h3>
+            <p class="resource-author">Craig Gidney (Algassert)</p>
+            <a class="resource-link" href="https://algassert.com/post/2503" target="_blank" rel="noopener noreferrer">Algassert &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="pqr5" style="--day-color: #ef4444">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="pqr5">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-blog">Blog</span>
+              <span class="time-badge">10min</span>
+            </div>
+            <h3 class="resource-title">Google Uses SP1 to Prove Quantum Security Threat</h3>
+            <p class="resource-author">Succinct Labs</p>
+            <a class="resource-link" href="https://blog.succinct.xyz/google-sp1-quantum-threat/" target="_blank" rel="noopener noreferrer">Succinct Blog &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="pqr6" style="--day-color: #ef4444">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="pqr6">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-blog">Blog</span>
+              <span class="time-badge">20min</span>
+            </div>
+            <h3 class="resource-title">We Beat Google's ZK Proof of Quantum Cryptanalysis</h3>
+            <p class="resource-author">Trail of Bits</p>
+            <a class="resource-link" href="https://blog.trailofbits.com/2026/04/17/we-beat-googles-zero-knowledge-proof-of-quantum-cryptanalysis/" target="_blank" rel="noopener noreferrer">Trail of Bits Blog &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="pqr7" style="--day-color: #ef4444">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="pqr7">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-blog">Blog</span>
+              <span class="time-badge">15min</span>
+            </div>
+            <h3 class="resource-title">Tracking the Cost of Quantum Factoring</h3>
+            <p class="resource-author">Google Security Blog</p>
+            <a class="resource-link" href="https://security.googleblog.com/2025/05/tracking-cost-of-quantum-factori.html" target="_blank" rel="noopener noreferrer">Google Security &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="pqr8" style="--day-color: #ef4444">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="pqr8">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-video">Video</span>
+              <span class="time-badge">25min</span>
+            </div>
+            <h3 class="resource-title">Neutral Atom Quantum Computing Explained</h3>
+            <p class="resource-author">PennyLane / Xanadu</p>
+            <a class="resource-link" href="https://pennylane.ai/qml/demos/tutorial_neutral_atoms" target="_blank" rel="noopener noreferrer">PennyLane Tutorial &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Quantum Company Landscape</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Map the major quantum computing companies (Google QAI, QuERA, Pasqal, Atom Computing, Alice &amp; Bob, PlanQC, Q-Factor, Oratomic), their modalities, funding, qubit counts, and roadmaps to assess the credibility of the 2029 cryptographic threat timeline.
+        </div>
+        <button class="study-guide-toggle" style="--day-color: #ef4444">&#128214; Study Guide</button>
+        <div class="study-guide-container" data-day="pq" data-block="2"></div>
+      </div>
+    </section>
+
     <!-- ===== RUST — Production Rust & Codebases ===== -->
     <section class="day-section" id="ch-rust" data-day="rust" role="tabpanel" hidden>
       <div class="day-header" style="--day-color: var(--color-rust)">
@@ -1631,6 +1781,8 @@
   <script src="ch25-papers-technical.js"></script>
   <script src="ch26-papers-guide.js?v=2"></script>
   <script src="ch26-papers-technical.js"></script>
+  <script src="pq-guide.js"></script>
+  <script src="pq-technical.js"></script>
   <script src="paper-guide.js?v=7"></script>
   <!-- SOTA data files -->
   <script src="sota-ch21.js"></script>
