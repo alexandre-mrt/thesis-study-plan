@@ -60,6 +60,10 @@
             <span class="day-tab-dot" style="background: var(--color-rust)"></span>
             Rust
           </button>
+          <button class="day-tab" data-day="iop" role="tab" aria-selected="false" aria-controls="ch-iop">
+            <span class="day-tab-dot" style="background: #14b8a6"></span>
+            IOP
+          </button>
           <button class="day-tab" data-day="zk" role="tab" aria-selected="false" aria-controls="zk-deepdive" id="zk-tab">
             <span class="day-tab-dot" style="background: #8B5CF6"></span>
             ZK
@@ -902,7 +906,16 @@
         <div id="ch25-sota-container" class="sota-container"></div>
       </div>
 
-      <!-- IOP & PCP Theory -->
+    </section>
+
+    <!-- ===== IOP & PCP — Probabilistic Proofs ===== -->
+    <section class="day-section" id="ch-iop" data-day="iop" role="tabpanel" hidden>
+      <div class="day-header" style="--day-color: #14b8a6">
+        <div class="day-label">PCP &amp; IOP</div>
+        <h1 class="day-title">Probabilistic Proofs</h1>
+        <p class="day-date">Foundations of Modern ZK Proof Systems</p>
+      </div>
+
       <div class="block">
         <div class="block-header">
           <h2 class="block-title">IOP &amp; PCP Theory</h2>
@@ -910,11 +923,11 @@
         <div class="block-objectives">
           <strong>Objectives:</strong> Understand the theoretical foundations of modern proof systems: PCPs, IOPs, IOPP/FRI, sumcheck protocol, error-correcting codes (rate, distance, code switching), arithmetic circuits &amp; constraint systems (R1CS, AIR, PLONKish), and the full compilation pipeline from computation to SNARK.
         </div>
-        <button class="study-guide-toggle" style="--day-color: var(--color-ch25)">&#128214; Study Guide</button>
+        <button class="study-guide-toggle" style="--day-color: #14b8a6">&#128214; Study Guide</button>
         <div class="study-guide-container" data-day="ch25-iop" data-block="1"></div>
         <div class="resources-grid">
 
-          <div class="resource-card" data-id="iop-r1" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r1" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r1">
@@ -927,7 +940,7 @@
             <a class="resource-link" href="https://ic-people.epfl.ch/~achiesa/fopp-course.html" target="_blank" rel="noopener noreferrer">Open course &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r2" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r2" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r2">
@@ -940,7 +953,7 @@
             <a class="resource-link" href="https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html" target="_blank" rel="noopener noreferrer">Open textbook &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r3" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r3" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r3">
@@ -958,7 +971,7 @@
             <a class="resource-link" href="https://www.youtube.com/watch?v=1qs9Z_XQa0Q" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r4" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r4" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r4">
@@ -976,7 +989,7 @@
             <a class="resource-link" href="https://www.youtube.com/watch?v=bGEXYpt3sj0" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r5" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r5" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r5">
@@ -990,11 +1003,11 @@
               <div class="yt-play-btn"></div>
             </div>
             <h3 class="resource-title">STARK Anatomy (Part I: FRI)</h3>
-            <p class="resource-author">Aszl&aacute;n &mdash; Alan Szepieniec</p>
+            <p class="resource-author">Alan Szepieniec</p>
             <a class="resource-link" href="https://www.youtube.com/watch?v=9VuZvdxFZQo" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r6" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r6" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r6">
@@ -1007,7 +1020,7 @@
             <a class="resource-link" href="https://eprint.iacr.org/2016/116" target="_blank" rel="noopener noreferrer">Open paper &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r7" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r7" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r7">
@@ -1020,7 +1033,7 @@
             <a class="resource-link" href="https://eccc.weizmann.ac.il/report/2017/134/" target="_blank" rel="noopener noreferrer">Open paper &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r8" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r8" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r8">
@@ -1033,7 +1046,7 @@
             <a class="resource-link" href="https://zkproof.org/events/zkproof-8-rome/" target="_blank" rel="noopener noreferrer">Open event &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r9" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r9" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r9">
@@ -1051,7 +1064,7 @@
             <a class="resource-link" href="https://www.youtube.com/watch?v=Mxbz_CKJha8" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
           </div>
 
-          <div class="resource-card" data-id="iop-r10" style="--day-color: var(--color-ch25)">
+          <div class="resource-card" data-id="iop-r10" style="--day-color: #14b8a6">
             <div class="resource-top">
               <label class="checkbox-wrap">
                 <input type="checkbox" class="resource-check" data-id="iop-r10">

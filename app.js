@@ -10,7 +10,7 @@ const STORAGE_KEYS = {
   ACTIVE_DAY: 'thesis-study-active-day',
 };
 
-const CHAPTER_KEYS = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'ch26', 'rust', 'method', 'flashcards'];
+const CHAPTER_KEYS = ['ch21', 'ch22', 'ch23', 'ch24', 'ch25', 'ch26', 'rust', 'iop', 'method', 'flashcards'];
 
 /*
  * RECENT_LOG_IDS — paper ids that appear in research-log entries from the last 7 days.
