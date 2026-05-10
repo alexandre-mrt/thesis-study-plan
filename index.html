@@ -901,6 +901,171 @@
         </div>
         <div id="ch25-sota-container" class="sota-container"></div>
       </div>
+
+      <!-- IOP & PCP Theory -->
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">IOP &amp; PCP Theory</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Understand the theoretical foundations of modern proof systems: PCPs, IOPs, IOPP/FRI, sumcheck protocol, error-correcting codes (rate, distance, code switching), arithmetic circuits &amp; constraint systems (R1CS, AIR, PLONKish), and the full compilation pipeline from computation to SNARK.
+        </div>
+        <button class="study-guide-toggle" style="--day-color: var(--color-ch25)">&#128214; Study Guide</button>
+        <div class="study-guide-container" data-day="ch25-iop" data-block="1"></div>
+        <div class="resources-grid">
+
+          <div class="resource-card" data-id="iop-r1" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-read">Course</span>
+            </div>
+            <h3 class="resource-title">Foundations of Probabilistic Proofs (EPFL)</h3>
+            <p class="resource-author">Alessandro Chiesa (EPFL)</p>
+            <a class="resource-link" href="https://ic-people.epfl.ch/~achiesa/fopp-course.html" target="_blank" rel="noopener noreferrer">Open course &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r2" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-read">Book</span>
+            </div>
+            <h3 class="resource-title">Proofs, Arguments, and Zero Knowledge</h3>
+            <p class="resource-author">Justin Thaler (Georgetown)</p>
+            <a class="resource-link" href="https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.html" target="_blank" rel="noopener noreferrer">Open textbook &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r3" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r3">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-video">Video</span>
+              <span class="time-badge">1h30</span>
+            </div>
+            <div class="yt-thumbnail" data-ytid="1qs9Z_XQa0Q">
+              <img src="https://img.youtube.com/vi/1qs9Z_XQa0Q/hqdefault.jpg" alt="Video thumbnail" loading="lazy">
+              <div class="yt-play-btn"></div>
+            </div>
+            <h3 class="resource-title">ZK Study Club: FRI &amp; Its Applications</h3>
+            <p class="resource-author">ZK Podcast / Albert Ni</p>
+            <a class="resource-link" href="https://www.youtube.com/watch?v=1qs9Z_XQa0Q" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r4" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r4">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-video">Video</span>
+              <span class="time-badge">50min</span>
+            </div>
+            <div class="yt-thumbnail" data-ytid="bGEXYpt3sj0">
+              <img src="https://img.youtube.com/vi/bGEXYpt3sj0/hqdefault.jpg" alt="Video thumbnail" loading="lazy">
+              <div class="yt-play-btn"></div>
+            </div>
+            <h3 class="resource-title">STARKs Explained (Eli Ben-Sasson)</h3>
+            <p class="resource-author">a16z crypto</p>
+            <a class="resource-link" href="https://www.youtube.com/watch?v=bGEXYpt3sj0" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r5" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r5">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-video">Video</span>
+              <span class="time-badge">1h</span>
+            </div>
+            <div class="yt-thumbnail" data-ytid="9VuZvdxFZQo">
+              <img src="https://img.youtube.com/vi/9VuZvdxFZQo/hqdefault.jpg" alt="Video thumbnail" loading="lazy">
+              <div class="yt-play-btn"></div>
+            </div>
+            <h3 class="resource-title">STARK Anatomy (Part I: FRI)</h3>
+            <p class="resource-author">Aszl&aacute;n &mdash; Alan Szepieniec</p>
+            <a class="resource-link" href="https://www.youtube.com/watch?v=9VuZvdxFZQo" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r6" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r6">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-read">Paper</span>
+            </div>
+            <h3 class="resource-title">Interactive Oracle Proofs (BCS 2016)</h3>
+            <p class="resource-author">Ben-Sasson, Chiesa, Spooner</p>
+            <a class="resource-link" href="https://eprint.iacr.org/2016/116" target="_blank" rel="noopener noreferrer">Open paper &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r7" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r7">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-read">Paper</span>
+            </div>
+            <h3 class="resource-title">Fast RS-IOPP (FRI, ICALP 2018)</h3>
+            <p class="resource-author">Ben-Sasson, Bentov, Horesh, Riabzev</p>
+            <a class="resource-link" href="https://eccc.weizmann.ac.il/report/2017/134/" target="_blank" rel="noopener noreferrer">Open paper &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r8" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r8">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-read">Conference</span>
+            </div>
+            <h3 class="resource-title">ZKProof 8 — Rome (May 2026)</h3>
+            <p class="resource-author">ZKProof Standards</p>
+            <a class="resource-link" href="https://zkproof.org/events/zkproof-8-rome/" target="_blank" rel="noopener noreferrer">Open event &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r9" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r9">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-video">Video</span>
+              <span class="time-badge">45min</span>
+            </div>
+            <div class="yt-thumbnail" data-ytid="Mxbz_CKJha8">
+              <img src="https://img.youtube.com/vi/Mxbz_CKJha8/hqdefault.jpg" alt="Video thumbnail" loading="lazy">
+              <div class="yt-play-btn"></div>
+            </div>
+            <h3 class="resource-title">Arithmetization &amp; R1CS/AIR Overview</h3>
+            <p class="resource-author">ZK Whiteboard Sessions (Dan Boneh)</p>
+            <a class="resource-link" href="https://www.youtube.com/watch?v=Mxbz_CKJha8" target="_blank" rel="noopener noreferrer">Open on YouTube &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="iop-r10" style="--day-color: var(--color-ch25)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="iop-r10">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-read">Slides</span>
+            </div>
+            <h3 class="resource-title">FoPP Course Materials (CC BY-SA)</h3>
+            <p class="resource-author">EPFL CompSec Lab</p>
+            <a class="resource-link" href="https://github.com/compsec-epfl/fopp-course-material" target="_blank" rel="noopener noreferrer">Open GitHub &rarr;</a>
+          </div>
+
+        </div>
+      </div>
     </section>
 
     <!-- ===== CH 2.6 — Sui Blockchain Primitives ===== -->
@@ -1438,6 +1603,8 @@
   <script src="ch22-technical.js"></script>
   <script src="rust-guide.js"></script>
   <script src="rust-technical.js"></script>
+  <script src="ch25-iop-guide.js"></script>
+  <script src="ch25-iop-technical.js"></script>
   <!-- Paper data files -->
   <script src="ch21-papers-guide.js?v=2"></script>
   <script src="ch21-papers-technical.js"></script>

@@ -11,7 +11,7 @@ window.CH25_IOP_TECHNICAL = {
     concepts: [
       /* ── 1. PCP ── */
       {
-        name: 'Probabilistically Checkable Proofs (PCP)',
+        name: 'PCP (Probabilistically Checkable Proofs)',
         formalDefinition:
           '<p>A PCP system for language \\( L \\) is a pair \\( (P, V) \\) where ' +
           '\\( P \\) produces a proof string \\( \\pi \\in \\Sigma^m \\), and ' +
@@ -58,7 +58,7 @@ window.CH25_IOP_TECHNICAL = {
 
       /* ── 2. IOP ── */
       {
-        name: 'Interactive Oracle Proofs (IOP)',
+        name: 'IOP (Interactive Oracle Proofs)',
         formalDefinition:
           '<p>A \\( k \\)-round IOP: in round \\( i \\), the prover sends an oracle ' +
           '\\( f_i \\), and the verifier sends a challenge \\( r_i \\). At the end, ' +
@@ -109,7 +109,7 @@ window.CH25_IOP_TECHNICAL = {
 
       /* ── 3. IOPP ── */
       {
-        name: 'IOP of Proximity (IOPP)',
+        name: 'IOPP (IOP of Proximity)',
         formalDefinition:
           '<p>An IOPP for code \\( C \\subseteq \\mathbb{F}^n \\): given oracle access to ' +
           '\\( f: L \\to \\mathbb{F} \\), the verifier tests whether \\( f \\) is ' +
@@ -157,7 +157,7 @@ window.CH25_IOP_TECHNICAL = {
 
       /* ── 4. FRI ── */
       {
-        name: 'FRI Protocol (Fast RS-IOPP)',
+        name: 'FRI Protocol (Fast Reed-Solomon IOP of Proximity)',
         formalDefinition:
           '<p>FRI tests proximity to \\( \\mathrm{RS}[\\mathbb{F}, L_0, d] \\) via ' +
           'recursive folding. At round \\( i \\): given \\( f_i \\) on domain ' +
@@ -219,7 +219,7 @@ window.CH25_IOP_TECHNICAL = {
 
       /* ── 5. Functional IOP & Sumcheck ── */
       {
-        name: 'Functional IOP &amp; Sumcheck',
+        name: 'Univariate Sumcheck & Functional IOP',
         formalDefinition:
           '<p><strong>Functional IOP:</strong> the prover sends a functional oracle ' +
           '\\( F \\) that the verifier can evaluate on linear functions (not just pointwise). ' +
@@ -269,7 +269,7 @@ window.CH25_IOP_TECHNICAL = {
 
       /* ── 6. Code Switching & Rate ── */
       {
-        name: 'Code Switching &amp; Rate of the Code',
+        name: 'Code Switching & Rate of the Code',
         formalDefinition:
           '<p>Reed-Solomon code: \\( \\mathrm{RS}[\\mathbb{F}, L, k] = ' +
           '\\{(p(\\alpha))_{\\alpha \\in L} : \\deg(p) &lt; k\\} \\) with rate ' +
@@ -316,7 +316,7 @@ window.CH25_IOP_TECHNICAL = {
 
       /* ── 7. Arithmetic Circuits & Constraint Systems ── */
       {
-        name: 'Arithmetic Circuits &amp; Constraint Systems',
+        name: 'Arithmetic Circuits & Constraint Systems',
         formalDefinition:
           '<p>An arithmetic circuit \\( C \\) over field \\( \\mathbb{F} \\) is a DAG with ' +
           'input gates, constant gates, addition gates (\\( + \\)), and multiplication ' +
@@ -381,7 +381,7 @@ window.CH25_IOP_TECHNICAL = {
 
       /* ── 8. Full Pipeline ── */
       {
-        name: 'The Full Pipeline: Computation &rarr; SNARK',
+        name: 'The Full Pipeline — Computation to SNARK',
         formalDefinition:
           '<p>A SNARK for NP language \\( L \\) is a triple ' +
           '\\( (\\mathsf{Setup}, \\mathsf{Prove}, \\mathsf{Verify}) \\) satisfying: ' +

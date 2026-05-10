@@ -14,6 +14,7 @@ const GUIDE_DATA = {
   3: () => window.DAY3_GUIDE,
   'ch22': () => window.CH22_GUIDE,
   'rust': () => window.RUST_GUIDE,
+  'ch25-iop': () => window.CH25_IOP_GUIDE,
 };
 
 const TECHNICAL_DATA = {
@@ -22,6 +23,7 @@ const TECHNICAL_DATA = {
   3: () => window.DAY3_TECHNICAL,
   'ch22': () => window.CH22_TECHNICAL,
   'rust': () => window.RUST_TECHNICAL,
+  'ch25-iop': () => window.CH25_IOP_TECHNICAL,
 };
 
 const BLOCK_KEY_MAP = { 1: 'block1', 2: 'block2' };
