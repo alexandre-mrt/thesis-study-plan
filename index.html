@@ -537,6 +537,48 @@
         </div>
         <div id="ch23-sota-container" class="sota-container"></div>
       </div>
+
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">Nautilus &mdash; Verifiable Off-Chain Compute via TEE</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Understand Mysten Labs' Nautilus framework: a self-managed AWS Nitro Enclave runs a Rust server, emits a signed attestation document (PCRs + ephemeral public key), and Sui Move verifies that attestation on-chain via <code>sui::nitro_attestation</code> before trusting the enclave's signed outputs. This is the TEE half of the thesis ZKP+TEE design space &mdash; study the trust model, enclave registration (Cap/witness), attestation structure, the off-chain server, on-chain signature verification, and ZKP+TEE composition with Seal.
+        </div>
+        <button class="study-guide-toggle" style="--day-color: var(--color-ch23)">&#128214; Nautilus Guide</button>
+        <div class="study-guide-container" data-day="nautilus" data-block="1"></div>
+        <div class="resources-grid">
+
+          <div class="resource-card" data-id="nautr1" style="--day-color: var(--color-ch23)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="nautr1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">45min</span>
+            </div>
+            <h3 class="resource-title">MystenLabs/nautilus &mdash; TEE Off-Chain Compute</h3>
+            <p class="resource-author">Mysten Labs</p>
+            <a class="resource-link" href="https://github.com/MystenLabs/nautilus" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+          <div class="resource-card" data-id="nautr2" style="--day-color: var(--color-ch23)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="nautr2">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-docs">Docs</span>
+              <span class="time-badge">20min</span>
+            </div>
+            <h3 class="resource-title">Nautilus Design &amp; On-Chain Attestation</h3>
+            <p class="resource-author">sui::nitro_attestation (sui-framework)</p>
+            <a class="resource-link" href="https://docs.sui.io/concepts/cryptography/nautilus" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+        </div>
+      </div>
     </section>
 
     <!-- ===== CH 2.4 — Private Payments ===== -->
@@ -1339,6 +1381,34 @@
         <div class="study-guide-container" data-day="rust" data-block="2"></div>
       </div>
 
+      <div class="block">
+        <div class="block-header">
+          <h2 class="block-title">On-Chain Cryptographic Primitives (Sui Move Natives)</h2>
+        </div>
+        <div class="block-objectives">
+          <strong>Objectives:</strong> Study the cryptographic primitives exposed directly to Move smart contracts as native functions in the <code>sui-framework</code> <code>crypto/</code> modules &mdash; the on-chain counterpart to fastcrypto. Covers <code>sui::groth16</code> (on-chain SNARK verifier), <code>sui::group_ops</code> (typed <code>Element&lt;T&gt;</code> group arithmetic), <code>sui::bls12381</code> (pairing + G1/G2 ops), <code>sui::poseidon</code> (ZK-friendly BN254 hash), <code>sui::ecvrf</code> and <code>sui::ecdsa_k1</code>. Real signatures, abort codes, and how a privacy-payments thesis (anonymous credentials, confidential tx, Merkle membership) calls them.
+        </div>
+        <button class="study-guide-toggle" style="--day-color: var(--color-rust)">&#128214; On-Chain Primitives Guide</button>
+        <div class="study-guide-container" data-day="sui-crypto" data-block="1"></div>
+        <div class="resources-grid">
+
+          <div class="resource-card" data-id="scryptr1" style="--day-color: var(--color-rust)">
+            <div class="resource-top">
+              <label class="checkbox-wrap">
+                <input type="checkbox" class="resource-check" data-id="scryptr1">
+                <span class="checkmark"></span>
+              </label>
+              <span class="type-badge badge-codebase">Codebase</span>
+              <span class="time-badge">40min</span>
+            </div>
+            <h3 class="resource-title">sui-framework/sources/crypto &mdash; Move Native Primitives</h3>
+            <p class="resource-author">Mysten Labs</p>
+            <a class="resource-link" href="https://github.com/MystenLabs/sui/tree/main/crates/sui-framework/packages/sui-framework/sources/crypto" target="_blank" rel="noopener noreferrer">Open resource &rarr;</a>
+          </div>
+
+        </div>
+      </div>
+
       <div id="rust-sota-container" class="sota-container"></div>
     </section>
 
@@ -1766,6 +1836,10 @@
   <script src="ch22-technical.js"></script>
   <script src="rust-guide.js"></script>
   <script src="rust-technical.js"></script>
+  <script src="nautilus-guide.js"></script>
+  <script src="nautilus-technical.js"></script>
+  <script src="sui-crypto-guide.js"></script>
+  <script src="sui-crypto-technical.js"></script>
   <script src="ch25-iop-guide.js"></script>
   <script src="ch25-iop-technical.js"></script>
   <!-- Paper data files -->

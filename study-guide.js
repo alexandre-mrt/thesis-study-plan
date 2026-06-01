@@ -16,6 +16,8 @@ const GUIDE_DATA = {
   'rust': () => window.RUST_GUIDE,
   'ch25-iop': () => window.CH25_IOP_GUIDE,
   'pq': () => window.PQ_GUIDE,
+  'nautilus': () => window.NAUTILUS_GUIDE,
+  'sui-crypto': () => window.SUICRYPTO_GUIDE,
 };
 
 const TECHNICAL_DATA = {
@@ -26,6 +28,8 @@ const TECHNICAL_DATA = {
   'rust': () => window.RUST_TECHNICAL,
   'ch25-iop': () => window.CH25_IOP_TECHNICAL,
   'pq': () => window.PQ_TECHNICAL,
+  'nautilus': () => window.NAUTILUS_TECHNICAL,
+  'sui-crypto': () => window.SUICRYPTO_TECHNICAL,
 };
 
 const BLOCK_KEY_MAP = { 1: 'block1', 2: 'block2' };
@@ -217,6 +221,13 @@ function buildIntuitiveContent(concept, dayNum) {
     analogy.className = 'concept-analogy';
     analogy.textContent = concept.analogy;
     container.appendChild(analogy);
+  }
+
+  if (concept.mermaidDiagram) {
+    const mmdHost = document.createElement('div');
+    mmdHost.className = 'concept-mermaid';
+    container.appendChild(mmdHost);
+    renderStudyGuideMermaid(mmdHost, concept.mermaidDiagram);
   }
 
   if (concept.diagram) {
@@ -844,7 +855,7 @@ function renderStudyGuides() {
 
     const guideEl = document.createElement('div');
     guideEl.className = 'study-guide';
-    const guideColorMap = { 1: 'day1', 2: 'day2', 3: 'day3', 'ch21': 'ch21', 'ch22': 'ch22', 'ch23': 'ch23', 'ch24': 'ch24', 'ch25': 'ch25', 'rust': 'rust' };
+    const guideColorMap = { 1: 'day1', 2: 'day2', 3: 'day3', 'ch21': 'ch21', 'ch22': 'ch22', 'ch23': 'ch23', 'ch24': 'ch24', 'ch25': 'ch25', 'rust': 'rust', 'nautilus': 'ch23', 'sui-crypto': 'rust' };
     const guideColorKey = guideColorMap[dayNum] || ('day' + dayNum);
     guideEl.style.setProperty('--day-color', 'var(--color-' + guideColorKey + ')');
 
