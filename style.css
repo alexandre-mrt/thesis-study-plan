@@ -751,8 +751,9 @@ body { padding-bottom: 56px; }
 .chapter-flashcard.flipped .chapter-flashcard-front { display: none; }
 .chapter-flashcard.flipped .chapter-flashcard-back { display: block; }
 
-/* === Mermaid diagram (paper cards) === */
-.concept-diagram-mermaid {
+/* === Mermaid diagram (paper cards + study guide) === */
+.concept-diagram-mermaid,
+.concept-mermaid {
   padding: 16px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -761,7 +762,8 @@ body { padding-bottom: 56px; }
   overflow-x: auto;
   text-align: center;
 }
-.concept-diagram-mermaid svg { max-width: 100%; height: auto; }
+.concept-diagram-mermaid svg,
+.concept-mermaid svg { max-width: 100%; height: auto; }
 
 /* === Study Guide === */
 .study-guide-toggle {
@@ -1138,7 +1140,7 @@ body { padding-bottom: 56px; }
 
 .concept-exercises-header {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1157,7 +1159,7 @@ body { padding-bottom: 56px; }
 .exercise-type-badge {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1169,8 +1171,8 @@ body { padding-bottom: 56px; }
 }
 
 .exercise-question {
-  font-size: 15px;
-  line-height: 1.7;
+  font-size: 13px;
+  line-height: 1.65;
   color: var(--text-primary);
   margin-bottom: 10px;
 }
@@ -1199,8 +1201,8 @@ body { padding-bottom: 56px; }
 .exercise-hint,
 .exercise-answer {
   display: none;
-  font-size: 15px;
-  line-height: 1.7;
+  font-size: 13px;
+  line-height: 1.65;
   color: var(--text-secondary);
   padding: 10px 12px;
   margin-bottom: 8px;

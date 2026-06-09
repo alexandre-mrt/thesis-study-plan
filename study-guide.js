@@ -19,6 +19,7 @@ const GUIDE_DATA = {
   'nautilus': () => window.NAUTILUS_GUIDE,
   'sui-crypto': () => window.SUICRYPTO_GUIDE,
   'confidential-transfers': () => window.CONFIDENTIAL_GUIDE,
+  'sui-private-tx': () => window.SUIPRIVATETX_GUIDE,
 };
 
 const TECHNICAL_DATA = {
@@ -32,6 +33,7 @@ const TECHNICAL_DATA = {
   'nautilus': () => window.NAUTILUS_TECHNICAL,
   'sui-crypto': () => window.SUICRYPTO_TECHNICAL,
   'confidential-transfers': () => window.CONFIDENTIAL_TECHNICAL,
+  'sui-private-tx': () => window.SUIPRIVATETX_TECHNICAL,
 };
 
 const BLOCK_KEY_MAP = { 1: 'block1', 2: 'block2' };

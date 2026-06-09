@@ -18,6 +18,27 @@ window.CH25_IOP_GUIDE = {
           'and catches any error with 99% probability. The proof is written in ' +
           'a special format so that any lie corrupts enough of the text to be ' +
           'detectable by spot-checking.',
+        mermaidDiagram:
+          'sequenceDiagram\n' +
+          '    participant P as 🔒 Prover\n' +
+          '    participant Pi as 📜 Proof π = [b₁, b₂, ..., bₙ]\n' +
+          '    participant V as 🔍 Verifier\n' +
+          '    Note over P: Writes static proof π<br/>(no interaction)\n' +
+          '    P->>Pi: Write proof string π ∈ Σᵐ\n' +
+          '    Note over V: Uses O(log n) random bits<br/>to pick query positions\n' +
+          '    V->>Pi: Query position i₁\n' +
+          '    Pi-->>V: b[i₁]\n' +
+          '    V->>Pi: Query position i₂\n' +
+          '    Pi-->>V: b[i₂]\n' +
+          '    V->>Pi: Query position i₃\n' +
+          '    Pi-->>V: b[i₃]\n' +
+          '    Note over V: Reads only O(1) bits total\n' +
+          '    alt All checks pass\n' +
+          '        V->>V: ✅ ACCEPT\n' +
+          '    else Any check fails\n' +
+          '        V->>V: ❌ REJECT\n' +
+          '    end\n' +
+          '    Note over P,V: Completeness: true proof ⟹ always accepts<br/>Soundness: false proof ⟹ rejects w.p. ≥ 1/2<br/>PCP Theorem: NP = PCP[O(log n), O(1)]',
         diagram:
           '┌──────────────────────────────────────────────────────┐\n' +
           '│        PCP: Probabilistically Checkable Proof        │\n' +
@@ -111,6 +132,34 @@ window.CH25_IOP_GUIDE = {
           'evidence box. The judge randomly opens a few drawers from any box submitted ' +
           'so far. The witness cannot change previously submitted boxes, but can adapt ' +
           'future submissions to the judge\'s questions.',
+        mermaidDiagram:
+          'sequenceDiagram\n' +
+          '    participant P as 🔒 Prover\n' +
+          '    participant V as 🔍 Verifier\n' +
+          '    rect rgb(30, 40, 60)\n' +
+          '        Note over P,V: Round 1\n' +
+          '        P->>V: Send oracle f₁ (polynomial)\n' +
+          '        Note over V: Oracle access: spot-check f₁<br/>at random positions\n' +
+          '        V->>P: Random challenge r₁\n' +
+          '    end\n' +
+          '    rect rgb(40, 30, 60)\n' +
+          '        Note over P,V: Round 2\n' +
+          '        Note over P: Computes f₂ using r₁\n' +
+          '        P->>V: Send oracle f₂ (depends on r₁)\n' +
+          '        Note over V: Oracle access: spot-check f₁ AND f₂\n' +
+          '        V->>P: Random challenge r₂\n' +
+          '    end\n' +
+          '    rect rgb(50, 30, 50)\n' +
+          '        Note over P,V: Round k (final)\n' +
+          '        P->>V: Send oracle fₖ\n' +
+          '        Note over V: Query f₁, f₂, ..., fₖ<br/>at chosen positions\n' +
+          '    end\n' +
+          '    alt All oracle checks pass\n' +
+          '        V->>V: ✅ ACCEPT\n' +
+          '    else Any check fails\n' +
+          '        V->>V: ❌ REJECT\n' +
+          '    end\n' +
+          '    Note over P,V: Key: V has oracle access (spot-checks) to each fᵢ<br/>Combines IP interactivity + PCP oracle access',
         diagram:
           '┌──────────────────────────────────────────────────────┐\n' +
           '│         IOP: Interactive Oracle Proof                 │\n' +
@@ -205,6 +254,27 @@ window.CH25_IOP_GUIDE = {
           'random brushstrokes. You cannot inspect every pixel, but you can catch ' +
           'a forgery that differs in more than a few percent of strokes. Proximity ' +
           'is the key relaxation that makes sublinear verification possible.',
+        mermaidDiagram:
+          'sequenceDiagram\n' +
+          '    participant P as 🔒 Prover\n' +
+          '    participant V as 🔍 Verifier\n' +
+          '    Note over P: Holds f : L → F<br/>(evaluations on domain L)\n' +
+          '    Note over V: Goal: Is f δ-close to RS[F, L, d]?<br/>i.e., does f agree with deg < d poly<br/>on ≥ (1−δ)|L| positions?\n' +
+          '    rect rgb(30, 50, 40)\n' +
+          '        Note over P,V: Multi-round proximity test\n' +
+          '        P->>V: Commit to f (oracle access)\n' +
+          '        V->>P: Random folding challenge α₁\n' +
+          '        P->>V: Send folded oracle f′ (reduced degree)\n' +
+          '        V->>P: Random folding challenge α₂\n' +
+          '        P->>V: Send folded oracle f″ (further reduced)\n' +
+          '        Note over P,V: ... log|L| rounds ...\n' +
+          '    end\n' +
+          '    Note over V: Query f at O(log|L|) positions<br/>Check consistency across rounds\n' +
+          '    alt f is δ-close to RS[F,L,d]\n' +
+          '        V->>V: ✅ ACCEPT (extractor recovers p)\n' +
+          '    else f is δ-far from RS[F,L,d]\n' +
+          '        V->>V: ❌ REJECT\n' +
+          '    end',
         diagram:
           '┌──────────────────────────────────────────────────────┐\n' +
           '│         IOPP: IOP of Proximity                       │\n' +
@@ -305,6 +375,38 @@ window.CH25_IOP_GUIDE = {
           'consistency. After log(d) rounds, you are left with a single note that ' +
           'you can verify directly. A fake pianist cannot maintain consistency ' +
           'through all the folding steps.',
+        mermaidDiagram:
+          'sequenceDiagram\n' +
+          '    participant P as 🔒 Prover\n' +
+          '    participant V as 🔍 Verifier\n' +
+          '    Note over P: f₀(x) on L₀, deg < d\n' +
+          '    rect rgb(30, 40, 60)\n' +
+          '        Note over P,V: Round 0 — Split f₀(x) = g₀(x²) + x·h₀(x²)\n' +
+          '        P->>V: Commit f₀ (Merkle root of evals on L₀)\n' +
+          '        V->>P: Random challenge α₀\n' +
+          '    end\n' +
+          '    rect rgb(35, 35, 65)\n' +
+          '        Note over P,V: Round 1 — f₁(y) = g₀(y) + α₀·h₀(y), deg < d/2\n' +
+          '        Note over P: Domain halves: L₁ = {x² : x ∈ L₀}\n' +
+          '        P->>V: Commit f₁ (Merkle root of evals on L₁)\n' +
+          '        V->>P: Random challenge α₁\n' +
+          '    end\n' +
+          '    rect rgb(40, 30, 70)\n' +
+          '        Note over P,V: Round 2 — f₂ = g₁ + α₁·h₁, deg < d/4\n' +
+          '        P->>V: Commit f₂\n' +
+          '        V->>P: Random challenge α₂\n' +
+          '    end\n' +
+          '    Note over P,V: ⋮ log(d) rounds total ⋮\n' +
+          '    rect rgb(50, 25, 50)\n' +
+          '        Note over P,V: Final Round — f_final = CONSTANT\n' +
+          '        P->>V: Send constant value directly\n' +
+          '    end\n' +
+          '    Note over V: CONSISTENCY CHECK:<br/>Pick x ∈ Lᵢ, read fᵢ(x) and fᵢ(−x),<br/>verify fᵢ₊₁(x²) matches folding\n' +
+          '    alt All consistency checks pass\n' +
+          '        V->>V: ✅ ACCEPT (f₀ is close to deg < d)\n' +
+          '    else Inconsistency found\n' +
+          '        V->>V: ❌ REJECT\n' +
+          '    end',
         diagram:
           '┌──────────────────────────────────────────────────────┐\n' +
           '│          FRI: Recursive Degree Halving                │\n' +
@@ -405,6 +507,21 @@ window.CH25_IOP_GUIDE = {
           'SUM formula is correct by evaluating a random weighted combination. ' +
           'If the sum claimed is wrong, a random challenge will catch the ' +
           'discrepancy with high probability over a large field.',
+        mermaidDiagram:
+          'sequenceDiagram\n' +
+          '    participant P as 🔒 Prover\n' +
+          '    participant V as 🔍 Verifier\n' +
+          '    Note over P,V: Claim: Σ_{a∈H} f(a) = σ\n' +
+          '    Note over P: Knows f(x) and witness<br/>Key identity: f(x) − σ/|H| = Z_H(x)·q(x) + r(x)<br/>where Z_H(x) = Π_{a∈H}(x−a)\n' +
+          '    P->>V: Claim σ + commit to quotient q(x)\n' +
+          '    V->>P: Random challenge r ← F\n' +
+          '    Note over V: Evaluate at random point r:<br/>Check f(r) − σ/|H| = Z_H(r)·q(r)<br/>(reduces sum to single point evaluation!)\n' +
+          '    alt Identity holds at r\n' +
+          '        V->>V: ✅ ACCEPT\n' +
+          '    else Identity fails at r\n' +
+          '        V->>V: ❌ REJECT\n' +
+          '    end\n' +
+          '    Note over P,V: Soundness: Schwartz-Zippel<br/>False identity fails at random point<br/>w.p. ≥ 1 − deg/|F|',
         diagram:
           '┌──────────────────────────────────────────────────────┐\n' +
           '│       Univariate Sumcheck Protocol                   │\n' +
@@ -504,6 +621,24 @@ window.CH25_IOP_GUIDE = {
           'spot errors) and a compressed summary (high rate: less redundancy, harder ' +
           'to verify but shorter). In STARKs, you pick a redundancy level that ' +
           'balances proof size against soundness guarantees.',
+        mermaidDiagram:
+          'flowchart LR\n' +
+          '    subgraph MSG["📝 Message"]\n' +
+          '        M["m₀, m₁, ..., m_{k-1}<br/>(k symbols)"]\n' +
+          '    end\n' +
+          '    subgraph ENC["🔢 RS Encoding"]\n' +
+          '        E["p(x) = m₀ + m₁x + ... + m_{k-1}x^{k-1}"]\n' +
+          '    end\n' +
+          '    subgraph CW["📜 Codeword"]\n' +
+          '        C["p(a₀), p(a₁), ..., p(a_{n-1})<br/>(n evaluations)"]\n' +
+          '    end\n' +
+          '    M --> E --> C\n' +
+          '    subgraph PARAMS["📊 Parameters"]\n' +
+          '        R["Rate ρ = k/n<br/>Distance d = n−k+1<br/>Blowup = 1/ρ"]\n' +
+          '    end\n' +
+          '    subgraph SWITCH["🔄 Code Switching"]\n' +
+          '        LO["Low rate 1/8<br/>More redundancy<br/>Better soundness"] -->|between rounds| HI["High rate 1/2<br/>Less redundancy<br/>Smaller proof"]\n' +
+          '    end',
         diagram:
           '┌──────────────────────────────────────────────────────┐\n' +
           '│     Reed-Solomon Encoding &amp; Rate                     │\n' +
@@ -600,6 +735,21 @@ window.CH25_IOP_GUIDE = {
           'a labeled gate with specific wiring. Different factory layouts (R1CS, AIR, ' +
           'PLONKish) suit different recipes — a repetitive recipe works best on a ' +
           'conveyor belt (AIR), while a complex one-off dish needs a flexible kitchen (PLONKish).',
+        mermaidDiagram:
+          'flowchart LR\n' +
+          '    subgraph INPUT["💻 Computation"]\n' +
+          '        X["x² + x + 5 = 35"]\n' +
+          '    end\n' +
+          '    subgraph SYSTEMS["⚙️ Constraint Systems"]\n' +
+          '        direction TB\n' +
+          '        R1CS["R1CS<br/>Az ∘ Bz = Cz<br/>deg-2 only<br/>→ Groth16, Spartan"]\n' +
+          '        AIR["AIR<br/>s_{i+1} = f(sᵢ)<br/>repeated structure<br/>→ STARKs"]\n' +
+          '        PLONK["PLONKish<br/>custom gates + lookups<br/>most flexible<br/>→ PLONK, Halo2"]\n' +
+          '    end\n' +
+          '    X --> R1CS & AIR & PLONK\n' +
+          '    style R1CS fill:#1a2744\n' +
+          '    style AIR fill:#1a3a2a\n' +
+          '    style PLONK fill:#3a1a3a',
         diagram:
           '┌──────────────────────────────────────────────────────┐\n' +
           '│  Computation: x^2 + x + 5 = 35 (x = 5)             │\n' +
@@ -697,6 +847,38 @@ window.CH25_IOP_GUIDE = {
           'transforms while preserving the essential truth. Raw computation is ' +
           'bulky and unstructured; the pipeline refines it into a tiny, ' +
           'verifiable gem that anyone can inspect in milliseconds.',
+        mermaidDiagram:
+          'flowchart TD\n' +
+          '    subgraph COMP["💻 Computation"]\n' +
+          '        X["x² + x + 5 = 35<br/>(witness: x = 5)"]\n' +
+          '    end\n' +
+          '    subgraph ARITH["Stage 1: Arithmetization"]\n' +
+          '        R1["R1CS<br/>Az ∘ Bz = Cz<br/>(deg-2 only)"] \n' +
+          '        AIR["AIR<br/>s_{i+1} = f(sᵢ)<br/>(repeated structure)"]\n' +
+          '        PLK["PLONKish<br/>custom gates + lookups<br/>(most flexible)"]\n' +
+          '    end\n' +
+          '    subgraph PIOP["Stage 2: Polynomial IOP"]\n' +
+          '        G16["Groth16<br/>(linear PCP)"]\n' +
+          '        STK["STARK<br/>(FRI IOPP)"]\n' +
+          '        PLN["PLONK<br/>(poly commit)"]\n' +
+          '    end\n' +
+          '    subgraph COMPILE["Stage 3: Compilation"]\n' +
+          '        C1["Fiat-Shamir + KZG"]\n' +
+          '        C2["BCS + Merkle"]\n' +
+          '        C3["Fiat-Shamir + KZG"]\n' +
+          '    end\n' +
+          '    subgraph RESULT["🎯 Result"]\n' +
+          '        S1["SNARK<br/>trusted setup<br/>192B, 3ms"]\n' +
+          '        S2["STARK<br/>transparent<br/>~45KB, 15ms"]\n' +
+          '        S3["SNARK<br/>universal setup<br/>~1.2KB, 5ms"]\n' +
+          '    end\n' +
+          '    X --> R1 & AIR & PLK\n' +
+          '    R1 --> G16 --> C1 --> S1\n' +
+          '    AIR --> STK --> C2 --> S2\n' +
+          '    PLK --> PLN --> C3 --> S3\n' +
+          '    style S1 fill:#1a3a2a\n' +
+          '    style S2 fill:#1a2744\n' +
+          '    style S3 fill:#3a1a3a',
         diagram:
           '┌──────────────────────────────────────────────────────┐\n' +
           '│  COMPUTATION → ARITHMETIZE → POLY IOP → COMPILE     │\n' +
